@@ -1,4 +1,0 @@
-get_filename_component(YAVIN_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-
-set(YAVIN_INCLUDE_DIRS ${YAVIN_CMAKE_DIR})
-set(YAVIN_LIBRARIES ${YAVIN_CMAKE_DIR}/build/libyavin.so)

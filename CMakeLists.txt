@@ -1,50 +1,90 @@
-cmake_minimum_required (VERSION 2.6)
-project (yavin)
-set(CMAKE_CXX_STANDARD 17)
+cmake_minimum_required(VERSION 3.5)
+set (CMAKE_CXX_STANDARD 17)
+project(yavin)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+set(YAVIN_MAJOR_VERSION 0)
+set(YAVIN_MINOR_VERSION 1)
+set(YAVIN_PATCH_VERSION 0)
+set(YAVIN_VERSION
+  ${YAVIN_MAJOR_VERSION}.${YAVIN_MINOR_VERSION}.${YAVIN_PATCH_VERSION})
+
+# Offer the user the choice of overriding the installation directories
+set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
+set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
+set(INSTALL_INCLUDE_DIR include CACHE PATH
+  "Installation directory for header files")
+if(WIN32 AND NOT CYGWIN)
+  set(DEF_INSTALL_CMAKE_DIR CMake)
+else()
+  set(DEF_INSTALL_CMAKE_DIR lib/CMake/yavin)
+endif()
+set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+  "Installation directory for CMake files")
+
+# Make relative paths absolute (needed later on)
+foreach(p LIB BIN INCLUDE CMAKE)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
+
+find_package(gl3w REQUIRED)
+find_package(GLFW3 REQUIRED)
+find_package(glm REQUIRED)
+find_package(OpenGL)
+
+configure_file(Yavin/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/Yavin/config.h" @ONLY)
 
 file(GLOB hdr Yavin/*.h)
 file(GLOB src Yavin/*.cpp)
-set(all_src ${src} ${hdr})
-# set(src Yavin/ComputeShader.cpp Yavin/FragmentShader.cpp Yavin/GeometryShader.cpp Yavin/GLSLVar.cpp Yavin/gl_wrapper.cpp Yavin/IndexBuffer.cpp Yavin/Mesh.cpp Yavin/Shader.cpp Yavin/ShaderStage.cpp Yavin/ShaderStageParser.cpp Yavin/TesselationControlShader.cpp Yavin/TesselationEvaluationShader.cpp Yavin/tiny_obj_loader.cpp Yavin/VertexArray.cpp Yavin/VertexShader.cpp Yavin/Window.cpp Yavin/Texture2D.cpp Yavin/FrameBuffer.cpp Yavin/error_check.cpp)
 
-add_library (yavin SHARED ${src})
+add_library(yavin SHARED ${src})
 
-IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
-      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
-ENDIF(NOT CMAKE_BUILD_TYPE)
+target_include_directories(yavin PUBLIC ${OPENGL_INCLUDE_DIR} ${GLM_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRECTORIES})
+target_link_libraries(yavin ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} gl3w ${GLFW_LIBRARIES})
 
-find_package(glfw3 REQUIRED)
-find_package(gl3w REQUIRED)
-find_package(glm REQUIRED)
-find_package(Threads REQUIRED)
+install(TARGETS yavin
+  # IMPORTANT: Add the yavin library to the "export-set"
+  EXPORT yavinTargets
+  RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin
+  LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT shlib
+  PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/yavin"
+    COMPONENT dev)
 
-target_link_libraries(yavin glfw gl3w glm png ${CMAKE_THREAD_LIBS_INIT})
+# add_subdirectory(test)
 
-install (TARGETS yavin DESTINATION bin)
-install (FILES yavin ${src} DESTINATION include)
+# Add all targets to the build-tree export set
+export(TARGETS yavin
+  FILE "${PROJECT_BINARY_DIR}/yavinTargets.cmake")
 
-add_subdirectory(test)
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE yavin)
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -pedantic")
+# Create the yavinConfig.cmake and yavinConfigVersion files
+file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
+   "${INSTALL_INCLUDE_DIR}")
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+configure_file(yavinConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/yavinConfig.cmake" @ONLY)
+# ... for the install tree
+set(CONF_INCLUDE_DIRS "\${YAVIN_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(yavinConfig.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/yavinConfig.cmake" @ONLY)
+# ... for both
+configure_file(yavinConfigVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/yavinConfigVersion.cmake" @ONLY)
 
-# foreach (SOURCE_FILE ${all_src})
-#   message(STATUS ${SOURCE_FILE})
-# endforeach ()
+# Install the yavinConfig.cmake and yavinConfigVersion.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/yavinConfig.cmake"
+  "${PROJECT_BINARY_DIR}/yavinConfigVersion.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
-# cppcheck
-add_custom_target(
-        cppcheck
-        COMMAND /usr/bin/cppcheck 
-        -I../Yavin
-        --enable=warning,performance,portability,information,missingInclude
-        --std=c++11
-        --template="[{severity}][{id}] {message} {callstack} \(On {file}:{line}\)"
-        --verbose
-        --quiet
-        --xml-version=2
-        ${src}
-        2> cppcheck.xml
-)
+# Install the export set for use with the install-tree
+install(EXPORT yavinTargets DESTINATION
+  "${INSTALL_CMAKE_DIR}" COMPONENT dev)

@@ -222,7 +222,7 @@ struct comb<uint16_t, BGRA> {
 template <>
 struct comb<int32_t, R> {
   static constexpr GLint        internal_format = GL_R32I;
-  static constexpr GLenum       format          = GL_RED;
+  static constexpr GLenum       format          = GL_RED_INTEGER;
   static constexpr GLenum       type            = GL_INT;
   static constexpr unsigned int num_components  = 1;
 };
@@ -230,7 +230,7 @@ struct comb<int32_t, R> {
 template <>
 struct comb<int32_t, RG> {
   static constexpr GLint        internal_format = GL_RG32I;
-  static constexpr GLenum       format          = GL_RG;
+  static constexpr GLenum       format          = GL_RG_INTEGER;
   static constexpr GLenum       type            = GL_INT;
   static constexpr unsigned int num_components  = 2;
 };
@@ -238,7 +238,7 @@ struct comb<int32_t, RG> {
 template <>
 struct comb<int32_t, RGB> {
   static constexpr GLint        internal_format = GL_RGB32I;
-  static constexpr GLenum       format          = GL_RGB;
+  static constexpr GLenum       format          = GL_RGB_INTEGER;
   static constexpr GLenum       type            = GL_INT;
   static constexpr unsigned int num_components  = 3;
 };
@@ -246,7 +246,7 @@ struct comb<int32_t, RGB> {
 template <>
 struct comb<int32_t, RGBA> {
   static constexpr GLint        internal_format = GL_RGBA32I;
-  static constexpr GLenum       format          = GL_RGBA;
+  static constexpr GLenum       format          = GL_RGBA_INTEGER;
   static constexpr GLenum       type            = GL_INT;
   static constexpr unsigned int num_components  = 4;
 };
@@ -254,7 +254,7 @@ struct comb<int32_t, RGBA> {
 template <>
 struct comb<int32_t, BGR> {
   static constexpr GLint        internal_format = GL_RGB32I;
-  static constexpr GLenum       format          = GL_BGR;
+  static constexpr GLenum       format          = GL_BGR_INTEGER;
   static constexpr GLenum       type            = GL_INT;
   static constexpr unsigned int num_components  = 3;
 };
@@ -262,7 +262,7 @@ struct comb<int32_t, BGR> {
 template <>
 struct comb<int32_t, BGRA> {
   static constexpr GLint        internal_format = GL_RGBA32I;
-  static constexpr GLenum       format          = GL_BGRA;
+  static constexpr GLenum       format          = GL_BGRA_INTEGER;
   static constexpr GLenum       type            = GL_INT;
   static constexpr unsigned int num_components  = 4;
 };
@@ -271,7 +271,7 @@ struct comb<int32_t, BGRA> {
 template <>
 struct comb<uint32_t, R> {
   static constexpr GLint        internal_format = GL_R32UI;
-  static constexpr GLenum       format          = GL_RED;
+  static constexpr GLenum       format          = GL_RED_INTEGER;
   static constexpr GLenum       type            = GL_UNSIGNED_INT;
   static constexpr unsigned int num_components  = 1;
 };
@@ -279,7 +279,7 @@ struct comb<uint32_t, R> {
 template <>
 struct comb<uint32_t, RG> {
   static constexpr GLint        internal_format = GL_RG32UI;
-  static constexpr GLenum       format          = GL_RG;
+  static constexpr GLenum       format          = GL_RG_INTEGER;
   static constexpr GLenum       type            = GL_UNSIGNED_INT;
   static constexpr unsigned int num_components  = 2;
 };
@@ -295,7 +295,7 @@ struct comb<uint32_t, RGB> {
 template <>
 struct comb<uint32_t, RGBA> {
   static constexpr GLint        internal_format = GL_RGBA32UI;
-  static constexpr GLenum       format          = GL_RGBA;
+  static constexpr GLenum       format          = GL_RGBA_INTEGER;
   static constexpr GLenum       type            = GL_UNSIGNED_INT;
   static constexpr unsigned int num_components  = 4;
 };
@@ -303,7 +303,7 @@ struct comb<uint32_t, RGBA> {
 template <>
 struct comb<uint32_t, BGR> {
   static constexpr GLint        internal_format = GL_RGB32UI;
-  static constexpr GLenum       format          = GL_BGR;
+  static constexpr GLenum       format          = GL_BGR_INTEGER;
   static constexpr GLenum       type            = GL_UNSIGNED_INT;
   static constexpr unsigned int num_components  = 3;
 };
@@ -311,7 +311,7 @@ struct comb<uint32_t, BGR> {
 template <>
 struct comb<uint32_t, BGRA> {
   static constexpr GLint        internal_format = GL_RGBA32UI;
-  static constexpr GLenum       format          = GL_BGRA;
+  static constexpr GLenum       format          = GL_BGRA_INTEGER;
   static constexpr GLenum       type            = GL_UNSIGNED_INT;
   static constexpr unsigned int num_components  = 4;
 };
@@ -397,7 +397,7 @@ struct comb<float, Depth32> {
   static constexpr GLenum       type            = GL_FLOAT;
   static constexpr unsigned int num_components  = 1;
 };
-}  // TexHelper
+}  // namespace TexHelper
 }  // namespace Yavin
 
 #endif
