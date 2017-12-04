@@ -35,8 +35,7 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> 
    * @param[in]  keep_data_on_cpu  if direct upload is true, specify if data
    *                               shall be kept in cpu
    */
-  VertexBuffer(const std::vector<data_t>& data, bool direct_upload = false,
-               bool keep_data_on_cpu = false);
+  VertexBuffer(const std::vector<data_t>& data, bool direct_upload = false, bool keep_data_on_cpu = false);
 
   /**
    * @brief      constructor initializing data on cpu via rvalue
@@ -47,8 +46,7 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> 
    * @param[in]  keep_data_on_cpu  if direct upload is true, specify if data
    *                               shall be kept in cpu
    */
-  VertexBuffer(std::vector<data_t>&& data, bool direct_upload = false,
-               bool keep_data_on_cpu = false);
+  VertexBuffer(std::vector<data_t>&& data, bool direct_upload = false, bool keep_data_on_cpu = false);
 
   /**
    * @brief      constructor initializing data on cpu via initializer list
@@ -59,8 +57,7 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> 
    * @param[in]  keep_data_on_cpu  if direct upload is true, specify if data
    *                               shall be kept in cpu
    */
-  VertexBuffer(std::initializer_list<data_t>&& list, bool direct_upload = false,
-               bool keep_data_on_cpu = false);
+  VertexBuffer(std::initializer_list<data_t>&& list, bool direct_upload = false, bool keep_data_on_cpu = false);
 
   /**
    * @brief      uploads data to gpu
@@ -83,17 +80,17 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> 
   auto end() const;
 
   template <unsigned int N>
-  auto                   get_view();
+  auto get_view();
 
   template <unsigned int N>
-  const auto             get_view() const;
+  auto get_view() const;
   /**
    * @brief      index element-wise
    *
    * @return     returns a tuple
    */
   auto operator[](const size_t idx);
-  const auto operator[](const size_t idx) const;
+  auto operator[](const size_t idx) const;
 
   /**
    * index byte-wise
@@ -125,28 +122,22 @@ VertexBuffer<Ts...>::VertexBuffer(VertexBuffer&& other)
 }
 
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(const std::vector<data_t>& data, bool direct_upload,
-                                  bool keep_data_on_cpu)
+VertexBuffer<Ts...>::VertexBuffer(const std::vector<data_t>& data, bool direct_upload, bool keep_data_on_cpu)
     : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(data, direct_upload, keep_data_on_cpu) {}
 
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(std::vector<data_t>&& data, bool direct_upload,
-                                  bool keep_data_on_cpu)
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(data), direct_upload,
-                                                          keep_data_on_cpu) {}
+VertexBuffer<Ts...>::VertexBuffer(std::vector<data_t>&& data, bool direct_upload, bool keep_data_on_cpu)
+    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(data), direct_upload, keep_data_on_cpu) {}
 
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(std::initializer_list<data_t>&& list, bool direct_upload,
-                                  bool keep_data_on_cpu)
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(list), direct_upload,
-                                                          keep_data_on_cpu) {}
+VertexBuffer<Ts...>::VertexBuffer(std::initializer_list<data_t>&& list, bool direct_upload, bool keep_data_on_cpu)
+    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(list), direct_upload, keep_data_on_cpu) {}
 
 template <typename... Ts>
 void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
   // gpu buffer neiter created nor initialized
   if (!m_gpu_buffer_created) {
-    glNamedBufferData(this->m_id, sizeofAttributes * this->cpu_size(), &this->m_data[0],
-                      GL_STATIC_DRAW);
+    glNamedBufferData(this->m_id, sizeofAttributes * this->cpu_size(), &this->m_data[0], GL_STATIC_DRAW);
     gl_error_check("glNamedBufferData");
 
     this->m_gpu_size = this->cpu_size();
@@ -221,27 +212,25 @@ auto VertexBuffer<Ts...>::end() const {
 
 template <typename... Ts>
 template <unsigned int N>
-auto                   VertexBuffer<Ts...>::get_view() {
+auto VertexBuffer<Ts...>::get_view() {
   return view<N>(*this);
 }
 
 template <typename... Ts>
 template <unsigned int N>
-const auto             VertexBuffer<Ts...>::get_view() const {
+auto VertexBuffer<Ts...>::get_view() const {
   return view<N>(*this);
 }
 
 template <typename... Ts>
 auto VertexBuffer<Ts...>::operator[](const size_t idx) {
-  return tuple_constructor<data_representation<Ts...>, sizeof...(Ts), 0,
-                           Yavin::attrib_pack_size<Ts...>::value,
+  return tuple_constructor<data_representation<Ts...>, sizeof...(Ts), 0, Yavin::attrib_pack_size<Ts...>::value,
                            Ts...>::construct(this->m_data, idx, Yavin::attr_prefs<Ts...>::offsets);
 }
 
 template <typename... Ts>
-const auto VertexBuffer<Ts...>::operator[](const size_t idx) const {
-  return tuple_constructor<data_representation<Ts...>, sizeof...(Ts), 0,
-                           Yavin::attrib_pack_size<Ts...>::value,
+auto VertexBuffer<Ts...>::operator[](const size_t idx) const {
+  return tuple_constructor<data_representation<Ts...>, sizeof...(Ts), 0, Yavin::attrib_pack_size<Ts...>::value,
                            Ts...>::construct(this->m_data, idx, Yavin::attr_prefs<Ts...>::offsets);
 }
 
@@ -256,8 +245,7 @@ void VertexBuffer<Ts...>::download_data() {
   gl_error_check("glMapNamedBuffer");
   this->m_data.resize(this->m_gpu_size);
   unsigned char* tmp_cpu_buffer = reinterpret_cast<unsigned char*>(&this->m_data[0]);
-  for (size_t i       = 0; i < this->m_gpu_size * attrib_pack_size<Ts...>::value; ++i)
-    tmp_cpu_buffer[i] = gpu_buffer[i];
+  for (size_t i = 0; i < this->m_gpu_size * attrib_pack_size<Ts...>::value; ++i) tmp_cpu_buffer[i] = gpu_buffer[i];
   glUnmapNamedBuffer(this->m_id);
   gl_error_check("glUnmapNamedBuffer");
   this->m_is_consistent = true;
@@ -338,8 +326,7 @@ template <typename... Ts>
 template <unsigned int N>
 class VertexBuffer<Ts...>::view<N>::iterator {
  public:
-  iterator(VertexBuffer<Ts...>::view<N>& vbo_view, const size_t idx)
-      : m_vbo_view(vbo_view), m_idx(idx) {}
+  iterator(VertexBuffer<Ts...>::view<N>& vbo_view, const size_t idx) : m_vbo_view(vbo_view), m_idx(idx) {}
 
   iterator(const iterator& other) : m_vbo_view(other.m_vbo_view), m_idx(other.m_idx) {}
 
@@ -364,8 +351,7 @@ template <typename... Ts>
 template <unsigned int N>
 class VertexBuffer<Ts...>::view<N>::const_iterator {
  public:
-  const_iterator(const VertexBuffer<Ts...>::view<N>& vbo_view, const size_t idx)
-      : m_vbo_view(vbo_view), m_idx(idx) {}
+  const_iterator(const VertexBuffer<Ts...>::view<N>& vbo_view, const size_t idx) : m_vbo_view(vbo_view), m_idx(idx) {}
 
   const_iterator(const const_iterator& other) : m_vbo_view(other.m_vbo_view), m_idx(other.m_idx) {}
 

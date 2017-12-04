@@ -23,24 +23,24 @@ class Texture2D : public Yavin::Texture {
 
   Texture2D(unsigned int width, unsigned int height);
 
-  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
-            bool direct_upload = true, bool keep_data_on_cpu = false);
+  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data, bool direct_upload = true,
+            bool keep_data_on_cpu = false);
 
-  Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data,
-            bool direct_upload = true, bool keep_data_on_cpu = false);
+  Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data, bool direct_upload = true,
+            bool keep_data_on_cpu = false);
 
-  Texture2D(unsigned int width, unsigned int height, std::initializer_list<T>&& list,
-            bool direct_upload = true, bool keep_data_on_cpu = false);
-
-  template <typename S>
-  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
-            bool direct_upload = true, bool keep_data_on_cpu = false);
+  Texture2D(unsigned int width, unsigned int height, std::initializer_list<T>&& list, bool direct_upload = true,
+            bool keep_data_on_cpu = false);
 
   template <typename S>
-  Texture2D(unsigned int width, unsigned int height, const std::initializer_list<S>& list,
-            bool direct_upload = true, bool keep_data_on_cpu = false);
+  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data, bool direct_upload = true,
+            bool keep_data_on_cpu = false);
 
-  void bind(unsigned int i = 0);
+  template <typename S>
+  Texture2D(unsigned int width, unsigned int height, const std::initializer_list<S>& list, bool direct_upload = true,
+            bool keep_data_on_cpu = false);
+
+  void        bind(unsigned int i = 0);
   static void unbind(unsigned int i = 0);
 
   void set_interpolation_mode(Yavin::Texture::InterpolationMode mode);
@@ -51,28 +51,25 @@ class Texture2D : public Yavin::Texture {
   void set_wrap_mode_s(Yavin::Texture::WrapMode mode);
   void set_wrap_mode_t(Yavin::Texture::WrapMode mode);
 
-  const auto  width() const;
-  const auto  height() const;
-  const auto  is_consistent() const;
+  auto        width() const;
+  auto        height() const;
+  auto        is_consistent() const;
   const auto& data() const;
 
-  void load_png(const std::string& filepath, bool direct_upload = true,
-                bool keep_data_on_cpu = false);
+  void load_png(const std::string& filepath, bool direct_upload = true, bool keep_data_on_cpu = false);
 
   void save_png(const std::string& filepath);
 
-  void upload_data(unsigned int width, unsigned int height, const std::vector<T>& data,
-                   bool keep_data_on_cpu = false);
+  void upload_data(unsigned int width, unsigned int height, const std::vector<T>& data, bool keep_data_on_cpu = false);
 
-  void upload_data(unsigned int width, unsigned int height, std::vector<T>&& data,
-                   bool keep_data_on_cpu = false);
+  void upload_data(unsigned int width, unsigned int height, std::vector<T>&& data, bool keep_data_on_cpu = false);
 
   void upload_data(unsigned int width, unsigned int height, std::initializer_list<T>&& data,
                    bool keep_data_on_cpu = false);
 
   void upload_data(bool keep_data_on_cpu = false);
 
-  void resize(unsigned int w, unsigned int h);
+  void        resize(unsigned int w, unsigned int h);
   const auto& download_data();
 
   static constexpr unsigned int n               = TexHelper::comb<T, Components>::num_components;
@@ -87,8 +84,7 @@ class Texture2D : public Yavin::Texture {
 };
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(const std::string& filepath, bool direct_upload,
-                                    bool keep_data_on_cpu) {
+Texture2D<T, Components>::Texture2D(const std::string& filepath, bool direct_upload, bool keep_data_on_cpu) {
   glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
   gl_error_check("glCreateTextures");
   assert(filepath.substr(filepath.size() - 3, 3) == "png");
@@ -97,8 +93,7 @@ Texture2D<T, Components>::Texture2D(const std::string& filepath, bool direct_upl
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height)
-    : Texture(), m_width(0), m_height(0) {
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height) : Texture(), m_width(0), m_height(0) {
   glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
   gl_error_check("glCreateTextures");
   bind();
@@ -138,9 +133,8 @@ Texture2D<T, Components>::Texture2D(Texture2D&& other)
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<T>& data, bool direct_upload,
-                                    bool keep_data_on_cpu)
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
+                                    bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(data) {
   if (direct_upload) {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
@@ -151,8 +145,8 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data,
-                                    bool direct_upload, bool keep_data_on_cpu)
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data, bool direct_upload,
+                                    bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(std::move(data)) {
   if (direct_upload) {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
@@ -163,9 +157,8 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    std::initializer_list<T>&& list, bool direct_upload,
-                                    bool keep_data_on_cpu)
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std::initializer_list<T>&& list,
+                                    bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(std::move(list)) {
   if (direct_upload) {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
@@ -177,13 +170,11 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
 
 template <typename T, typename Components>
 template <typename S>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<S>& data, bool direct_upload,
-                                    bool keep_data_on_cpu)
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
+                                    bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height) {
   m_data.reserve(data.size());
-  for (const auto& date : data)
-    m_data.push_back(static_cast<T>(date));
+  for (const auto& date : data) m_data.push_back(static_cast<T>(date));
 
   if (direct_upload) {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
@@ -195,12 +186,10 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
 
 template <typename T, typename Components>
 template <typename S>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::initializer_list<S>& list, bool direct_upload,
-                                    bool keep_data_on_cpu)
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, const std::initializer_list<S>& list,
+                                    bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height) {
-  for (const auto& date : list)
-    m_data.push_back(static_cast<T>(date));
+  for (const auto& date : list) m_data.push_back(static_cast<T>(date));
   if (direct_upload) {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
     gl_error_check("glCreateTextures");
@@ -263,17 +252,17 @@ void Texture2D<T, Components>::set_wrap_mode_t(WrapMode mode) {
 }
 
 template <typename T, typename Components>
-const auto Texture2D<T, Components>::width() const {
+auto Texture2D<T, Components>::width() const {
   return m_width;
 }
 
 template <typename T, typename Components>
-const auto Texture2D<T, Components>::height() const {
+auto Texture2D<T, Components>::height() const {
   return m_height;
 }
 
 template <typename T, typename Components>
-const auto Texture2D<T, Components>::is_consistent() const {
+auto Texture2D<T, Components>::is_consistent() const {
   return m_is_consistent;
 }
 
@@ -283,161 +272,142 @@ const auto& Texture2D<T, Components>::data() const {
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::load_png(const std::string& filepath, bool direct_upload,
-                                        bool keep_data_on_cpu) {
-  if
-    constexpr(std::is_same<Components, RGB>::value) {
-      png::image<png::rgb_pixel> image;
-      image.read(filepath);
-      m_width  = image.get_width();
-      m_height = image.get_height();
-      m_data.reserve(m_width * m_height * n);
-      for (png::uint_32 y = image.get_height(); y > 0; --y)
-        for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-          m_data.push_back(static_cast<T>(image[y - 1][x].red));
-          m_data.push_back(static_cast<T>(image[y - 1][x].green));
-          m_data.push_back(static_cast<T>(image[y - 1][x].blue));
-        }
-      if
-        constexpr(std::is_same<float, T>::value) for (auto& date : m_data) date /= 255.0f;
-    }
-  else if
-    constexpr(std::is_same<Components, RGBA>::value) {
-      png::image<png::rgba_pixel> image;
-      image.read(filepath);
-      m_width  = image.get_width();
-      m_height = image.get_height();
-      m_data.reserve(m_width * m_height * n);
-      for (png::uint_32 y = image.get_height(); y > 0; --y)
-        for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-          m_data.push_back(static_cast<T>(image[y - 1][x].red));
-          m_data.push_back(static_cast<T>(image[y - 1][x].green));
-          m_data.push_back(static_cast<T>(image[y - 1][x].blue));
-          m_data.push_back(static_cast<T>(image[y - 1][x].alpha));
-        }
-      if
-        constexpr(std::is_same<float, T>::value) for (auto& date : m_data) date /= 255.0f;
-    }
-  else if
-    constexpr(std::is_same<Components, BGR>::value) {
-      png::image<png::rgb_pixel> image;
-      image.read(filepath);
-      m_width  = image.get_width();
-      m_height = image.get_height();
-      m_data.reserve(m_width * m_height * n);
-      for (png::uint_32 y = image.get_height(); y > 0; --y)
-        for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-          m_data.push_back(static_cast<T>(image[y - 1][x].blue));
-          m_data.push_back(static_cast<T>(image[y - 1][x].green));
-          m_data.push_back(static_cast<T>(image[y - 1][x].red));
-        }
-      if
-        constexpr(std::is_same<float, T>::value) for (auto& date : m_data) date /= 255.0f;
-    }
-  else if
-    constexpr(std::is_same<Components, BGRA>::value) {
-      png::image<png::rgba_pixel> image;
-      image.read(filepath);
-      m_width  = image.get_width();
-      m_height = image.get_height();
-      m_data.reserve(m_width * m_height * n);
-      for (png::uint_32 y = image.get_height(); y > 0; --y)
-        for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-          m_data.push_back(static_cast<T>(image[y - 1][x].blue));
-          m_data.push_back(static_cast<T>(image[y - 1][x].green));
-          m_data.push_back(static_cast<T>(image[y - 1][x].red));
-          m_data.push_back(static_cast<T>(image[y - 1][x].alpha));
-        }
-      if
-        constexpr(std::is_same<float, T>::value) for (auto& date : m_data) date /= 255.0f;
-    }
+void Texture2D<T, Components>::load_png(const std::string& filepath, bool direct_upload, bool keep_data_on_cpu) {
+  if constexpr (std::is_same<Components, RGB>::value) {
+    png::image<png::rgb_pixel> image;
+    image.read(filepath);
+    m_width  = image.get_width();
+    m_height = image.get_height();
+    m_data.reserve(m_width * m_height * n);
+    for (png::uint_32 y = image.get_height(); y > 0; --y)
+      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+        m_data.push_back(static_cast<T>(image[y - 1][x].red));
+        m_data.push_back(static_cast<T>(image[y - 1][x].green));
+        m_data.push_back(static_cast<T>(image[y - 1][x].blue));
+      }
+    if constexpr (std::is_same<float, T>::value)
+      for (auto& date : m_data) date /= 255.0f;
+  } else if constexpr (std::is_same<Components, RGBA>::value) {
+    png::image<png::rgba_pixel> image;
+    image.read(filepath);
+    m_width  = image.get_width();
+    m_height = image.get_height();
+    m_data.reserve(m_width * m_height * n);
+    for (png::uint_32 y = image.get_height(); y > 0; --y)
+      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+        m_data.push_back(static_cast<T>(image[y - 1][x].red));
+        m_data.push_back(static_cast<T>(image[y - 1][x].green));
+        m_data.push_back(static_cast<T>(image[y - 1][x].blue));
+        m_data.push_back(static_cast<T>(image[y - 1][x].alpha));
+      }
+    if constexpr (std::is_same<float, T>::value)
+      for (auto& date : m_data) date /= 255.0f;
+  } else if constexpr (std::is_same<Components, BGR>::value) {
+    png::image<png::rgb_pixel> image;
+    image.read(filepath);
+    m_width  = image.get_width();
+    m_height = image.get_height();
+    m_data.reserve(m_width * m_height * n);
+    for (png::uint_32 y = image.get_height(); y > 0; --y)
+      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+        m_data.push_back(static_cast<T>(image[y - 1][x].blue));
+        m_data.push_back(static_cast<T>(image[y - 1][x].green));
+        m_data.push_back(static_cast<T>(image[y - 1][x].red));
+      }
+    if constexpr (std::is_same<float, T>::value)
+      for (auto& date : m_data) date /= 255.0f;
+  } else if constexpr (std::is_same<Components, BGRA>::value) {
+    png::image<png::rgba_pixel> image;
+    image.read(filepath);
+    m_width  = image.get_width();
+    m_height = image.get_height();
+    m_data.reserve(m_width * m_height * n);
+    for (png::uint_32 y = image.get_height(); y > 0; --y)
+      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+        m_data.push_back(static_cast<T>(image[y - 1][x].blue));
+        m_data.push_back(static_cast<T>(image[y - 1][x].green));
+        m_data.push_back(static_cast<T>(image[y - 1][x].red));
+        m_data.push_back(static_cast<T>(image[y - 1][x].alpha));
+      }
+    if constexpr (std::is_same<float, T>::value)
+      for (auto& date : m_data) date /= 255.0f;
+  }
 
   if (direct_upload) upload_data(keep_data_on_cpu);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::save_png(const std::string& filepath) {
-  if
-    constexpr(std::is_same<Components, RGB>::value) {
-      png::image<png::rgb_pixel> image(m_width, m_height);
-      for (unsigned int y = 0; y < image.get_height(); ++y)
-        for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-          unsigned int idx                           = x + m_width * y;
-          image[image.get_height() - 1 - y][x].red   = m_data[idx * n];
-          image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
-          image[image.get_height() - 1 - y][x].blue  = m_data[idx * n + 2];
-          if
-            constexpr(std::is_same<float, T>::value) {
-              image[image.get_height() - 1 - y][x].red *= 255.0f;
-              image[image.get_height() - 1 - y][x].green *= 255.0f;
-              image[image.get_height() - 1 - y][x].blue *= 255.0f;
-            }
+  if constexpr (std::is_same<Components, RGB>::value) {
+    png::image<png::rgb_pixel> image(m_width, m_height);
+    for (unsigned int y = 0; y < image.get_height(); ++y)
+      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+        unsigned int idx                           = x + m_width * y;
+        image[image.get_height() - 1 - y][x].red   = m_data[idx * n];
+        image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
+        image[image.get_height() - 1 - y][x].blue  = m_data[idx * n + 2];
+        if constexpr (std::is_same<float, T>::value) {
+          image[image.get_height() - 1 - y][x].red *= 255.0f;
+          image[image.get_height() - 1 - y][x].green *= 255.0f;
+          image[image.get_height() - 1 - y][x].blue *= 255.0f;
         }
-      image.write(filepath);
-    }
-  else if
-    constexpr(std::is_same<Components, RGBA>::value) {
-      png::image<png::rgba_pixel> image(m_width, m_height);
-      for (unsigned int y = 0; y < image.get_height(); ++y)
-        for (unsigned int x = 0; x < image.get_width(); ++x) {
-          unsigned int idx                           = x + m_width * y;
-          image[image.get_height() - 1 - y][x].red   = m_data[idx * n];
-          image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
-          image[image.get_height() - 1 - y][x].blue  = m_data[idx * n + 2];
-          image[image.get_height() - 1 - y][x].alpha = m_data[idx * n + 3];
-          if
-            constexpr(std::is_same<float, T>::value) {
-              image[image.get_height() - 1 - y][x].red *= 255.0f;
-              image[image.get_height() - 1 - y][x].green *= 255.0f;
-              image[image.get_height() - 1 - y][x].blue *= 255.0f;
-              image[image.get_height() - 1 - y][x].alpha *= 255.0f;
-            }
+      }
+    image.write(filepath);
+  } else if constexpr (std::is_same<Components, RGBA>::value) {
+    png::image<png::rgba_pixel> image(m_width, m_height);
+    for (unsigned int y = 0; y < image.get_height(); ++y)
+      for (unsigned int x = 0; x < image.get_width(); ++x) {
+        unsigned int idx                           = x + m_width * y;
+        image[image.get_height() - 1 - y][x].red   = m_data[idx * n];
+        image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
+        image[image.get_height() - 1 - y][x].blue  = m_data[idx * n + 2];
+        image[image.get_height() - 1 - y][x].alpha = m_data[idx * n + 3];
+        if constexpr (std::is_same<float, T>::value) {
+          image[image.get_height() - 1 - y][x].red *= 255.0f;
+          image[image.get_height() - 1 - y][x].green *= 255.0f;
+          image[image.get_height() - 1 - y][x].blue *= 255.0f;
+          image[image.get_height() - 1 - y][x].alpha *= 255.0f;
         }
-      image.write(filepath);
-    }
-  else if
-    constexpr(std::is_same<Components, BGR>::value) {
-      png::image<png::rgba_pixel> image(m_width, m_height);
-      for (unsigned int y = 0; y < image.get_height(); ++y)
-        for (unsigned int x = 0; x < image.get_width(); ++x) {
-          unsigned int idx                           = x + m_width * y;
-          image[image.get_height() - 1 - y][x].blue  = m_data[idx * n];
-          image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
-          image[image.get_height() - 1 - y][x].red   = m_data[idx * n + 2];
-          if
-            constexpr(std::is_same<float, T>::value) {
-              image[image.get_height() - 1 - y][x].blue *= 255.0f;
-              image[image.get_height() - 1 - y][x].green *= 255.0f;
-              image[image.get_height() - 1 - y][x].red *= 255.0f;
-            }
+      }
+    image.write(filepath);
+  } else if constexpr (std::is_same<Components, BGR>::value) {
+    png::image<png::rgba_pixel> image(m_width, m_height);
+    for (unsigned int y = 0; y < image.get_height(); ++y)
+      for (unsigned int x = 0; x < image.get_width(); ++x) {
+        unsigned int idx                           = x + m_width * y;
+        image[image.get_height() - 1 - y][x].blue  = m_data[idx * n];
+        image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
+        image[image.get_height() - 1 - y][x].red   = m_data[idx * n + 2];
+        if constexpr (std::is_same<float, T>::value) {
+          image[image.get_height() - 1 - y][x].blue *= 255.0f;
+          image[image.get_height() - 1 - y][x].green *= 255.0f;
+          image[image.get_height() - 1 - y][x].red *= 255.0f;
         }
-      image.write(filepath);
-    }
-  else if
-    constexpr(std::is_same<Components, BGRA>::value) {
-      png::image<png::rgba_pixel> image(m_width, m_height);
-      for (unsigned int y = 0; y < image.get_height(); ++y)
-        for (unsigned int x = 0; x < image.get_width(); ++x) {
-          unsigned int idx                           = x + m_width * y;
-          image[image.get_height() - 1 - y][x].blue  = m_data[idx * n];
-          image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
-          image[image.get_height() - 1 - y][x].red   = m_data[idx * n + 2];
-          image[image.get_height() - 1 - y][x].alpha = m_data[idx * n + 3];
-          if
-            constexpr(std::is_same<float, T>::value) {
-              image[image.get_height() - 1 - y][x].blue *= 255.0f;
-              image[image.get_height() - 1 - y][x].green *= 255.0f;
-              image[image.get_height() - 1 - y][x].red *= 255.0f;
-              image[image.get_height() - 1 - y][x].alpha *= 255.0f;
-            }
+      }
+    image.write(filepath);
+  } else if constexpr (std::is_same<Components, BGRA>::value) {
+    png::image<png::rgba_pixel> image(m_width, m_height);
+    for (unsigned int y = 0; y < image.get_height(); ++y)
+      for (unsigned int x = 0; x < image.get_width(); ++x) {
+        unsigned int idx                           = x + m_width * y;
+        image[image.get_height() - 1 - y][x].blue  = m_data[idx * n];
+        image[image.get_height() - 1 - y][x].green = m_data[idx * n + 1];
+        image[image.get_height() - 1 - y][x].red   = m_data[idx * n + 2];
+        image[image.get_height() - 1 - y][x].alpha = m_data[idx * n + 3];
+        if constexpr (std::is_same<float, T>::value) {
+          image[image.get_height() - 1 - y][x].blue *= 255.0f;
+          image[image.get_height() - 1 - y][x].green *= 255.0f;
+          image[image.get_height() - 1 - y][x].red *= 255.0f;
+          image[image.get_height() - 1 - y][x].alpha *= 255.0f;
         }
-      image.write(filepath);
-    }
+      }
+    image.write(filepath);
+  }
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height,
-                                           const std::vector<T>& data, bool keep_data_on_cpu) {
+void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height, const std::vector<T>& data,
+                                           bool keep_data_on_cpu) {
   m_width         = width;
   m_height        = height;
   m_data          = data;
@@ -446,8 +416,8 @@ void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int heig
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height,
-                                           std::vector<T>&& data, bool keep_data_on_cpu) {
+void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height, std::vector<T>&& data,
+                                           bool keep_data_on_cpu) {
   m_width         = width;
   m_height        = height;
   m_data          = std::move(data);
@@ -456,8 +426,8 @@ void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int heig
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height,
-                                           std::initializer_list<T>&& list, bool keep_data_on_cpu) {
+void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height, std::initializer_list<T>&& list,
+                                           bool keep_data_on_cpu) {
   m_width         = width;
   m_height        = height;
   m_data          = std::move(list);
