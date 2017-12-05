@@ -6,10 +6,7 @@ namespace Yavin {
 
 Shader::Shader() {
   m_id           = glCreateProgram();
-  GLenum glError = glGetError();
-  if (glError != GL_NO_ERROR)
-    std::cout << "Error when creating GLSL Shader Program: " << gluErrorString(glError)
-              << std::endl;
+  gl_error_check("glCreateProgram");
 }
 
 Shader::~Shader() { glDeleteProgram(m_id); }

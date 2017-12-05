@@ -21,5 +21,6 @@ const std::string gl_framebuffer_error_to_string(int status);
 
 void gl_error_check(const std::string& function);
 void gl_framebuffer_not_complete_check(const unsigned int fbo_id);
-}  // Yavin
+
+}  // namespace Yavin
 #endif

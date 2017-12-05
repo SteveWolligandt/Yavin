@@ -5,6 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <algorithm>
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -13,7 +14,15 @@
 namespace Yavin {
 class Transform {
  public:
-  Transform() : m_matrix(glm::mat4()) {}
+  Transform() {}
+  Transform(const Transform& other)
+      : m_matrix(other.m_matrix),
+        m_first_person_pitch(other.m_first_person_pitch),
+        m_first_person_yaw(other.m_first_person_yaw) {}
+  Transform(Transform&& other)
+      : m_matrix(std::move(other.m_matrix)),
+        m_first_person_pitch(other.m_first_person_pitch),
+        m_first_person_yaw(other.m_first_person_yaw) {}
   virtual ~Transform() {}
 
   glm::mat4x4& matrix() { return m_matrix; }
@@ -50,23 +59,20 @@ class Transform {
     glm::vec3 yaxis = {sinYaw * sinPitch, cosPitch, cosYaw * sinPitch};
     glm::vec3 zaxis = {sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw};
 
-    m_matrix = glm::inverse(
-        glm::mat4{glm::vec4(xaxis.x, yaxis.x, zaxis.x, 0), glm::vec4(xaxis.y, yaxis.y, zaxis.y, 0),
-                  glm::vec4(xaxis.z, yaxis.z, zaxis.z, 0),
-                  glm::vec4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)});
+    m_matrix = glm::inverse(glm::mat4{glm::vec4(xaxis.x, yaxis.x, zaxis.x, 0), glm::vec4(xaxis.y, yaxis.y, zaxis.y, 0),
+                                      glm::vec4(xaxis.z, yaxis.z, zaxis.z, 0),
+                                      glm::vec4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)});
   }
 
-  void translate(const glm::vec3& translation) { m_matrix = glm::translate(m_matrix, translation); }
-  void translate(const float x, const float y, const float z) { translate(glm::vec3(x, y, z)); }
+  void      translate(const glm::vec3& translation) { m_matrix = glm::translate(m_matrix, translation); }
+  void      translate(const float x, const float y, const float z) { translate(glm::vec3(x, y, z)); }
   glm::vec3 translation() { return glm::vec3(glm::vec3(m_matrix[3])); }
 
   void scale(const glm::vec3& scale) { m_matrix = glm::scale(m_matrix, scale); }
   void scale(const float x, const float y, const float z) { scale(glm::vec3(x, y, z)); }
   void scale(const float s) { scale(glm::vec3(s, s, s)); }
 
-  void rotate(const float angle, const glm::vec3& axis) {
-    m_matrix = glm::rotate(m_matrix, angle, axis);
-  }
+  void rotate(const float angle, const glm::vec3& axis) { m_matrix = glm::rotate(m_matrix, angle, axis); }
   void rotate(const float angle, const float axisX, const float axisY, const float axisZ) {
     rotate(angle, glm::vec3(axisX, axisY, axisZ));
   }
