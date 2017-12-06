@@ -5,11 +5,11 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <algorithm>
-#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
+#include <iostream>
 
 namespace Yavin {
 class Transform {
@@ -49,7 +49,7 @@ class Transform {
   }
 
   void first_person() {
-    auto  eye      = translation();
+    auto  eye      = glm::vec3(translation());
     float cosPitch = cos(m_first_person_pitch * M_PI / 180);
     float sinPitch = sin(m_first_person_pitch * M_PI / 180);
     float cosYaw   = cos(m_first_person_yaw * M_PI / 180);
@@ -64,9 +64,10 @@ class Transform {
                                       glm::vec4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)});
   }
 
-  void      translate(const glm::vec3& translation) { m_matrix = glm::translate(m_matrix, translation); }
-  void      translate(const float x, const float y, const float z) { translate(glm::vec3(x, y, z)); }
-  glm::vec3 translation() { return glm::vec3(glm::vec3(m_matrix[3])); }
+  void             translate(const glm::vec3& translation) { m_matrix = glm::translate(m_matrix, translation); }
+  void             translate(const float x, const float y, const float z) { translate(glm::vec3(x, y, z)); }
+  glm::vec4&       translation() { return m_matrix[3]; }
+  const glm::vec4& translation() const { return m_matrix[3]; }
 
   void scale(const glm::vec3& scale) { m_matrix = glm::scale(m_matrix, scale); }
   void scale(const float x, const float y, const float z) { scale(glm::vec3(x, y, z)); }

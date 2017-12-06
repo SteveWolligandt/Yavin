@@ -22,10 +22,10 @@ class PerspectiveCamera : public Camera {
 
   template <typename T>
   auto create_ray(T x, T y) {
-    glm::vec3 screen_coord{x, y, 0};
+    glm::vec3 screen_coord{x, y, 0.5};
     glm::vec3 world_pos = glm::unProject(screen_coord, view_matrix(), projection_matrix(), m_viewport);
     glm::vec3 origin    = transform().translation();
-    return ray_t<T>(origin, world_pos - origin);
+    return ray_t<T>(origin, glm::normalize(world_pos - origin));
   }
 };
 }  // namespace Yavin

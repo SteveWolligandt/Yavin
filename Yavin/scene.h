@@ -29,6 +29,23 @@ class scene_t : public std::vector<scene_object_t<T>> {
     return closest_collision;
   }
 
+  void push_back(const scene_object_t<T>& obj) {
+    std::vector<scene_object_t<T>>::push_back(obj);
+    obj.m_appropriate_scenes.push_back(this);
+  }
+
+  void push_back(scene_object_t<T>&& obj) {
+    std::vector<scene_object_t<T>>::push_back(std::move(obj));
+    obj.m_appropriate_scenes.push_back(this);
+  }
+
+  template <class... Args>
+  auto& emplace_back(Args&&... args) {
+    std::vector<scene_object_t<T>>::emplace_back(std::forward<Args>(args)...);
+    this->back().m_appropriate_scenes.push_back(this);
+    return this->back();
+  }
+
   std::optional<collision_t<T>> cast_ray(const Yavin::ray_t<T>& r, T x, T y) const {
     auto c = cast_ray(r);
     if (c) c->object().on_mouse_down(x, y);

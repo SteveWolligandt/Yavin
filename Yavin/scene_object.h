@@ -14,6 +14,9 @@
 namespace Yavin {
 
 template <typename T>
+class scene_t;
+
+template <typename T>
 class collider_t;
 
 template <typename T>
@@ -24,6 +27,8 @@ struct is_collider;
 
 template <typename T>
 class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, public Movable {
+  friend class scene_t<T>;
+
  public:
   scene_object_t() : m_collider(nullptr), m_parent_object(nullptr), m_name("unnamed") {}
   scene_object_t(std::string&& name) : m_collider(nullptr), m_parent_object(nullptr), m_name(std::move(name)) {}
@@ -86,16 +91,17 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
     return *static_cast<collider_cast_t*>(m_collider.get());
   }
 
+  auto&       parent() { return *m_parent_object; }
   const auto& parent() const { return *m_parent_object; }
   void        set_parent(scene_object_t<T>& o) { m_parent_object = &o; }
   void        unset_parent() { m_parent_object = nullptr; }
 
-  // glm::mat4x4 transformation_matrix(){
-  //   if (m_parent_object)
-  //     return transform().matrix() * m_parent_object->transformation_matrix();
-  //   else
-  //     return transform().matrix();
-  // }
+  glm::mat4x4 transformation_matrix() const {
+    if (m_parent_object)
+      return transform().matrix() * m_parent_object->transformation_matrix();
+    else
+      return transform().matrix();
+  }
 
   auto&       name() { return m_name; }
   const auto& name() const { return m_name; }
@@ -104,6 +110,7 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
   std::unique_ptr<collider_t<T>> m_collider;
   scene_object_t<T>*             m_parent_object;
   std::string                    m_name;
+  std::vector<scene_t<T>*>       m_appropriate_scenes;  // friend class scene_t adds itself on push_back
 };
 
 using scene_object_d = scene_object_t<double>;
