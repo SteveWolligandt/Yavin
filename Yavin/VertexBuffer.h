@@ -99,8 +99,8 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> 
 
   void download_data();
 
-  static constexpr unsigned int numAttributes    = sizeof...(Ts);
-  static constexpr unsigned int sizeofAttributes = attrib_pack_size<Ts...>::value;
+  static constexpr unsigned int num_attributes     = sizeof...(Ts);
+  static constexpr unsigned int size_of_attributes = attrib_pack_size<Ts...>::value;
 
  private:
   bool m_gpu_buffer_created = false;
@@ -137,7 +137,7 @@ template <typename... Ts>
 void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
   // gpu buffer neiter created nor initialized
   if (!m_gpu_buffer_created) {
-    glNamedBufferData(this->m_id, sizeofAttributes * this->cpu_size(), &this->m_data[0], GL_STATIC_DRAW);
+    glNamedBufferData(this->m_id, size_of_attributes * this->cpu_size(), this->m_data.data(), GL_STATIC_DRAW);
     gl_error_check("glNamedBufferData");
 
     this->m_gpu_size = this->cpu_size();
@@ -151,7 +151,7 @@ void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
     gl_error_check("glMapNamedBuffer");
 
     this->m_data.resize(this->m_gpu_size);
-    unsigned char* tmp_cpu_buffer = reinterpret_cast<unsigned char*>(&this->m_data[0]);
+    unsigned char* tmp_cpu_buffer = reinterpret_cast<unsigned char*>(this->m_data.data());
     for (size_t i = 0; i < this->m_gpu_size * attrib_pack_size<Ts...>::value; ++i) {
       gpu_buffer[i] = tmp_cpu_buffer[i];
     }
@@ -236,7 +236,7 @@ auto VertexBuffer<Ts...>::operator[](const size_t idx) const {
 
 template <typename... Ts>
 auto& VertexBuffer<Ts...>::operator()(const size_t idx) {
-  return reinterpret_cast<unsigned char*>(&this->m_data[0])[idx];
+  return reinterpret_cast<unsigned char*>(this->m_data.data())[idx];
 }
 
 template <typename... Ts>
@@ -244,7 +244,7 @@ void VertexBuffer<Ts...>::download_data() {
   auto gpu_buffer = reinterpret_cast<unsigned char*>(glMapNamedBuffer(this->m_id, GL_READ_ONLY));
   gl_error_check("glMapNamedBuffer");
   this->m_data.resize(this->m_gpu_size);
-  unsigned char* tmp_cpu_buffer = reinterpret_cast<unsigned char*>(&this->m_data[0]);
+  unsigned char* tmp_cpu_buffer = reinterpret_cast<unsigned char*>(this->m_data.data());
   for (size_t i = 0; i < this->m_gpu_size * attrib_pack_size<Ts...>::value; ++i) tmp_cpu_buffer[i] = gpu_buffer[i];
   glUnmapNamedBuffer(this->m_id);
   gl_error_check("glUnmapNamedBuffer");

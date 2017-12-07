@@ -118,7 +118,7 @@ Buffer<array_type, T>::~Buffer() {
 template <int array_type, typename T>
 void Buffer<array_type, T>::upload_data(bool keep_data_on_cpu) {
   if (!m_is_consistent) {
-    glNamedBufferData(m_id, sizeof(T) * cpu_size(), &m_data[0], GL_STATIC_DRAW);
+    glNamedBufferData(m_id, sizeof(T) * cpu_size(), m_data.data(), GL_STATIC_DRAW);
     gl_error_check("glNamedBufferData");
     m_gpu_size = cpu_size();
 
@@ -221,7 +221,7 @@ template <int array_type, typename T>
 void Buffer<array_type, T>::download_data() {
   auto gpu_buffer = reinterpret_cast<unsigned char*>(glMapNamedBuffer(this->m_id, GL_READ_ONLY));
   m_data.resize(m_gpu_size);
-  unsigned char* tmp_buffer = reinterpret_cast<unsigned char*>(&m_data[0]);
+  unsigned char* tmp_buffer = reinterpret_cast<unsigned char*>(m_data.data());
   for (size_t i = 0; i < m_gpu_size * sizeof(T); ++i) tmp_buffer[i] = gpu_buffer[i];
   glUnmapNamedBuffer(this->m_id);
   m_is_consistent = true;

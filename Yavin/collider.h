@@ -78,12 +78,12 @@ class aabb_collider : public collider_t<T> {
     T             left_dist = (le - r.x(0)) / r.dir(0);
     glm::tvec3<T> x_left    = r(left_dist);
     bool          left_hit =
-        (left_dist >= 0) && (x_left[1] >= fr) && (x_left[1] <= ba) && (x_left[2] >= bo) && (x_left[2] <= to);
+        (left_dist >= 0) && (x_left[1] >= bo) && (x_left[1] <= to) && (x_left[2] >= fr) && (x_left[2] <= ba);
 
     T             right_dist = (ri - r.x(0)) / r.dir(0);
     glm::tvec3<T> x_right    = r(right_dist);
     bool          right_hit =
-        (right_dist >= 0) && (x_right[1] >= fr) && (x_right[1] <= ba) && (x_right[2] >= bo) && (x_right[2] <= to);
+        (right_dist >= 0) && (x_right[1] >= bo) && (x_right[1] <= to) && (x_right[2] >= fr) && (x_right[2] <= ba);
 
     T             bottom_dist = (bo - r.x(1)) / r.dir(1);
     glm::tvec3<T> x_bottom    = r(bottom_dist);

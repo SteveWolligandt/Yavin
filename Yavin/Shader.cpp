@@ -5,7 +5,7 @@
 namespace Yavin {
 
 Shader::Shader() {
-  m_id           = glCreateProgram();
+  m_id = glCreateProgram();
   gl_error_check("glCreateProgram");
 }
 
@@ -37,10 +37,8 @@ void Shader::create() {
   gl_error_check("glLinkProgram");
   info_log();
   bind();
-  for (const auto& var : m_attribute_var_names)
-    add_attribute(var);
-  for (const auto& var : m_uniform_var_names)
-    add_uniform(var);
+  for (const auto& var : m_attribute_var_names) add_attribute(var);
+  for (const auto& var : m_uniform_var_names) add_uniform(var);
 }
 
 void Shader::bind() {
@@ -54,22 +52,18 @@ void Shader::unbind() {
 }
 
 void Shader::add_uniform(const std::string& uniformVarName) {
-  m_uniform_locations.insert(std::pair<std::string, GLint>(
-      uniformVarName, glGetUniformLocation(m_id, uniformVarName.c_str())));
+  m_uniform_locations.insert(
+      std::pair<std::string, GLint>(uniformVarName, glGetUniformLocation(m_id, uniformVarName.c_str())));
 }
 
 void Shader::add_attribute(const std::string& attributeVarName) {
-  m_attribute_locations.insert(std::pair<std::string, GLint>(
-      attributeVarName, glGetAttribLocation(m_id, attributeVarName.c_str())));
+  m_attribute_locations.insert(
+      std::pair<std::string, GLint>(attributeVarName, glGetAttribLocation(m_id, attributeVarName.c_str())));
 }
 
-GLint Shader::uniform(const std::string& uniformVarName) {
-  return m_uniform_locations[uniformVarName];
-}
+GLint Shader::uniform(const std::string& uniformVarName) { return m_uniform_locations[uniformVarName]; }
 
-GLint Shader::attribute(const std::string& attributeVarName) {
-  return m_attribute_locations[attributeVarName];
-}
+GLint Shader::attribute(const std::string& attributeVarName) { return m_attribute_locations[attributeVarName]; }
 
 void Shader::set_uniform(const std::string& name, float value) {
   assert(m_uniform_locations.find(name) != m_uniform_locations.end());
@@ -123,11 +117,10 @@ void Shader::set_uniform(const std::string& name, const glm::vec2& value) {
 void Shader::info_log() {
   GLint   infoLogLength = 0;
   GLsizei charsWritten  = 0;
-  char*   infoLog;
 
   glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
   gl_error_check("glGetProgramiv - GL_INFO_LOG_LENGTH");
-  infoLog = (char*)malloc(infoLogLength);
+  auto infoLog = new char[infoLogLength];
   glGetProgramInfoLog(m_id, infoLogLength, &charsWritten, infoLog);
   gl_error_check("glGetProgramInfoLog");
 

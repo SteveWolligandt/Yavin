@@ -1,21 +1,21 @@
 #include "VertexArray.h"
+#include "gl_includes.h"
 
 namespace Yavin {
 VertexArray::VertexArray() {
-  glCreateVertexArrays(1, &m_vaoID);
+  glCreateVertexArrays(1, &m_id);
   gl_error_check("glGenVertexArrays");
 }
 VertexArray::VertexArray(const VertexArray& other) { std::cout << "COPY CONSTRUCTOR OF VAO\n"; }
 VertexArray::VertexArray(VertexArray&& other) { std::cout << "MOVE CONSTRUCTOR OF VAO\n"; }
 
 VertexArray::~VertexArray() {
-  glDeleteVertexArrays(1, &m_vaoID);
+  glDeleteVertexArrays(1, &m_id);
   gl_error_check("glDeleteVertexArrays");
 }
 
 void VertexArray::bind() {
-  glBindVertexArray(m_vaoID);
-  // std::cout << "glBindVertexArray(m_vaoID) -> " << m_vaoID << '\n';
+  glBindVertexArray(m_id);
   gl_error_check("glBindVertexArray");
 }
 

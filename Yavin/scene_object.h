@@ -45,13 +45,13 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
     if constexpr (is_collider<behaviour_t>::value) {
       if (!m_collider) {
         m_collider = std::make_unique<behaviour_t>(this, std::forward<Args>(args)...);
-        return *m_collider;
+        return *dynamic_cast<behaviour_t*>(m_collider.get());
       } else
         throw std::runtime_error("scene object already has collider");
 
     } else {
       this->emplace_back(new behaviour_t(this, std::forward<Args>(args)...));
-      return *(this->back());
+      return *dynamic_cast<behaviour_t*>(this->back().get());
     }
   }
 

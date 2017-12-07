@@ -7,7 +7,6 @@
 #include "Type.h"
 #include "VertexBuffer.h"
 #include "error_check.h"
-#include "gl_includes.h"
 
 namespace Yavin {
 class VertexArray {
@@ -19,10 +18,10 @@ class VertexArray {
 
   void bind();
   void unbind();
-  void draw(Primitive primitive, unsigned int numPrimitives);
+  void draw(Primitive primitive, unsigned int num_primitives);
 
  protected:
-  GLuint m_vaoID;
+  unsigned int m_id;
 };
 }  // namespace Yavin
 

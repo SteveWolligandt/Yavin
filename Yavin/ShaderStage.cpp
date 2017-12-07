@@ -6,24 +6,12 @@ namespace Yavin {
 
 ShaderStage::ShaderStage(GLenum shaderType, const std::string &filename) {
   switch (shaderType) {
-    case GL_VERTEX_SHADER:
-      m_shader_type_name = "Vertex";
-      break;
-    case GL_FRAGMENT_SHADER:
-      m_shader_type_name = "Fragment";
-      break;
-    case GL_GEOMETRY_SHADER:
-      m_shader_type_name = "Geometry";
-      break;
-    case GL_TESS_EVALUATION_SHADER:
-      m_shader_type_name = "Tesselation Evaluation";
-      break;
-    case GL_TESS_CONTROL_SHADER:
-      m_shader_type_name = "Tesselation Control";
-      break;
-    case GL_COMPUTE_SHADER:
-      m_shader_type_name = "Compute";
-      break;
+    case GL_VERTEX_SHADER: m_shader_type_name = "Vertex"; break;
+    case GL_FRAGMENT_SHADER: m_shader_type_name = "Fragment"; break;
+    case GL_GEOMETRY_SHADER: m_shader_type_name = "Geometry"; break;
+    case GL_TESS_EVALUATION_SHADER: m_shader_type_name = "Tesselation Evaluation"; break;
+    case GL_TESS_CONTROL_SHADER: m_shader_type_name = "Tesselation Control"; break;
+    case GL_COMPUTE_SHADER: m_shader_type_name = "Compute"; break;
   }
 
   // Create Shader
@@ -59,14 +47,13 @@ const GLuint &ShaderStage::id() const { return m_id; }
 void ShaderStage::print_log() {
   GLint   infologLength = 0;
   GLsizei charsWritten  = 0;
-  char *  infoLog;
 
   glGetShaderiv(id(), GL_INFO_LOG_LENGTH, &infologLength);
   gl_error_check("glGetShaderiv");
-  infoLog = (char *)malloc(infologLength);
+  auto infoLog = new char[infologLength];
   glGetShaderInfoLog(id(), infologLength, &charsWritten, infoLog);
   gl_error_check("glGetShaderInfoLog");
-  if (infologLength > 1) {
+  if (infologLength >= 1) {
     std::cout << "[Shader Compilation Error] - " << m_shader_type_name << '\n';
     std::cout << infoLog << '\n';
   }
