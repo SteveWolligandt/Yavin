@@ -14,6 +14,14 @@ namespace Yavin {
 template <typename T = double>
 class scene_t : public std::vector<scene_object_t<T>> {
  public:
+  std::vector<std::unique_ptr<Shader>> m_shader_pool;
+
+  template <typename shader_t, typename... Args>
+  auto& add_shader(Args&&... args) {
+    m_shader_pool.emplace_back(new shader_t(std::forward<Args>(args)...));
+    return *dynamic_cast<shader_t*>(m_shader_pool.back().get());
+  }
+
   std::optional<collision_t<T>> cast_ray(const Yavin::ray_t<T>& r) const {
     T                             shortest_dist = 1e10;
     std::optional<collision_t<T>> closest_collision;
@@ -69,6 +77,7 @@ class scene_t : public std::vector<scene_object_t<T>> {
   }
 
   void on_render(const Yavin::Camera& cam) {
+    Yavin::set_viewport(cam.viewport());
     for (auto& obj : *this) obj.on_render(cam);
   }
 };

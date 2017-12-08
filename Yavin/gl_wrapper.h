@@ -1,6 +1,7 @@
 #ifndef __YAVIN_GL_WRAPPER_H__
 #define __YAVIN_GL_WRAPPER_H__
 
+#include <glm/glm.hpp>
 #include "error_check.h"
 #include "gl_includes.h"
 
@@ -23,6 +24,7 @@ void blend_func_multiplicative();
 void blend_func_subtractive();
 void blend_func_alpha();
 void set_viewport(unsigned int left, unsigned int bottom, unsigned int width, unsigned int height);
+void set_viewport(const glm::vec4& vp) { set_viewport(vp[0], vp[1], vp[2], vp[3]); }
 }  // namespace Yavin
 
 #endif
