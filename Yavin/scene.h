@@ -47,6 +47,10 @@ class scene_t : public std::vector<scene_object_t<T>> {
     obj.m_appropriate_scenes.push_back(this);
   }
 
+  void push_back_dispatcher(std::function<void()>&& dispatcher) {
+    m_dispatch_functions.push_back(std::move(dispatcher));
+  }
+
   template <class... Args>
   auto& emplace_back(Args&&... args) {
     std::vector<scene_object_t<T>>::emplace_back(std::forward<Args>(args)...);
@@ -80,6 +84,14 @@ class scene_t : public std::vector<scene_object_t<T>> {
     Yavin::set_viewport(cam.viewport());
     for (auto& obj : *this) obj.on_render(cam);
   }
+
+  void dispatch() {
+    for (auto& dispatcher : m_dispatch_functions) dispatcher();
+    m_dispatch_functions.clear();
+  }
+
+ private:
+  std::vector<std::function<void()>> m_dispatch_functions;
 };
 
 using scene_d = scene_t<double>;

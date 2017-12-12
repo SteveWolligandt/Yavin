@@ -106,6 +106,9 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
   auto&       name() { return m_name; }
   const auto& name() const { return m_name; }
 
+  auto&       appropriate_scenes() { return m_appropriate_scenes; }
+  const auto& appropriate_scenes() const { return m_appropriate_scenes; }
+
  protected:
   std::unique_ptr<collider_t<T>> m_collider;
   scene_object_t<T>*             m_parent_object;
