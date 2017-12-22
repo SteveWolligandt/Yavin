@@ -18,6 +18,16 @@ template <typename... Ts>
 struct attrib {};
 
 /**
+ * @brief      float
+ */
+template <>
+struct attrib<float> {
+  float                         val;
+  static constexpr GLenum       type     = GL_FLOAT;
+  static constexpr unsigned int num_dims = 1;
+};
+
+/**
  * @brief      float vec2
  */
 template <>
@@ -47,9 +57,10 @@ struct attrib<float, float, float, float> {
   static constexpr unsigned int num_dims = 4;
 };
 
-using vec2 = attrib<float, float>;
-using vec3 = attrib<float, float, float>;
-using vec4 = attrib<float, float, float, float>;
+using Float = attrib<float, float>;
+using vec2  = attrib<float, float>;
+using vec3  = attrib<float, float, float>;
+using vec4  = attrib<float, float, float, float>;
 
 template <typename... Ss>
 constexpr auto plus_fold(Ss... ss) {
@@ -91,8 +102,8 @@ struct attr_generator_offset<num_attrs> {
 template <unsigned num_attrs, class FirstAttrib, class... RestAttribs>
 struct attr_generator_offset<num_attrs, FirstAttrib, RestAttribs...> {
   constexpr static std::array<unsigned long, num_attrs> gen(unsigned long off, unsigned int idx) {
-    auto arr = attr_generator_offset<num_attrs, RestAttribs...>::gen(
-        off + attrib_pack_size<FirstAttrib>::value, idx + 1);
+    auto arr =
+        attr_generator_offset<num_attrs, RestAttribs...>::gen(off + attrib_pack_size<FirstAttrib>::value, idx + 1);
     arr[idx] = off;
     return arr;
   }
@@ -141,9 +152,7 @@ struct attr_generator_types;
 
 template <unsigned int num_attrs>
 struct attr_generator_types<num_attrs> {
-  constexpr static std::array<GLenum, num_attrs> gen(unsigned int) {
-    return std::array<GLenum, num_attrs>();
-  }
+  constexpr static std::array<GLenum, num_attrs> gen(unsigned int) { return std::array<GLenum, num_attrs>(); }
 };
 
 template <unsigned num_attrs, class FirstAttrib, class... RestAttribs>
@@ -157,15 +166,11 @@ struct attr_generator_types<num_attrs, FirstAttrib, RestAttribs...> {
 
 template <class... Ts>
 struct attr_prefs {
-  constexpr static unsigned int num_attrs = sizeof...(Ts);
-  constexpr static std::array<unsigned long, num_attrs> offsets =
-      attr_generator_offset<num_attrs, Ts...>::gen(0, 0);
-  constexpr static std::array<unsigned int, num_attrs> sizes =
-      attr_generator_sizes<num_attrs, Ts...>::gen(0);
-  constexpr static std::array<unsigned int, num_attrs> num_dims =
-      attr_generator_num_dims<num_attrs, Ts...>::gen(0);
-  constexpr static std::array<unsigned int, num_attrs> types =
-      attr_generator_types<num_attrs, Ts...>::gen(0);
+  constexpr static unsigned int                         num_attrs = sizeof...(Ts);
+  constexpr static std::array<unsigned long, num_attrs> offsets   = attr_generator_offset<num_attrs, Ts...>::gen(0, 0);
+  constexpr static std::array<unsigned int, num_attrs>  sizes     = attr_generator_sizes<num_attrs, Ts...>::gen(0);
+  constexpr static std::array<unsigned int, num_attrs>  num_dims  = attr_generator_num_dims<num_attrs, Ts...>::gen(0);
+  constexpr static std::array<unsigned int, num_attrs>  types     = attr_generator_types<num_attrs, Ts...>::gen(0);
 };
 
 /////// Following structs are used for indexing vbo memory
@@ -175,34 +180,29 @@ struct tuple_constructor;
 template <typename Data_t, unsigned int M, unsigned int N, unsigned int PackSize, typename T>
 struct tuple_constructor<Data_t, M, N, PackSize, T> {
   static std::tuple<T&> construct(std::vector<Data_t>& buffer, unsigned int idx,
-                                  const std::array<unsigned long, M>&       offsets) {
+                                  const std::array<unsigned long, M>& offsets) {
     unsigned char* temp_buf = reinterpret_cast<unsigned char*>(&buffer[0]);
     return std::tuple<T&>(*reinterpret_cast<T*>(&temp_buf[idx * PackSize + offsets[N]]));
   }
 
   static std::tuple<const T&> construct(const std::vector<Data_t>& buffer, unsigned int idx,
-                                        const std::array<unsigned long, M>&             offsets) {
+                                        const std::array<unsigned long, M>& offsets) {
     const unsigned char* temp_buf = reinterpret_cast<const unsigned char*>(&buffer[0]);
-    return std::tuple<const T&>(
-        *reinterpret_cast<const T*>(&temp_buf[idx * PackSize + offsets[N]]));
+    return std::tuple<const T&>(*reinterpret_cast<const T*>(&temp_buf[idx * PackSize + offsets[N]]));
   }
 };
 
-template <typename Data_t, unsigned int M, unsigned int N, unsigned int PackSize, typename T,
-          typename... Ts>
+template <typename Data_t, unsigned int M, unsigned int N, unsigned int PackSize, typename T, typename... Ts>
 struct tuple_constructor<Data_t, M, N, PackSize, T, Ts...> {
   static std::tuple<T&, Ts&...> construct(std::vector<Data_t>& buffer, unsigned int idx,
                                           const std::array<unsigned long, M>& offsets) {
-    return std::tuple_cat(
-        tuple_constructor<Data_t, M, N, PackSize, T>::construct(buffer, idx, offsets),
-        tuple_constructor<Data_t, M, N + 1, PackSize, Ts...>::construct(buffer, idx, offsets));
+    return std::tuple_cat(tuple_constructor<Data_t, M, N, PackSize, T>::construct(buffer, idx, offsets),
+                          tuple_constructor<Data_t, M, N + 1, PackSize, Ts...>::construct(buffer, idx, offsets));
   }
-  static std::tuple<const T&, const Ts&...> construct(const std::vector<Data_t>& buffer,
-                                                      unsigned int idx,
+  static std::tuple<const T&, const Ts&...> construct(const std::vector<Data_t>& buffer, unsigned int idx,
                                                       const std::array<unsigned long, M>& offsets) {
-    return std::tuple_cat(
-        tuple_constructor<Data_t, M, N, PackSize, T>::construct(buffer, idx, offsets),
-        tuple_constructor<Data_t, M, N + 1, PackSize, Ts...>::construct(buffer, idx, offsets));
+    return std::tuple_cat(tuple_constructor<Data_t, M, N, PackSize, T>::construct(buffer, idx, offsets),
+                          tuple_constructor<Data_t, M, N + 1, PackSize, Ts...>::construct(buffer, idx, offsets));
   }
 };
 
@@ -241,8 +241,7 @@ constexpr bool can_apply(AttribHolder<Attrib>, ParamHolder<Param>) {
 }
 
 // for every attribute parameter tuple check if it data_attrib_pair is defined
-template <class FirstAttrib, class SecondAttrib, class... Attribs, class FirstParam,
-          class SecondParam, class... Params>
+template <class FirstAttrib, class SecondAttrib, class... Attribs, class FirstParam, class SecondParam, class... Params>
 constexpr bool can_apply(AttribHolder<FirstAttrib, SecondAttrib, Attribs...>,
                          ParamHolder<FirstParam, SecondParam, Params...>) {
   return data_attrib_pair<FirstAttrib, FirstParam>::exists &&
@@ -278,8 +277,7 @@ struct data_representation {
   // the size of the attribs
   template <class... DataTs>
   data_representation(const DataTs&... data) {
-    static_assert(can_apply(AttribHolder<Attribs...>(), ParamHolder<DataTs...>()),
-                  "Data values do not match");
+    static_assert(can_apply(AttribHolder<Attribs...>(), ParamHolder<DataTs...>()), "Data values do not match");
 
     set_data<DataTs...>(0, data...);
   }
@@ -288,8 +286,7 @@ struct data_representation {
 
   template <class... DataTs>
   void operator=(const DataTs&... data) {
-    static_assert(can_apply(AttribHolder<Attribs...>(), ParamHolder<DataTs...>()),
-                  "Data values do not match");
+    static_assert(can_apply(AttribHolder<Attribs...>(), ParamHolder<DataTs...>()), "Data values do not match");
 
     set_data<DataTs...>(0, data...);
   }
@@ -302,8 +299,7 @@ struct data_representation {
 
   // recursively assigns values to parts of the internal memory buffer
   template <class FirstDataT, class SecondDataT, class... DataTs>
-  void set_data(const unsigned int offset, const FirstDataT& first, const SecondDataT& second,
-                const DataTs&... data) {
+  void set_data(const unsigned int offset, const FirstDataT& first, const SecondDataT& second, const DataTs&... data) {
     auto num_data_inserted = data_inserter<FirstDataT>::insert(first, m_buffer, offset);
     set_data<SecondDataT, DataTs...>(offset + num_data_inserted, second, data...);
   }

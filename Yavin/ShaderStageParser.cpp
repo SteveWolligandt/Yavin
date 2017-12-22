@@ -41,7 +41,6 @@ std::string ShaderStageParser::parse(const std::string& filename, std::vector<GL
       fileContent += '\n' + line;
   }
   file.close();
-
   return fileContent;
 }
 

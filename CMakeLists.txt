@@ -34,6 +34,7 @@ endforeach()
 find_package(gl3w REQUIRED)
 find_package(GLFW3 REQUIRED)
 find_package(glm REQUIRED)
+# find_package(imgui REQUIRED)
 find_package(OpenGL)
 
 configure_file(Yavin/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/Yavin/config.h" @ONLY)
@@ -42,6 +43,7 @@ file(GLOB hdr Yavin/*.h)
 file(GLOB src Yavin/*.cpp)
 
 add_library(yavin SHARED ${src})
+# add_library(yavin SHARED ${src} ${IMGUI_SOURCES})
 
 target_include_directories(yavin PUBLIC ${OPENGL_INCLUDE_DIR} ${GLM_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRECTORIES})
 target_link_libraries(yavin ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} gl3w ${GLFW_LIBRARIES})
