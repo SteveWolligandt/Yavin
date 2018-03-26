@@ -34,8 +34,9 @@ endforeach()
 find_package(gl3w REQUIRED)
 find_package(GLFW3 REQUIRED)
 find_package(glm REQUIRED)
-# find_package(imgui REQUIRED)
 find_package(OpenGL)
+find_package(PNG REQUIRED)
+find_package(PNG++ REQUIRED)
 
 configure_file(Yavin/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/Yavin/config.h" @ONLY)
 

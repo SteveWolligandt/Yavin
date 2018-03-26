@@ -10,8 +10,9 @@ Window::Window()
       m_cursor_pos_callback_function([](double, double) {}),
       m_mouse_button_callback_function([](int, int, int) {}) {}
 
-Window::Window(const std::string& name, const int width, const unsigned int height,
-               const unsigned int major, const unsigned int minor)
+Window::Window(const std::string& name, const int width,
+               const unsigned int height, const unsigned int major,
+               const unsigned int minor)
     : m_render_function([]() {}),
       m_update_function([](double) {}),
       m_key_callback_function([](int, int, int, int) {}),
@@ -29,7 +30,8 @@ Window::Window(std::function<void()> render_function)
       m_cursor_pos_callback_function([](double, double) {}),
       m_mouse_button_callback_function([](int, int, int) {}) {}
 
-Window::Window(std::function<void()> render_function, std::function<void(double)> update_function)
+Window::Window(std::function<void()>       render_function,
+               std::function<void(double)> update_function)
     : m_render_function(render_function),
       m_update_function(update_function),
       m_key_callback_function([](int, int, int, int) {}),
@@ -72,7 +74,8 @@ void Window::init(const std::string& name,                     //
 
   auto support = gl3wIsSupported(major, minor);
   if (support < 0) {
-    std::cerr << "Opengl 4.5 not supported: " << support << ".\n";
+    std::cerr << "Opengl " << major << "." << minor
+              << " not supported: " << support << ".\n";
     return;
   }
 
@@ -80,20 +83,26 @@ void Window::init(const std::string& name,                     //
             << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
 
   glfwSetWindowUserPointer(m_window, this);
-  glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
+  glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode,
+                                  int action, int mode) {
     ((Window*)glfwGetWindowUserPointer(window))
         ->m_key_callback_function(key, scancode, action, mode);
   });
-  glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-    ((Window*)glfwGetWindowUserPointer(window))->m_resize_callback_function(width, height);
-  });
-  glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double x, double y) {
-    ((Window*)glfwGetWindowUserPointer(window))->m_cursor_pos_callback_function(x, y);
-  });
-  glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
-    ((Window*)glfwGetWindowUserPointer(window))
-        ->m_mouse_button_callback_function(button, action, mods);
-  });
+  glfwSetWindowSizeCallback(m_window,
+                            [](GLFWwindow* window, int width, int height) {
+                              ((Window*)glfwGetWindowUserPointer(window))
+                                  ->m_resize_callback_function(width, height);
+                            });
+  glfwSetCursorPosCallback(m_window,
+                           [](GLFWwindow* window, double x, double y) {
+                             ((Window*)glfwGetWindowUserPointer(window))
+                                 ->m_cursor_pos_callback_function(x, y);
+                           });
+  glfwSetMouseButtonCallback(
+      m_window, [](GLFWwindow* window, int button, int action, int mods) {
+        ((Window*)glfwGetWindowUserPointer(window))
+            ->m_mouse_button_callback_function(button, action, mods);
+      });
 
   glEnable(GL_MULTISAMPLE);
 }
@@ -104,10 +113,12 @@ void Window::set_render_function(std::function<void()> render_function) {
 void Window::set_update_function(std::function<void(double)> update_function) {
   m_update_function = update_function;
 }
-void Window::set_key_callback(std::function<void(int, int, int, int)> key_callback_function) {
+void Window::set_key_callback(
+    std::function<void(int, int, int, int)> key_callback_function) {
   m_key_callback_function = key_callback_function;
 }
-void Window::set_resize_callback(std::function<void(int, int)> resize_callback_function) {
+void Window::set_resize_callback(
+    std::function<void(int, int)> resize_callback_function) {
   m_resize_callback_function = resize_callback_function;
 }
 void Window::set_cursor_pos_callback(
@@ -130,13 +141,17 @@ void Window::start_rendering() {
     m_render_function();
     auto time_after      = timer.now();
     auto render_duration = time_after - time_before;
-    auto render_time     = std::chrono::duration_cast<std::chrono::milliseconds>(render_duration);
+    auto render_time =
+        std::chrono::duration_cast<std::chrono::milliseconds>(render_duration);
 
     auto to_wait = 1.0 / (m_fps / 1000.0 - render_time.count());
     if (to_wait > 0)
-      std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(to_wait)));
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(static_cast<int>(to_wait)));
 
-    t = std::chrono::duration_cast<std::chrono::milliseconds>(timer.now() - time_before).count();
+    t = std::chrono::duration_cast<std::chrono::milliseconds>(timer.now() -
+                                                              time_before)
+            .count();
   }
   // });
 }
@@ -159,4 +174,4 @@ void Window::join_render_thread() {
 }
 
 void Window::should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
-}  // Yavin
+}  // namespace Yavin

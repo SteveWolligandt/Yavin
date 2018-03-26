@@ -21,13 +21,13 @@ class BaseMesh {
   void draw();
 
  protected:
-  void load_obj(
-      const std::string& filepath,
-      std::function<void(size_t, const tinyobj::attrib_t&, const std::vector<tinyobj::shape_t>&,
-                         const std::vector<tinyobj::material_t>&,
-                         const std::vector<size_t>& normal_indices,
-                         const std::vector<size_t>& texcoord_indices)>
-          f);
+  // void load_obj(
+  //     const std::string& filepath,
+  //     std::function<void(size_t, const tinyobj::attrib_t&, const std::vector<tinyobj::shape_t>&,
+  //                        const std::vector<tinyobj::material_t>&,
+  //                        const std::vector<size_t>& normal_indices,
+  //                        const std::vector<size_t>& texcoord_indices)>
+  //         f);
 
   std::vector<VertexArray>         m_vaos;
   std::vector<VertexBuffer<Ts...>> m_vbos;
