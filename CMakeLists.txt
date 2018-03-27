@@ -44,10 +44,11 @@ file(GLOB hdr Yavin/*.h)
 file(GLOB src Yavin/*.cpp)
 
 add_library(yavin SHARED ${src})
-# add_library(yavin SHARED ${src} ${IMGUI_SOURCES})
 
-target_include_directories(yavin PUBLIC ${OPENGL_INCLUDE_DIR} ${GLM_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRECTORIES})
-target_link_libraries(yavin ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} gl3w ${GLFW_LIBRARIES})
+set(GL3W_INCLUDE_DIR ${gl3w_DIR}/../include/)
+
+target_include_directories(yavin PUBLIC ${OPENGL_INCLUDE_DIR} ${GLM_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRECTORIES}i ${GL3W_INCLUDE_DIR})
+target_link_libraries(yavin ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} gl3w ${GLFW_LIBRARIES} ${PNG_LIBRARIES} ${PNG+_LIBRARIES})
 
 install(TARGETS yavin
   # IMPORTANT: Add the yavin library to the "export-set"
@@ -57,7 +58,7 @@ install(TARGETS yavin
   PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/yavin"
     COMPONENT dev)
 
-# add_subdirectory(test)
+add_subdirectory(test)
 
 # Add all targets to the build-tree export set
 export(TARGETS yavin

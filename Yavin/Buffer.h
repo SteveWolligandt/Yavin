@@ -14,6 +14,8 @@ struct first {
 template <int _array_type, typename T>
 class Buffer {
  public:
+  using this_t = Buffer<_array_type, T>;
+
   constexpr static int array_type = _array_type;
 
   Buffer();
@@ -28,11 +30,17 @@ class Buffer {
   ~Buffer();
 
   void upload_data(bool keep_data_on_cpu = false);
+  void gpu_malloc(size_t bytes) {
+    glNamedBufferData(this->m_id, bytes, nullptr, GL_STATIC_DRAW);
+  }
+  void gpu_malloc() { gpu_malloc(cpu_size() * sizeof(T)); }
 
   void        bind() const;
   void        bind_as_copy_write_buffer() const;
   static void unbind();
   static void unbind_as_copy_write_buffer();
+
+  void copy(const this_t& other);
 
   auto cpu_size() const;
   auto gpu_size() const;
@@ -81,11 +89,13 @@ Buffer<array_type, T>::Buffer() {
 
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer(const Buffer& other)
-    : m_is_consistent(other.m_is_consistent), m_data(other.m_data) {
+    : m_gpu_size(other.m_gpu_size),
+      m_is_consistent(other.m_is_consistent),
+      m_dont_delete(other.m_dont_delete),
+      m_data(other.m_data) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
-  glCopyNamedBufferSubData(other.m_id, m_id, 0, 0, sizeof(T) * gpu_size());
-  gl_error_check("glCopyNamedBufferSubData");
+  copy(other);
 }
 
 template <int array_type, typename T>
@@ -169,6 +179,12 @@ template <int array_type, typename T>
 void Buffer<array_type, T>::unbind_as_copy_write_buffer() {
   glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
   gl_error_check("glBindBuffer");
+}
+
+template <int array_type, typename T>
+void Buffer<array_type, T>::copy(const this_t& other) {
+  glCopyNamedBufferSubData(other.m_id, m_id, 0, 0, sizeof(T) * gpu_size());
+  gl_error_check("glCopyNamedBufferSubData");
 }
 
 template <int array_type, typename T>

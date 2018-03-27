@@ -15,7 +15,9 @@ template <typename... Ts>
 class VertexBuffer
     : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> {
  public:
+  using this_t   = VertexBuffer<Ts...>;
   using parent_t = Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>;
+  using parent_t::gpu_malloc;
 
   class iterator;
   class const_iterator;
@@ -24,7 +26,6 @@ class VertexBuffer
   class view;
 
   using data_t = data_representation<Ts...>;
-  using parent_t::bind_as_copy_write_buffer;
 
   VertexBuffer();
   VertexBuffer(const VertexBuffer& other);
@@ -72,6 +73,9 @@ class VertexBuffer
    * @param[in]  keep_data_on_cpu  if true the internal data will be kept on cpu
    */
   void upload_data(bool keep_data_on_cpu = false);
+  void gpu_malloc() { this->gpu_malloc(size_of_attributes * this->cpu_size()); }
+
+  void copy(const this_t& other);
 
   /**
    * @brief      enables and specifies vertex attribute pointer
@@ -114,22 +118,30 @@ class VertexBuffer
   bool m_gpu_buffer_created = false;
 };
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer()
     : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>() {}
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other) {
-  glCreateBuffers(1, &this->m_id);
-  gl_error_check("glCreateBuffers");
-  glCopyNamedBufferSubData(other.m_id, this->m_id, 0, 0,
-                           size_of_attributes * this->gpu_size());
-  gl_error_check("glCopyNamedBufferSubData");
+VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other) : parent_t() {
+  this->m_gpu_size      = other.m_gpu_size;
+  this->m_is_consistent = other.m_is_consistent;
+  this->m_dont_delete   = other.m_dont_delete;
+  this->m_data          = other.m_data;
+  copy(other);
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(VertexBuffer&& other)
     : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(other)) {}
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(const std::vector<data_t>& data,
@@ -137,17 +149,23 @@ VertexBuffer<Ts...>::VertexBuffer(const std::vector<data_t>& data,
     : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(data, direct_upload,
                                                           keep_data_on_cpu) {}
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(std::vector<data_t>&& data,
                                   bool direct_upload, bool keep_data_on_cpu)
     : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(
           std::move(data), direct_upload, keep_data_on_cpu) {}
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(std::initializer_list<data_t>&& list,
                                   bool direct_upload, bool keep_data_on_cpu)
     : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(
           std::move(list), direct_upload, keep_data_on_cpu) {}
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
@@ -187,6 +205,19 @@ void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
     this->m_is_consistent = false;
 }
 
+//------------------------------------------------------------------------------
+
+template <typename... Ts>
+void VertexBuffer<Ts...>::copy(const this_t& other) {
+  this->gpu_malloc(size_of_attributes * other.gpu_size());
+
+  glCopyNamedBufferSubData(other.m_id, this->m_id, 0, 0,
+                           size_of_attributes * this->gpu_size());
+  gl_error_check("glCopyNamedBufferSubData");
+}
+
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 constexpr void VertexBuffer<Ts...>::activate_attributes() {
   for (unsigned int i = 0; i < attr_prefs<Ts...>::num_attrs; i++) {
@@ -200,11 +231,15 @@ constexpr void VertexBuffer<Ts...>::activate_attributes() {
   }
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 void VertexBuffer<Ts...>::push_back(const Ts&... ts) {
   this->m_is_consistent = false;
   this->m_data.push_back(data_t(ts...));
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 void VertexBuffer<Ts...>::emplace_back(const Ts&... ts) {
@@ -212,25 +247,35 @@ void VertexBuffer<Ts...>::emplace_back(const Ts&... ts) {
   this->m_data.emplace_back(ts...);
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 auto VertexBuffer<Ts...>::begin() {
   return iterator(*this, 0);
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 auto VertexBuffer<Ts...>::end() {
   return iterator(*this, this->cpu_size());
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 auto VertexBuffer<Ts...>::begin() const {
   return const_iterator(*this, 0);
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 auto VertexBuffer<Ts...>::end() const {
   return const_iterator(*this, this->cpu_size());
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 template <unsigned int N>
@@ -238,11 +283,15 @@ auto VertexBuffer<Ts...>::get_view() {
   return view<N>(*this);
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 template <unsigned int N>
 auto VertexBuffer<Ts...>::get_view() const {
   return view<N>(*this);
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 auto VertexBuffer<Ts...>::operator[](const size_t idx) {
@@ -252,6 +301,8 @@ auto VertexBuffer<Ts...>::operator[](const size_t idx) {
                                              Yavin::attr_prefs<Ts...>::offsets);
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 auto VertexBuffer<Ts...>::operator[](const size_t idx) const {
   return tuple_constructor<data_representation<Ts...>, sizeof...(Ts), 0,
@@ -260,10 +311,14 @@ auto VertexBuffer<Ts...>::operator[](const size_t idx) const {
                                              Yavin::attr_prefs<Ts...>::offsets);
 }
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 auto& VertexBuffer<Ts...>::operator()(const size_t idx) {
   return reinterpret_cast<unsigned char*>(this->m_data.data())[idx];
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 void VertexBuffer<Ts...>::download_data() {
@@ -279,6 +334,8 @@ void VertexBuffer<Ts...>::download_data() {
   gl_error_check("glUnmapNamedBuffer");
   this->m_is_consistent = true;
 }
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 class VertexBuffer<Ts...>::iterator {
@@ -304,6 +361,8 @@ class VertexBuffer<Ts...>::iterator {
   size_t               m_idx = 0;
 };
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 class VertexBuffer<Ts...>::const_iterator {
  public:
@@ -328,6 +387,8 @@ class VertexBuffer<Ts...>::const_iterator {
   const VertexBuffer<Ts...>& m_vbo;
   size_t                     m_idx = 0;
 };
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 template <unsigned int N>
@@ -355,6 +416,8 @@ class VertexBuffer<Ts...>::view {
   VertexBuffer& m_vbo;
 };
 
+//------------------------------------------------------------------------------
+
 template <typename... Ts>
 template <unsigned int N>
 class VertexBuffer<Ts...>::view<N>::iterator {
@@ -381,6 +444,8 @@ class VertexBuffer<Ts...>::view<N>::iterator {
   VertexBuffer<Ts...>::view<N>& m_vbo_view;
   size_t                        m_idx = 0;
 };
+
+//------------------------------------------------------------------------------
 
 template <typename... Ts>
 template <unsigned int N>
