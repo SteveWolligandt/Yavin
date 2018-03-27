@@ -18,6 +18,7 @@ class VertexBuffer
   using this_t   = VertexBuffer<Ts...>;
   using parent_t = Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>;
   using parent_t::gpu_malloc;
+  using parent_t::gpu_malloc_bytes;
 
   class iterator;
   class const_iterator;
@@ -73,7 +74,9 @@ class VertexBuffer
    * @param[in]  keep_data_on_cpu  if true the internal data will be kept on cpu
    */
   void upload_data(bool keep_data_on_cpu = false);
-  void gpu_malloc() { this->gpu_malloc(size_of_attributes * this->cpu_size()); }
+
+  void gpu_malloc(size_t n) { gpu_malloc_bytes(n * size_of_attributes); }
+  void gpu_malloc() { gpu_malloc(cpu_size()); }
 
   void copy(const this_t& other);
 
@@ -209,8 +212,7 @@ void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
 
 template <typename... Ts>
 void VertexBuffer<Ts...>::copy(const this_t& other) {
-  this->gpu_malloc(size_of_attributes * other.gpu_size());
-
+  gpu_malloc(other.gpu_size());
   glCopyNamedBufferSubData(other.m_id, this->m_id, 0, 0,
                            size_of_attributes * this->gpu_size());
   gl_error_check("glCopyNamedBufferSubData");

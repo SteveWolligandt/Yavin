@@ -30,10 +30,11 @@ class Buffer {
   ~Buffer();
 
   void upload_data(bool keep_data_on_cpu = false);
-  void gpu_malloc(size_t bytes) {
+  void gpu_malloc_bytes(size_t bytes) {
     glNamedBufferData(this->m_id, bytes, nullptr, GL_STATIC_DRAW);
   }
-  void gpu_malloc() { gpu_malloc(cpu_size() * sizeof(T)); }
+  void gpu_malloc(size_t n) { gpu_malloc_bytes(n * sizeof(T)); }
+  void gpu_malloc() { gpu_malloc(cpu_size()); }
 
   void        bind() const;
   void        bind_as_copy_write_buffer() const;
@@ -183,6 +184,7 @@ void Buffer<array_type, T>::unbind_as_copy_write_buffer() {
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::copy(const this_t& other) {
+  gpu_malloc(other.gpu_size());
   glCopyNamedBufferSubData(other.m_id, m_id, 0, 0, sizeof(T) * gpu_size());
   gl_error_check("glCopyNamedBufferSubData");
 }
