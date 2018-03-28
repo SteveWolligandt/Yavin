@@ -1,9 +1,10 @@
 #include <yavin>
 
 using namespace Yavin;
-Window w("VBO-Test", 100, 50, 4, 5);
 
 int main(int argc, char** argv) {
+  Window w("VBO-Test", 100, 50, 4, 5);
+
   VertexBuffer<vec3> original;
   original.push_back({1, 2, 3});
   original.push_back({4, 5, 6});

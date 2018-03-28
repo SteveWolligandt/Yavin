@@ -54,5 +54,6 @@ link_directories(${PMP_BUILD_PATH})
 # This makes the project importable from the build directory
 export(TARGETS yavin FILE tatooineConfig.cmake)
 
+target_compile_definitions(yavin PRIVATE DLL_EXPORT)
 
 add_subdirectory(test)

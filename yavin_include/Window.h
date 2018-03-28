@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>
 #include "gl_includes.h"
+#include "dll_export.h"
 
 #include <GLFW/glfw3.h>
 
@@ -15,33 +16,33 @@ using namespace std::chrono_literals;
 namespace Yavin {
 class Window {
  public:
-  Window();
-  Window(const std::string& name, const int width, const unsigned int height,
+  DLL_API Window();
+  DLL_API Window(const std::string& name, const int width, const unsigned int height,
          const unsigned int major = 4, const unsigned int minor = 5);
-  Window(std::function<void()> render_function);
-  Window(std::function<void()> render_function, std::function<void(double)> update_function);
-  ~Window();
+  DLL_API Window(std::function<void()> render_function);
+  DLL_API Window(std::function<void()> render_function, std::function<void(double)> update_function);
+  DLL_API ~Window();
 
-  void init(const std::string& name, const int width, const unsigned int height,
+  DLL_API void init(const std::string& name, const int width, const unsigned int height,
             const unsigned int major = 4, const unsigned int minor = 5);
 
-  void start_rendering();
+  DLL_API void start_rendering();
 
-  void set_render_function(std::function<void()>);
-  void set_update_function(std::function<void(double)>);
-  void set_key_callback(std::function<void(int, int, int, int)>);
-  void set_resize_callback(std::function<void(int, int)>);
-  void set_cursor_pos_callback(std::function<void(double, double)>);
-  void set_mouse_button_callback(std::function<void(int, int, int)>);
+  DLL_API void set_render_function(std::function<void()>);
+  DLL_API void set_update_function(std::function<void(double)>);
+  DLL_API void set_key_callback(std::function<void(int, int, int, int)>);
+  DLL_API void set_resize_callback(std::function<void(int, int)>);
+  DLL_API void set_cursor_pos_callback(std::function<void(double, double)>);
+  DLL_API void set_mouse_button_callback(std::function<void(int, int, int)>);
 
-  void swap_buffers();
+  DLL_API void swap_buffers();
 
-  void get_framebuffer_size(int& width, int& height);
-  void poll_events();
+  DLL_API void get_framebuffer_size(int& width, int& height);
+  DLL_API void poll_events();
 
-  void set_fps(const double fps);
-  void join_render_thread();
-  void should_close(bool b);
+  DLL_API void set_fps(const double fps);
+  DLL_API void join_render_thread();
+  DLL_API void should_close(bool b);
 
  private:
   GLFWwindow*  m_window;
