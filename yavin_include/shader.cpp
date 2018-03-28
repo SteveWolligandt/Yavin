@@ -2,6 +2,8 @@
 
 #include "gl_includes.h"
 
+#include "windows_undefines.h"
+
 namespace Yavin {
 
 Shader::Shader() {

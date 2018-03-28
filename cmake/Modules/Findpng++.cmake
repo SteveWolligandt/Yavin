@@ -1,61 +1,49 @@
-# - Try to find png++
+# - Find the PNG++ includes 
 #
-# The following variables are optionally searched for defaults
-#  png++_ROOT_DIR:            Base directory where all GLOG components are found
+# This module searches libpng++, the library for working with PNG images.
 #
-# The following are set after configuration is done: 
-#  png++_FOUND
-#  png++_INCLUDE_DIRS
-#  png++_LIBRARIES
+# It defines the following variables
+#  PNG++_INCLUDE_DIRS
+#  PNG_FOUND, If false, do not try to use PNG.
+#  PNG_VERSION_STRING - the version of the PNG library found (since CMake 2.8.8)
+#
+# Since PNG depends on the ZLib compression library, none of the above will be
+# defined unless ZLib can be found.
 
-find_package(PNG REQUIRED)
+#=============================================================================
+# Copyright 2002-2009 Kitware, Inc.
+#
+# Distributed under the OSI-approved BSD License (the "License");
+# see accompanying file Copyright.txt for details.
+#
+# This software is distributed WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the License for more information.
+#=============================================================================
+# (To distribute this file outside of CMake, substitute the full
+#  License text for the above reference.)
 
-include(FindPackageHandleStandardArgs)
-
-set(png++_ROOT_DIR "" CACHE PATH "Folder contains png++")
-
-find_path(png++_INCLUDE_DIR
-    NAMES
-        png++/color.hpp
-        png++/config.hpp
-        png++/consumer.hpp
-        png++/convert_color_space.hpp
-        png++/end_info.hpp
-        png++/error.hpp
-        png++/ga_pixel.hpp
-        png++/generator.hpp
-        png++/gray_pixel.hpp
-        png++/image.hpp
-        png++/image_info.hpp
-        png++/index_pixel.hpp
-        png++/info.hpp
-        png++/info_base.hpp
-        png++/io_base.hpp
-        png++/packed_pixel.hpp
-        png++/palette.hpp
-        png++/pixel_buffer.hpp
-        png++/pixel_traits.hpp
-        png++/png.hpp
-        png++/reader.hpp
-        png++/require_color_space.hpp
-        png++/rgb_pixel.hpp
-        png++/rgba_pixel.hpp
-        png++/streaming_base.hpp
-        png++/tRNS.hpp
-        png++/types.hpp
-        png++/writer.hpp
-    PATHS
-        ${png++_ROOT_DIR}
-    PATH_SUFFIXES
-        src)
-
-set(png++_INCLUDE_DIRS ${png++_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
-set(png++_LIBRARIES ${PNG_LIBRARIES})
-
-find_package_handle_standard_args(png++ DEFAULT_MSG
-    png++_INCLUDE_DIR)
-
-if(png++_FOUND)
-    set(png++_INCLUDE_DIRS ${png++_INCLUDE_DIR})
-    set(png++_LIBRARIES ${png++_LIBRARY})
+if(PNG_FIND_QUIETLY)
+  set(_FIND_ZLIB_ARG QUIET)
 endif()
+find_package(ZLIB ${_FIND_ZLIB_ARG})
+
+if(ZLIB_FOUND)
+  find_path(
+    PNG++_INCLUDE_DIR 
+    png.hpp
+    /usr/local/include/png++
+    /usr/include/png++
+  )
+  if (PNG++_INCLUDE_DIR)
+      set(PNG++_INCLUDE_DIRS ${PNG++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} )
+      unset(PNG++_INCLUDE_DIR)
+  endif ()
+endif()
+
+# handle the QUIETLY and REQUIRED arguments and set PNG_FOUND to TRUE if
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(PNG++ REQUIRED_VARS PNG++_INCLUDE_DIRS)
+mark_as_advanced(PNG++_INCLUDE_DIRS)
+
+

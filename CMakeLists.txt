@@ -13,11 +13,8 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "-fdiagnostics-color=always")
 endif()
 
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
-include(GNUInstallDirs)
 
-file(GLOB src Yavin/*.cpp)
+file(GLOB src yavin_include/*.cpp)
 
 # create library target
 add_library(yavin SHARED ${src})
@@ -31,8 +28,8 @@ find_package(gl3w REQUIRED)
 find_package(GLFW3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenGL)
-find_package(PNG REQUIRED)
-find_package(PNG++ REQUIRED)
+# find_package(PNG REQUIRED)
+# find_package(PNG++ REQUIRED)
 
 set(GL3W_INCLUDE_DIR ${gl3w_DIR}/../include/)
 
@@ -57,7 +54,5 @@ link_directories(${PMP_BUILD_PATH})
 # This makes the project importable from the build directory
 export(TARGETS yavin FILE tatooineConfig.cmake)
 
-# configure include files
-configure_file(Yavin/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/Yavin/config.h" @ONLY)
 
 add_subdirectory(test)

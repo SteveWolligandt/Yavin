@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "windows_undefines.h"
+
 namespace Yavin {
 struct GLSLVar {
   enum modifier_t { UNIFORM, IN, OUT, UNKNOWN };

@@ -2,6 +2,8 @@
 
 #include "gl_includes.h"
 
+#include "windows_undefines.h"
+
 namespace Yavin {
 PerspectiveCamera::PerspectiveCamera(const float fovy, const float aspect, const float near, const float far,
                                      const float vp_x, const float vp_y, const float vp_width, const float vp_height)

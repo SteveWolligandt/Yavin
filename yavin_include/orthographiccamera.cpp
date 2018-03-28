@@ -2,6 +2,8 @@
 
 #include "gl_includes.h"
 
+#include "windows_undefines.h"
+
 namespace Yavin {
 OrthographicCamera::OrthographicCamera(const float left, const float right, const float bottom, const float top,
                                        const float near, const float far, const float vp_x, const float vp_y,
