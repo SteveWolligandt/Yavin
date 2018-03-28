@@ -1,5 +1,6 @@
 #include "AtomicCounterBuffer.h"
 
+#include <cstring>
 #include "gl_includes.h"
 
 //==============================================================================
@@ -45,7 +46,7 @@ void AtomicCounterBuffer::set_all_to(unsigned int val) {
   auto userCounters = reinterpret_cast<unsigned char*>(
       glMapNamedBuffer(this->m_id, GL_WRITE_ONLY));
   gl_error_check("glMapNamedBuffer");
-  memset(userCounters, val, sizeof(unsigned int) * m_gpu_size);
+  std::memset(userCounters, val, sizeof(unsigned int) * m_gpu_size);
   glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 }
 //==============================================================================

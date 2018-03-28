@@ -8,11 +8,12 @@
 #include "error_check.h"
 
 namespace Yavin {
-class IndexBuffer : public Buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int> {
+class AtomicCounterBuffer
+    : public Buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int> {
  public:
   AtomicCounterBuffer();
-  AtomicCounterBuffer(const IndexBuffer& other);
-  AtomicCounterBuffer(IndexBuffer&& other);
+  AtomicCounterBuffer(const AtomicCounterBuffer& other);
+  AtomicCounterBuffer(AtomicCounterBuffer&& other);
   AtomicCounterBuffer(const std::vector<unsigned int>& data,
                       bool                             direct_upload = false,
                       bool keep_data_on_cpu                          = false);

@@ -50,7 +50,7 @@ class Buffer {
 
   auto cpu_size() const { return m_data.size(); }
   auto gpu_size() const { return m_gpu_size; }
-  auto is_consistent() const {return m_is_consistent};
+  auto is_consistent() const { return m_is_consistent; }
 
   void reserve(const size_t size) { m_data.reserve(size); }
   void clear() { m_data.clear(); }
