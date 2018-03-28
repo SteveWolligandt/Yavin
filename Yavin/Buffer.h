@@ -5,11 +5,16 @@
 #include "error_check.h"
 #include "gl_includes.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 template <class T1, class... T>
 struct first {
   typedef T1 type;
 };
+
+//==============================================================================
 
 template <int _array_type, typename T>
 class Buffer {
@@ -43,12 +48,12 @@ class Buffer {
 
   void copy(const this_t& other);
 
-  auto cpu_size() const;
-  auto gpu_size() const;
-  auto is_consistent() const;
+  auto cpu_size() const { return m_data.size(); }
+  auto gpu_size() const { return m_gpu_size; }
+  auto is_consistent() const {return m_is_consistent};
 
-  void reserve(const size_t size);
-  void clear();
+  void reserve(const size_t size) { m_data.reserve(size); }
+  void clear() { m_data.clear(); }
 
   void push_back(const T& data);
   void push_back(const std::initializer_list<T>& data);
@@ -82,11 +87,15 @@ class Buffer {
   std::vector<T> m_data;
 };
 
+//==============================================================================
+
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer() {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer(const Buffer& other)
@@ -99,6 +108,8 @@ Buffer<array_type, T>::Buffer(const Buffer& other)
   copy(other);
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer(Buffer&& other)
     : m_id(other.m_id),
@@ -107,6 +118,8 @@ Buffer<array_type, T>::Buffer(Buffer&& other)
       m_data(std::move(other.m_data)) {
   other.m_dont_delete = true;
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer(const std::vector<T>& data, bool direct_upload,
@@ -117,6 +130,8 @@ Buffer<array_type, T>::Buffer(const std::vector<T>& data, bool direct_upload,
   if (direct_upload) upload_data(keep_data_on_cpu);
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer(std::vector<T>&& data, bool direct_upload,
                               bool keep_data_on_cpu)
@@ -125,6 +140,8 @@ Buffer<array_type, T>::Buffer(std::vector<T>&& data, bool direct_upload,
   gl_error_check("glCreateBuffers");
   if (direct_upload) upload_data(keep_data_on_cpu);
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 Buffer<array_type, T>::Buffer(std::initializer_list<T>&& list,
@@ -135,11 +152,15 @@ Buffer<array_type, T>::Buffer(std::initializer_list<T>&& list,
   if (direct_upload) upload_data(keep_data_on_cpu);
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 Buffer<array_type, T>::~Buffer() {
   glDeleteBuffers(1, &m_id);
   gl_error_check("glDeleteBuffers");
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::upload_data(bool keep_data_on_cpu) {
@@ -158,11 +179,15 @@ void Buffer<array_type, T>::upload_data(bool keep_data_on_cpu) {
     m_is_consistent = false;
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 void Buffer<array_type, T>::bind() const {
   glBindBuffer(array_type, m_id);
   gl_error_check("glBindBuffer");
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::bind_as_copy_write_buffer() const {
@@ -170,17 +195,23 @@ void Buffer<array_type, T>::bind_as_copy_write_buffer() const {
   gl_error_check("glBindBuffer");
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 void Buffer<array_type, T>::unbind() {
   glBindBuffer(array_type, 0);
   gl_error_check("glBindBuffer");
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 void Buffer<array_type, T>::unbind_as_copy_write_buffer() {
   glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
   gl_error_check("glBindBuffer");
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::copy(const this_t& other) {
@@ -189,15 +220,7 @@ void Buffer<array_type, T>::copy(const this_t& other) {
   gl_error_check("glCopyNamedBufferSubData");
 }
 
-template <int array_type, typename T>
-auto Buffer<array_type, T>::cpu_size() const {
-  return m_data.size();
-}
-
-template <int array_type, typename T>
-auto Buffer<array_type, T>::gpu_size() const {
-  return m_gpu_size;
-}
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::push_back(const T& idx) {
@@ -205,11 +228,15 @@ void Buffer<array_type, T>::push_back(const T& idx) {
   m_data.push_back(idx);
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 void Buffer<array_type, T>::push_back(const std::initializer_list<T>& data) {
   m_is_consistent = false;
   for (const auto& date : data) m_data.push_back(date);
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 template <typename S>
@@ -218,11 +245,7 @@ void Buffer<array_type, T>::push_back(const std::initializer_list<S>& data) {
   for (const auto& date : data) m_data.push_back(static_cast<T>(date));
 }
 
-// template <int array_type, typename T>
-// template <typename... Ts>
-// void Buffer<array_type, T>::push_back(const Ts&... ts) {
-//   push_back(std::initializer_list<const typename first<Ts...>::type>(ts...));
-// }
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::emplace_back(T idx) {
@@ -230,11 +253,15 @@ void Buffer<array_type, T>::emplace_back(T idx) {
   m_data.emplace_back(idx);
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 void Buffer<array_type, T>::set_data(const std::vector<T>& data) {
   m_is_consistent = false;
   m_data          = data;
 }
+
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::set_data(std::vector<T>&& data) {
@@ -242,26 +269,15 @@ void Buffer<array_type, T>::set_data(std::vector<T>&& data) {
   m_data          = std::move(data);
 }
 
+//------------------------------------------------------------------------------
+
 template <int array_type, typename T>
 void Buffer<array_type, T>::set_data(std::initializer_list<T>&& l) {
   m_is_consistent = false;
   m_data          = std::move(l);
 }
 
-template <int array_type, typename T>
-auto Buffer<array_type, T>::is_consistent() const {
-  return m_is_consistent;
-}
-
-template <int array_type, typename T>
-void Buffer<array_type, T>::reserve(const size_t size) {
-  m_data.reserve(size);
-}
-
-template <int array_type, typename T>
-void Buffer<array_type, T>::clear() {
-  m_data.clear();
-}
+//------------------------------------------------------------------------------
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::download_data() {
@@ -274,6 +290,9 @@ void Buffer<array_type, T>::download_data() {
   glUnmapNamedBuffer(this->m_id);
   m_is_consistent = true;
 }
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

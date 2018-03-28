@@ -76,7 +76,7 @@ class VertexBuffer
   void upload_data(bool keep_data_on_cpu = false);
 
   void gpu_malloc(size_t n) { gpu_malloc_bytes(n * size_of_attributes); }
-  void gpu_malloc() { gpu_malloc(cpu_size()); }
+  void gpu_malloc() { gpu_malloc(this->cpu_size()); }
 
   void copy(const this_t& other);
 
