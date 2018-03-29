@@ -50,10 +50,10 @@ class Transform {
 
   void first_person() {
     auto  eye      = glm::vec3(translation());
-    float cosPitch = cos(m_first_person_pitch * M_PI / 180);
-    float sinPitch = sin(m_first_person_pitch * M_PI / 180);
-    float cosYaw   = cos(m_first_person_yaw * M_PI / 180);
-    float sinYaw   = sin(m_first_person_yaw * M_PI / 180);
+    float cosPitch = cos(m_first_person_pitch * float(M_PI) / 180.0f);
+    float sinPitch = sin(m_first_person_pitch * float(M_PI) / 180.0f);
+    float cosYaw   = cos(m_first_person_yaw * float(M_PI) / 180.0f);
+    float sinYaw   = sin(m_first_person_yaw * float(M_PI) / 180.0f);
 
     glm::vec3 xaxis = {cosYaw, 0, -sinYaw};
     glm::vec3 yaxis = {sinYaw * sinPitch, cosPitch, cosYaw * sinPitch};

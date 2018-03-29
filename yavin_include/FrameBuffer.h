@@ -4,23 +4,24 @@
 #include "error_check.h"
 
 #include "Texture2D.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class FrameBuffer {
  public:
-  FrameBuffer();
-  FrameBuffer(FrameBuffer&& other);
-  ~FrameBuffer();
+  DLL_API FrameBuffer();
+  DLL_API FrameBuffer(FrameBuffer&& other);
+  DLL_API ~FrameBuffer();
 
   template <typename T, typename Components>
-  void attachTex2D(const Texture2D<T, Components>& tex, unsigned int i = 0);
+  DLL_API void attachTex2D(const Texture2D<T, Components>& tex, unsigned int i = 0);
 
-  void        bind();
-  static void unbind();
+  DLL_API void        bind();
+  DLL_API static void unbind();
 
-  void clear();
+  DLL_API void clear();
 
-  GLuint id() const;
+  DLL_API GLuint id() const;
 
  private:
   GLuint m_id;

@@ -1,9 +1,10 @@
 #include <yavin>
+#include <tuple>
 
 using namespace Yavin;
 
 int main(int argc, char** argv) {
-  Window w("VBO-Test", 100, 50, 4, 5);
+  Window w("VBO-Test", 100, 50, 3, 3);
 
   VertexBuffer<vec3> original;
   original.push_back({1, 2, 3});
@@ -41,4 +42,5 @@ int main(int argc, char** argv) {
     assert(std::get<0>(original[i]).y == std::get<0>(copy[i]).y);
     assert(std::get<0>(original[i]).z == std::get<0>(copy[i]).z);
   }
+  std::cin.get();
 }

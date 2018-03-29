@@ -9,8 +9,6 @@
 #include "gl_includes.h"
 #include "dll_export.h"
 
-#include <GLFW/glfw3.h>
-
 using namespace std::chrono_literals;
 
 namespace Yavin {

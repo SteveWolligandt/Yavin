@@ -2,12 +2,13 @@
 #define __YAVIN_MOVABLE_H__
 
 #include "Transform.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class Movable {
  public:
-  Movable()          = default;
-  virtual ~Movable() = default;
+  DLL_API Movable()          = default;
+  DLL_API virtual ~Movable() = default;
   Transform&       transform() { return m_transform; }
   const Transform& transform() const { return m_transform; }
 

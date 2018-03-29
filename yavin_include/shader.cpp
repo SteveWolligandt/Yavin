@@ -2,8 +2,6 @@
 
 #include "gl_includes.h"
 
-#include "windows_undefines.h"
-
 namespace Yavin {
 
 Shader::Shader() {
@@ -12,20 +10,6 @@ Shader::Shader() {
 }
 
 Shader::~Shader() { glDeleteProgram(m_id); }
-
-template <typename T, typename... Args>
-void Shader::add_shader_stage(Args... args) {
-  m_shader_stages.push_back(T(args...));
-  glAttachShader(m_id, m_shader_stages.back().id());
-  gl_error_check("glAttachShader - " + m_shader_stages.back().stage());
-  for (const auto& stage : m_shader_stages)
-    for (const auto& var : stage.glsl_vars()) {
-      if (var.modifier == GLSLVar::UNIFORM)
-        m_uniform_var_names.insert(var.name);
-      else if (std::is_same<VertexShader, T>::value && var.modifier == GLSLVar::IN)
-        m_attribute_var_names.insert(var.name);
-    }
-}
 
 template void Shader::add_shader_stage<VertexShader, char const*>(char const*);
 template void Shader::add_shader_stage<FragmentShader, char const*>(char const*);

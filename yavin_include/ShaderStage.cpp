@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "ShaderStage.h"
 
 #include "gl_includes.h"
 

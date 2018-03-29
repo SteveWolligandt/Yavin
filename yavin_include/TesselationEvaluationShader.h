@@ -4,12 +4,13 @@
 #include <string>
 
 #include "ShaderStage.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class TesselationEvaluationShader : public ShaderStage {
  public:
-  TesselationEvaluationShader(const std::string& filename);
-  TesselationEvaluationShader(TesselationEvaluationShader&& other);
+  DLL_API TesselationEvaluationShader(const std::string& filename);
+  DLL_API TesselationEvaluationShader(TesselationEvaluationShader&& other);
 };
 }  // namespace Yavin
 

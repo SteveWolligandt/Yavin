@@ -10,6 +10,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "tiny_obj_loader.h"
+#include "dll_export.h"
 
 namespace Yavin {
 template <typename... Ts>
@@ -18,7 +19,7 @@ class BaseMesh {
   using vbo_t    = VertexBuffer<Ts...>;
   using vertex_t = typename vbo_t::data_t;
 
-  void draw();
+  DLL_API void draw();
 
  protected:
   // void load_obj(
@@ -40,37 +41,37 @@ class Mesh;
 template <>
 class Mesh<vec3> : public BaseMesh<vec3> {
  public:
-  Mesh(const std::string& filepath);
+  DLL_API Mesh(const std::string& filepath);
 
  protected:
-  void load_obj(const std::string& filepath);
+  DLL_API void load_obj(const std::string& filepath);
 };
 
 template <>
 class Mesh<vec3, vec3> : public BaseMesh<vec3, vec3> {
  public:
-  Mesh(const std::string& filepath);
+  DLL_API Mesh(const std::string& filepath);
 
  protected:
-  void load_obj(const std::string& filepath);
+  DLL_API void load_obj(const std::string& filepath);
 };
 
 template <>
 class Mesh<vec3, vec2> : public BaseMesh<vec3, vec2> {
  public:
-  Mesh(const std::string& filepath);
+  DLL_API Mesh(const std::string& filepath);
 
  protected:
-  void load_obj(const std::string& filepath);
+  DLL_API void load_obj(const std::string& filepath);
 };
 
 template <>
 class Mesh<vec3, vec3, vec2> : public BaseMesh<vec3, vec3, vec2> {
  public:
-  Mesh(const std::string& filepath);
+  DLL_API Mesh(const std::string& filepath);
 
  protected:
-  void load_obj(const std::string& filepath);
+  DLL_API void load_obj(const std::string& filepath);
 };
 
 }  // namespace Yavin

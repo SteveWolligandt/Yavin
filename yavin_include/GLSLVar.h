@@ -4,6 +4,7 @@
 #include <string>
 
 #include "windows_undefines.h"
+#include "dll_export.h"
 
 namespace Yavin {
 struct GLSLVar {
@@ -12,7 +13,7 @@ struct GLSLVar {
   std::string datatype;
   std::string name;
 
-  static auto modifier_to_string(const GLSLVar::modifier_t& modifier);
+  DLL_API static auto modifier_to_string(const GLSLVar::modifier_t& modifier);
 };
 }  // Yavin
 #endif

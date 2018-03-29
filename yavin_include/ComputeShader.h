@@ -4,12 +4,13 @@
 #include <string>
 
 #include "ShaderStage.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class ComputeShader : public ShaderStage {
  public:
-  ComputeShader(const std::string& filename);
-  ComputeShader(ComputeShader&& other);
+  DLL_API ComputeShader(const std::string& filename);
+  DLL_API ComputeShader(ComputeShader&& other);
 };
 }  // namespace Yavin
 

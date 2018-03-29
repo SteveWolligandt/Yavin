@@ -5,12 +5,13 @@
 #include "gl_includes.h"
 
 #include "ShaderStage.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class FragmentShader : public ShaderStage {
  public:
-  FragmentShader(const std::string& filename);
-  FragmentShader(FragmentShader&& other);
+  DLL_API FragmentShader(const std::string& filename);
+  DLL_API FragmentShader(FragmentShader&& other);
 };
 }  // namespace Yavin
 

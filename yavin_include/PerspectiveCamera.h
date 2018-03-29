@@ -4,21 +4,22 @@
 #include <glm/glm.hpp>
 #include "Camera.h"
 #include "ray.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class PerspectiveCamera : public Camera {
  public:
-  PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, const float vp_x,
+  DLL_API PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, const float vp_x,
                     const float vp_y, const float vp_width, const float vp_height);
 
-  PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, const float vp_width,
+  DLL_API PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, const float vp_width,
                     const float vp_height);
 
-  PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, const glm::vec4& vp);
+  DLL_API PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, const glm::vec4& vp);
 
-  PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, glm::vec4&& vp);
+  DLL_API PerspectiveCamera(const float fovy, const float aspect, const float near, const float far, glm::vec4&& vp);
 
-  void set_projection(const float fovy, const float aspect, const float near, const float far);
+  DLL_API void set_projection(const float fovy, const float aspect, const float near, const float far);
 
   template <typename T>
   auto create_ray(T x, T y) {

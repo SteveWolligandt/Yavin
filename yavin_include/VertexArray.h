@@ -7,18 +7,19 @@
 #include "Type.h"
 #include "VertexBuffer.h"
 #include "error_check.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class VertexArray {
  public:
-  VertexArray();
-  VertexArray(const VertexArray& other);
-  VertexArray(VertexArray&& other);
-  ~VertexArray();
+  DLL_API VertexArray();
+  DLL_API VertexArray(const VertexArray& other);
+  DLL_API VertexArray(VertexArray&& other);
+  DLL_API ~VertexArray();
 
-  void bind();
-  void unbind();
-  void draw(Primitive primitive, unsigned int num_primitives);
+  DLL_API void bind();
+  DLL_API void unbind();
+  DLL_API void draw(Primitive primitive, unsigned int num_primitives);
 
  protected:
   unsigned int m_id;

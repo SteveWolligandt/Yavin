@@ -5,12 +5,13 @@
 #include "gl_includes.h"
 
 #include "ShaderStage.h"
+#include "dll_export.h"
 
 namespace Yavin {
 class VertexShader : public ShaderStage {
  public:
-  VertexShader(const std::string& filename);
-  VertexShader(VertexShader&& other);
+  DLL_API VertexShader(const std::string& filename);
+  DLL_API VertexShader(VertexShader&& other);
 };
 }  // namespace Yavin
 
