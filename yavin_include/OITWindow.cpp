@@ -86,7 +86,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
 
     std::cout << "m_linked_list.resize\n";
     m_linked_list.gpu_malloc(m_width * m_height * m_linked_list_size_factor);
-    m_linked_list.bind(80);
+    m_linked_list.bind(8);
 
     std::cout << "set new cam options\n";
     OrthographicCamera cam(0, 1, 0, 1, -1, 1, m_width, m_height);
