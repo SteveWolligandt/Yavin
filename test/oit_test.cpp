@@ -55,6 +55,7 @@ class OITTestWindow : public OITWindow {
         quad2{vec3{-1, -1.4, 1}, vec3{1, -1.4, 1}, vec3{-1, 0.9, 1},
               vec3{1, 0.9, 1}} {
     cam.transform().translate(0, 0, 3);
+    set_clear_color({1, 1, 1, 1});
     set_render_function([&]() {
       shader.bind();
       shader.set_uniform("projection", cam.projection_matrix());

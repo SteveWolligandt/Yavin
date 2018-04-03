@@ -55,6 +55,10 @@ class OITWindow : public Window {
     IndexBuffer m_ibo;
   };
 
+  void set_clear_color(const glm::vec4& clear_color) {
+    m_linked_list_render_shader.set_uniform("clear_color", clear_color);
+  }
+
  private:
   std::function<void()> m_oit_render_function;
 
