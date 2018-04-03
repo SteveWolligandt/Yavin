@@ -14,8 +14,5 @@ configure_file(linked_list_render.vert linked_list_render.vert COPYONLY)
 add_executable (vbo_test vbo_test.cpp)
 target_link_libraries(vbo_test yavin)
 
-add_executable (shader_storage_buffer shader_storage_buffer.cpp)
-target_link_libraries(shader_storage_buffer yavin)
-
 add_executable (oit_test oit_test.cpp)
 target_link_libraries(oit_test yavin)
