@@ -39,7 +39,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
   m_linked_list_render_shader.set_uniform("modelview", cam.view_matrix());
 
   m_atomic_counter.bind(5);
-  m_linked_list.bind(80);
+  m_linked_list.bind(8);
 
   m_head_indices_tex.bind();
   m_head_indices_tex.set_interpolation_mode(Texture::NEAREST);

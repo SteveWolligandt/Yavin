@@ -9,7 +9,7 @@ struct linked_list_element {
 
 layout (binding = 7, r32ui) uniform uimage2D head_index;
 layout (binding = 5, offset = 0) uniform atomic_uint cnt;
-layout (binding = 80, std430) buffer linked_list { 
+layout (binding = 8, std430) buffer linked_list { 
   linked_list_element nodes[];
 };
 
