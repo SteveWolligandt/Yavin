@@ -6,8 +6,14 @@ VertexArray::VertexArray() {
   glCreateVertexArrays(1, &m_id);
   gl_error_check("glGenVertexArrays");
 }
-VertexArray::VertexArray(const VertexArray& other) { std::cout << "COPY CONSTRUCTOR OF VAO\n"; }
-VertexArray::VertexArray(VertexArray&& other) { std::cout << "MOVE CONSTRUCTOR OF VAO\n"; }
+VertexArray::VertexArray(const VertexArray& other) {
+  glCreateVertexArrays(1, &m_id);
+  gl_error_check("glGenVertexArrays");
+  std::cout << "COPY CONSTRUCTOR OF VAO\n";
+}
+VertexArray::VertexArray(VertexArray&& other) {
+  std::cout << "MOVE CONSTRUCTOR OF VAO\n";
+}
 
 VertexArray::~VertexArray() {
   glDeleteVertexArrays(1, &m_id);

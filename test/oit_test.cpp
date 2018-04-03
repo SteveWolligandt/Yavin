@@ -30,9 +30,18 @@ class OITTestWindow : public OITWindow {
       : OITWindow(name, screen_width, screen_height),
         cam(30, (float)screen_width / (float)screen_height, 0.01, 100,
             screen_width, screen_height),
-        quad1{vec3{-1, -1, 0}, vec3{1, -1, 2}, vec3{-1, 1, 0}, vec3{1, 1, 2}},
-        quad2{vec3{-1, -1.4, 1}, vec3{1, -1.4, 1}, vec3{-1, 0.9, 1},
-              vec3{1, 0.9, 1}} {
+        quads{
+
+            {vec3{-1, -1, 0}, vec3{1, -1, 2}, vec3{-1, 1, 0}, vec3{1, 1, 2}},
+
+            {vec3{-1.1, -0.9, 1}, vec3{0.9, -0.9, 1}, vec3{-1, 1.4, 1},
+             vec3{1, 1.4, 1}},
+
+            {vec3{-2, -0.9, 1}, vec3{1.1, -0.9, 0}, vec3{-2, 1.1, 1},
+             vec3{1.1, 1.1, 0}},
+
+        },
+        colors{{1, 0, 0, 0.5}, {0, 0, 1, 0.5}, {0, 1, 0, 0.5}} {
     cam.transform().translate(0, 0, 3);
     set_clear_color({1, 1, 1, 1});
     set_render_function([&]() {
@@ -40,11 +49,10 @@ class OITTestWindow : public OITWindow {
       shader.set_uniform("projection", cam.projection_matrix());
       shader.set_uniform("modelview", cam.view_matrix());
 
-      shader.set_color({1, 0, 0, 0.5});
-      quad1.draw();
-
-      shader.set_color({0, 1, 0, 0.5});
-      quad2.draw();
+      for (size_t i = 0; i < quads.size(); ++i) {
+        shader.set_color(colors[i]);
+        quads[i].draw();
+      }  // namespace Yavin::Test
     });
 
     set_resize_function([this](int w, int h) {
@@ -53,10 +61,10 @@ class OITTestWindow : public OITWindow {
   }
 
  private:
-  ColorLinkedListShader shader;
-  PerspectiveCamera     cam;
-  TriangleStrip         quad1;
-  TriangleStrip         quad2;
+  ColorLinkedListShader      shader;
+  PerspectiveCamera          cam;
+  std::vector<TriangleStrip> quads;
+  std::vector<glm::vec4>     colors;
 };
 //==============================================================================
 }  // namespace Yavin::Test

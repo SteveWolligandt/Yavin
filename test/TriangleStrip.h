@@ -1,6 +1,6 @@
 #ifndef __YAVIN_TEST_TRIANGLESTRIP_H__
 #define __YAVIN_TEST_TRIANGLESTRIP_H__
-
+#include <yavin>
 //==============================================================================
 namespace Yavin::Test {
 //==============================================================================
@@ -17,6 +17,16 @@ class TriangleStrip {
     vbo.bind();
     ibo.bind();
     vbo_t::activate_attributes();
+    vao.unbind();
+  }
+
+  TriangleStrip(const TriangleStrip& other)
+      : size(other.size), vao(other.vao), vbo(other.vbo), ibo(other.ibo) {
+    vao.bind();
+    vbo.bind();
+    ibo.bind();
+    vbo_t::activate_attributes();
+    vao.unbind();
   }
 
   void draw() {
