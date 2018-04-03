@@ -49,9 +49,9 @@ class OITWindow : public Window {
   const static std::string vertex_shader_path;
   const static std::string fragment_shader_path;
   //----------------------------------------------------------------------------
-  DLL_API OITWindow(const std::string& name, const int width,
-                    const unsigned int height, const unsigned int major = 4,
-                    const unsigned int minor = 5);
+  DLL_API OITWindow(const std::string& name, size_t width, size_t height,
+                    unsigned int linked_list_size_factor = 8,
+                    unsigned int major = 4, unsigned int minor = 5);
 
   //----------------------------------------------------------------------------
   DLL_API void init();
@@ -59,15 +59,20 @@ class OITWindow : public Window {
   void set_render_function(std::function<void()> render_function) {
     m_oit_render_function = render_function;
   }
+  void set_resize_function(std::function<void(int, int)> resize_fun) {
+    m_oit_resize_function = resize_fun;
+  }
   //----------------------------------------------------------------------------
   void set_clear_color(const glm::vec4& clear_color) {
     m_linked_list_render_shader.set_uniform("clear_color", clear_color);
   }
 
  private:
-  std::function<void()> m_oit_render_function;
+  std::function<void()>         m_oit_render_function;
+  std::function<void(int, int)> m_oit_resize_function;
 
   size_t m_width, m_height;
+  size_t m_linked_list_size_factor;
 
   Shader                                   m_linked_list_render_shader;
   AtomicCounterBuffer                      m_atomic_counter;

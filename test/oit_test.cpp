@@ -46,6 +46,10 @@ class OITTestWindow : public OITWindow {
       shader.set_color({0, 1, 0, 0.5});
       quad2.draw();
     });
+
+    set_resize_function([this](int w, int h) {
+      cam.set_projection(30, (float)w / (float)h, 0.01, 100, w, h);
+    });
   }
 
  private:
