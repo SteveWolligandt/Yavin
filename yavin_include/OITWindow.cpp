@@ -3,12 +3,18 @@
 #include "gl_wrapper.h"
 #include "shader_include_paths.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
 
 const std::string OITWindow::vertex_shader_path =
     shader_dir + std::string("linked_list_render.vert");
+
+//------------------------------------------------------------------------------
 const std::string OITWindow::fragment_shader_path =
     shader_dir + std::string("linked_list_render.frag");
+
+//------------------------------------------------------------------------------
 OITWindow::OITWindow(const std::string& name, const int width,
                      const unsigned int height, const unsigned int major,
                      const unsigned int minor)
@@ -62,8 +68,6 @@ OITWindow::OITWindow(const std::string& name, const int width,
     poll_events();
   });
 }
-
-void OITWindow::set_render_function(std::function<void()> render_function) {
-  m_oit_render_function = render_function;
-}
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================

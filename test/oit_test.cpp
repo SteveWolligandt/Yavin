@@ -1,4 +1,5 @@
 #include <yavin>
+#include "TriangleStrip.h"
 
 using namespace Yavin;
 
@@ -8,6 +9,9 @@ const unsigned int num_pixels       = screen_width * screen_height;
 const unsigned int linked_list_size = num_pixels * 3;
 
 //==============================================================================
+namespace Yavin::Test {
+//==============================================================================
+
 class ColorLinkedListShader : public Shader {
  public:
   ColorLinkedListShader() : Shader() {
@@ -17,34 +21,9 @@ class ColorLinkedListShader : public Shader {
   }
   void set_color(const glm::vec4 color) { set_uniform("color", color); }
 };
+
 //==============================================================================
-class TriangleStrip {
- public:
-  using vbo_t = VertexBuffer<vec3>;
-  TriangleStrip(std::initializer_list<vbo_t::data_t>&& vertices)
-      : size(vertices.size()), vbo(std::move(vertices)) {
-    std::vector<unsigned int> indices;
-    for (size_t i = 0; i < size; ++i) ibo.push_back(i);
-    ibo.upload_data();
 
-    vao.bind();
-    vbo.bind();
-    ibo.bind();
-    vbo_t::activate_attributes();
-  }
-
-  void draw() {
-    vao.bind();
-    vao.draw(Yavin::TRIANGLE_STRIP, size);
-  }
-
- private:
-  size_t      size;
-  VertexArray vao;
-  vbo_t       vbo;
-  IndexBuffer ibo;
-};
-//==============================================================================
 class OITTestWindow : public OITWindow {
  public:
   OITTestWindow(const std::string& name)
@@ -75,8 +54,11 @@ class OITTestWindow : public OITWindow {
   TriangleStrip         quad1;
   TriangleStrip         quad2;
 };
+//==============================================================================
+}  // namespace Yavin::Test
+//==============================================================================
 
 int main() {
-  OITTestWindow w("OIT Test");
+  Yavin::Test::OITTestWindow w("OIT Test");
   w.start_rendering();
 }

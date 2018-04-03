@@ -15,23 +15,7 @@ namespace Yavin {
 
 class OITWindow : public Window {
  public:
-  DLL_API OITWindow(const std::string& name, const int width,
-                    const unsigned int height, const unsigned int major = 4,
-                    const unsigned int minor = 5);
-
-  DLL_API void init();
-  DLL_API void set_render_function(std::function<void()>);
-
-  struct linked_list_element {
-    vec4         color;
-    unsigned int next_index;
-    float        depth;
-    vec2         pad;
-  };
-
-  const static std::string vertex_shader_path;
-  const static std::string fragment_shader_path;
-
+  //============================================================================
   class screen_quad_t {
    public:
     using vbo_t = VertexBuffer<vec2>;
@@ -54,7 +38,28 @@ class OITWindow : public Window {
     vbo_t       m_vbo;
     IndexBuffer m_ibo;
   };
+  //============================================================================
+  struct linked_list_element {
+    vec4         color;
+    unsigned int next_index;
+    float        depth;
+    vec2         pad;
+  };
+  //============================================================================
+  const static std::string vertex_shader_path;
+  const static std::string fragment_shader_path;
+  //----------------------------------------------------------------------------
+  DLL_API OITWindow(const std::string& name, const int width,
+                    const unsigned int height, const unsigned int major = 4,
+                    const unsigned int minor = 5);
 
+  //----------------------------------------------------------------------------
+  DLL_API void init();
+  //----------------------------------------------------------------------------
+  void set_render_function(std::function<void()> render_function) {
+    m_oit_render_function = render_function;
+  }
+  //----------------------------------------------------------------------------
   void set_clear_color(const glm::vec4& clear_color) {
     m_linked_list_render_shader.set_uniform("clear_color", clear_color);
   }
