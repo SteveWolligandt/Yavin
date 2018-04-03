@@ -9,8 +9,12 @@ ShaderStage::ShaderStage(GLenum shaderType, const std::string &filename) {
     case GL_VERTEX_SHADER: m_shader_type_name = "Vertex"; break;
     case GL_FRAGMENT_SHADER: m_shader_type_name = "Fragment"; break;
     case GL_GEOMETRY_SHADER: m_shader_type_name = "Geometry"; break;
-    case GL_TESS_EVALUATION_SHADER: m_shader_type_name = "Tesselation Evaluation"; break;
-    case GL_TESS_CONTROL_SHADER: m_shader_type_name = "Tesselation Control"; break;
+    case GL_TESS_EVALUATION_SHADER:
+      m_shader_type_name = "Tesselation Evaluation";
+      break;
+    case GL_TESS_CONTROL_SHADER:
+      m_shader_type_name = "Tesselation Control";
+      break;
     case GL_COMPUTE_SHADER: m_shader_type_name = "Compute"; break;
   }
 

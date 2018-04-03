@@ -36,18 +36,22 @@ AtomicCounterBuffer::AtomicCounterBuffer(std::vector<unsigned int>&& data,
 //------------------------------------------------------------------------------
 
 AtomicCounterBuffer::AtomicCounterBuffer(
-    std::initializer_list<unsigned int>&& list, bool direct_upload,
-    bool keep_data_on_cpu)
-    : Buffer(std::move(list), direct_upload, keep_data_on_cpu) {}
+    std::initializer_list<unsigned int>&& list)
+    : Buffer(std::move(list)) {}
 
 //------------------------------------------------------------------------------
 
 void AtomicCounterBuffer::set_all_to(unsigned int val) {
-  auto userCounters = reinterpret_cast<unsigned char*>(
+  auto gpu_data = reinterpret_cast<unsigned char*>(
       glMapNamedBuffer(this->m_id, GL_WRITE_ONLY));
   gl_error_check("glMapNamedBuffer");
-  std::memset(userCounters, val, sizeof(unsigned int) * m_gpu_size);
-  glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+  std::memset(gpu_data, val, sizeof(unsigned int) * m_gpu_size);
+  // for (size_t i = 0; i < m_gpu_size; ++i) gpu_data[i] = val;
+  glUnmapNamedBuffer(this->m_id);
+}
+
+void AtomicCounterBuffer::bind(size_t i) {
+  glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, i, this->m_id);
 }
 //==============================================================================
 }  // namespace Yavin

@@ -1,22 +1,13 @@
-#include <yavin>
 #include <tuple>
+#include <yavin>
 
 using namespace Yavin;
 
 int main(int argc, char** argv) {
   Window w("VBO-Test", 100, 50, 3, 3);
 
-  VertexBuffer<vec3> original;
-  original.push_back({1, 2, 3});
-  original.push_back({4, 5, 6});
-  original.push_back({7, 8, 9});
-  original.upload_data();
-
-  IndexBuffer original_ibo;
-  original_ibo.push_back(0);
-  original_ibo.push_back(1);
-  original_ibo.push_back(2);
-  original_ibo.upload_data();
+  VertexBuffer<vec3> original{vec3{1, 2, 3}, vec3{4, 5, 6}, vec3{7, 8, 9}};
+  IndexBuffer        original_ibo{0, 1, 2};
 
   auto copy     = original;
   auto copy_ibo = original_ibo;

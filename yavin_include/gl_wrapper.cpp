@@ -9,11 +9,11 @@ void clear_depth_Buffer() {
   glClear(GL_DEPTH_BUFFER_BIT);
   gl_error_check("glClear");
 }
-void clear_color_depth_duffer() {
+void clear_color_depth_buffer() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   gl_error_check("glClear");
 }
-void set_clear_Color(float r, float g, float b, float a) {
+void set_clear_color(float r, float g, float b, float a) {
   glClearColor(r, g, b, a);
   gl_error_check("glClearColor");
 }
@@ -53,9 +53,11 @@ void blend_func_additive() { blend_func(GL_ONE, GL_ONE); }
 void blend_func_multiplicative() { blend_func(GL_ONE, GL_ONE); }
 void blend_func_subtractive() { blend_func(GL_ONE, GL_ONE); }
 void blend_func_alpha() { blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); }
-void set_viewport(unsigned int left, unsigned int bottom, unsigned int width, unsigned int height) {
+void set_viewport(unsigned int left, unsigned int bottom, unsigned int width,
+                  unsigned int height) {
   glViewport(left, bottom, width, height);
-  gl_error_check("glViewport(" + std::to_string(left) + ", " + std::to_string(bottom) + ", " +
-                 std::to_string(width) + ", " + std::to_string(height) + ")");
+  gl_error_check("glViewport(" + std::to_string(left) + ", " +
+                 std::to_string(bottom) + ", " + std::to_string(width) + ", " +
+                 std::to_string(height) + ")");
 }
 }  // namespace Yavin

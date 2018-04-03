@@ -9,7 +9,7 @@ namespace Yavin {
  * <any>                                       <- variable name
  */
 const std::regex ShaderStageParser::regex_var(
-    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|int|sampler\dD|mat\d|vec\d)\s(.*)[;])");
+    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|int|uint|sampler\dD|mat\d|vec\d)\s(.*)[;])");
 
 /**
  * #include <- keyword
@@ -20,14 +20,16 @@ const std::regex ShaderStageParser::regex_var(
 const std::regex ShaderStageParser::regex_include(
     R"(#include\s+\"(.*)\")");
 
-std::string ShaderStageParser::parse(const std::string& filename, std::vector<GLSLVar>& vars) {
+std::string ShaderStageParser::parse(const std::string&    filename,
+                                     std::vector<GLSLVar>& vars) {
   std::string fileContent;
   std::string line;
   std::string folder = filename.substr(0, filename.find_last_of("/\\") + 1);
 
   std::ifstream file(filename.c_str());
 
-  if (!file.is_open()) throw std::runtime_error("ERROR: Unable to open file " + filename);
+  if (!file.is_open())
+    throw std::runtime_error("ERROR: Unable to open file " + filename);
 
   while (!file.eof()) {
     getline(file, line);
@@ -44,7 +46,8 @@ std::string ShaderStageParser::parse(const std::string& filename, std::vector<GL
   return fileContent;
 }
 
-std::optional<GLSLVar> ShaderStageParser::parse_varname(const std::string& line) {
+std::optional<GLSLVar> ShaderStageParser::parse_varname(
+    const std::string& line) {
   std::smatch match;
 
   std::regex_match(line, match, regex_var);
@@ -65,7 +68,8 @@ std::optional<GLSLVar> ShaderStageParser::parse_varname(const std::string& line)
     return {};
 }
 
-std::optional<std::string> ShaderStageParser::parse_include(const std::string& line) {
+std::optional<std::string> ShaderStageParser::parse_include(
+    const std::string& line) {
   std::smatch match;
 
   std::regex_match(line, match, regex_include);

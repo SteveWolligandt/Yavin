@@ -15,17 +15,12 @@ endif()
 # try to find required packages
 find_path(GLEW_INCLUDE_DIR GL/glew.h)
 find_library(GLEW_LIBRARY NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
-find_package(gl3w REQUIRED)
 find_package(GLFW3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenGL)
 # find_package(PNG REQUIRED)
 # find_package(PNG++ REQUIRED)
-
-set(GL3W_INCLUDE_DIR ${gl3w_DIR}/../include/)
-set(GL3W_SOURCE_DIR ${gl3w_DIR}/../src/)
-set(GL3W_SOURCES ${GL3W_SOURCE_DIR}/gl3w.c)
 
 file(GLOB YAVIN_SOURCES yavin_include/*.cpp)
 file(GLOB YAVIN_HEADERS yavin_include/*.h)
@@ -39,7 +34,6 @@ target_include_directories(yavin PUBLIC
   ${OPENGL_INCLUDE_DIR} 
   ${GLM_INCLUDE_DIRS} 
   ${GLFW3_INCLUDE_DIRECTORIES}
-  ${GL3W_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIR}
   )
 
