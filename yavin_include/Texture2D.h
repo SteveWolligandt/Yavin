@@ -8,6 +8,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include "PixelUnpackBuffer.h"
 #include "TexHelper.h"
 #include "Texture.h"
 
@@ -15,7 +16,8 @@ namespace Yavin {
 template <typename T, typename Components>
 class Texture2D : public Yavin::Texture {
  public:
-  // Texture2D(const std::string& filepath, bool direct_upload = true, bool keep_data_on_cpu = false);
+  // Texture2D(const std::string& filepath, bool direct_upload = true, bool
+  // keep_data_on_cpu = false);
 
   Texture2D(const Texture2D& other);
 
@@ -23,25 +25,29 @@ class Texture2D : public Yavin::Texture {
 
   Texture2D(unsigned int width, unsigned int height);
 
-  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data, bool direct_upload = true,
-            bool keep_data_on_cpu = false);
+  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
+            bool direct_upload = true, bool keep_data_on_cpu = false);
 
-  Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data, bool direct_upload = true,
-            bool keep_data_on_cpu = false);
+  Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data,
+            bool direct_upload = true, bool keep_data_on_cpu = false);
 
-  Texture2D(unsigned int width, unsigned int height, std::initializer_list<T>&& list, bool direct_upload = true,
-            bool keep_data_on_cpu = false);
-
-  template <typename S>
-  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data, bool direct_upload = true,
+  Texture2D(unsigned int width, unsigned int height,
+            std::initializer_list<T>&& list, bool direct_upload = true,
             bool keep_data_on_cpu = false);
 
   template <typename S>
-  Texture2D(unsigned int width, unsigned int height, const std::initializer_list<S>& list, bool direct_upload = true,
+  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
+            bool direct_upload = true, bool keep_data_on_cpu = false);
+
+  template <typename S>
+  Texture2D(unsigned int width, unsigned int height,
+            const std::initializer_list<S>& list, bool direct_upload = true,
             bool keep_data_on_cpu = false);
 
   void        bind(unsigned int i = 0);
   static void unbind(unsigned int i = 0);
+  void        bind_image_texture(unsigned int i = 0);
+  static void unbind_image_texture(unsigned int i = 0);
 
   void set_interpolation_mode(Yavin::Texture::InterpolationMode mode);
   void set_interpolation_mode_min(Yavin::Texture::InterpolationMode mode);
@@ -56,26 +62,33 @@ class Texture2D : public Yavin::Texture {
   auto        is_consistent() const;
   const auto& data() const;
 
-  // void load_png(const std::string& filepath, bool direct_upload = true, bool keep_data_on_cpu = false);
+  // void load_png(const std::string& filepath, bool direct_upload = true, bool
+  // keep_data_on_cpu = false);
 
   // void save_png(const std::string& filepath);
 
-  void upload_data(unsigned int width, unsigned int height, const std::vector<T>& data, bool keep_data_on_cpu = false);
+  void upload_data(unsigned int width, unsigned int height,
+                   const std::vector<T>& data, bool keep_data_on_cpu = false);
 
-  void upload_data(unsigned int width, unsigned int height, std::vector<T>&& data, bool keep_data_on_cpu = false);
+  void upload_data(unsigned int width, unsigned int height,
+                   std::vector<T>&& data, bool keep_data_on_cpu = false);
 
-  void upload_data(unsigned int width, unsigned int height, std::initializer_list<T>&& data,
-                   bool keep_data_on_cpu = false);
+  void upload_data(unsigned int width, unsigned int height,
+                   std::initializer_list<T>&& data,
+                   bool                       keep_data_on_cpu = false);
 
   void upload_data(bool keep_data_on_cpu = false);
+  void set_data(const PixelUnpackBuffer<T>& pbo);
 
   void        resize(unsigned int w, unsigned int h);
   const auto& download_data();
 
-  static constexpr unsigned int n               = TexHelper::comb<T, Components>::num_components;
-  static constexpr GLint        internal_format = TexHelper::comb<T, Components>::internal_format;
-  static constexpr GLenum       format          = TexHelper::comb<T, Components>::format;
-  static constexpr GLenum       type            = TexHelper::comb<T, Components>::type;
+  static constexpr unsigned int n =
+      TexHelper::comb<T, Components>::num_components;
+  static constexpr GLint internal_format =
+      TexHelper::comb<T, Components>::internal_format;
+  static constexpr GLenum format = TexHelper::comb<T, Components>::format;
+  static constexpr GLenum type   = TexHelper::comb<T, Components>::type;
 
  protected:
   unsigned int   m_width, m_height;
@@ -84,16 +97,17 @@ class Texture2D : public Yavin::Texture {
 };
 
 /*template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(const std::string& filepath, bool direct_upload, bool keep_data_on_cpu) {
-  glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-  gl_error_check("glCreateTextures");
+Texture2D<T, Components>::Texture2D(const std::string& filepath, bool
+direct_upload, bool keep_data_on_cpu) { glCreateTextures(GL_TEXTURE_2D, 1,
+&m_id); gl_error_check("glCreateTextures");
   assert(filepath.substr(filepath.size() - 3, 3) == "png");
   if (direct_upload) bind();
   load_png(filepath, direct_upload, keep_data_on_cpu);
 }*/
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height) : Texture(), m_width(0), m_height(0) {
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height)
+    : Texture(), m_width(0), m_height(0) {
   glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
   gl_error_check("glCreateTextures");
   bind();
@@ -133,7 +147,8 @@ Texture2D<T, Components>::Texture2D(Texture2D&& other)
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
+                                    const std::vector<T>& data,
                                     bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(data) {
   if (direct_upload) {
@@ -145,7 +160,8 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, con
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std::vector<T>&& data, bool direct_upload,
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
+                                    std::vector<T>&& data, bool direct_upload,
                                     bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(std::move(data)) {
   if (direct_upload) {
@@ -157,7 +173,8 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std::initializer_list<T>&& list,
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
+                                    std::initializer_list<T>&& list,
                                     bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(std::move(list)) {
   if (direct_upload) {
@@ -170,7 +187,8 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, std
 
 template <typename T, typename Components>
 template <typename S>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
+                                    const std::vector<S>& data,
                                     bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height) {
   m_data.reserve(data.size());
@@ -186,7 +204,8 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, con
 
 template <typename T, typename Components>
 template <typename S>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height, const std::initializer_list<S>& list,
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
+                                    const std::initializer_list<S>& list,
                                     bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height) {
   for (const auto& date : list) m_data.push_back(static_cast<T>(date));
@@ -216,19 +235,32 @@ void Texture2D<T, Components>::unbind(unsigned int i) {
 }
 
 template <typename T, typename Components>
+void Texture2D<T, Components>::bind_image_texture(unsigned int i) {
+  glBindImageTexture(i, this->m_id, 0, GL_FALSE, 0, GL_READ_WRITE,
+                     internal_format);
+}
+
+template <typename T, typename Components>
+void Texture2D<T, Components>::unbind_image_texture(unsigned int i) {
+  glBindImageTexture(i, 0, 0, GL_FALSE, 0, GL_READ_WRITE, internal_format);
+}
+
+template <typename T, typename Components>
 void Texture2D<T, Components>::set_interpolation_mode(InterpolationMode mode) {
   set_interpolation_mode_min(mode);
   set_interpolation_mode_mag(mode);
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::set_interpolation_mode_min(InterpolationMode mode) {
+void Texture2D<T, Components>::set_interpolation_mode_min(
+    InterpolationMode mode) {
   glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, mode);
   gl_error_check("glTextureParameteri - GL_TEXTURE_MIN_FILTER");
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::set_interpolation_mode_mag(InterpolationMode mode) {
+void Texture2D<T, Components>::set_interpolation_mode_mag(
+    InterpolationMode mode) {
   glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, mode);
   gl_error_check("glTextureParameteri - GL_TEXTURE_MAG_FILTER");
 }
@@ -272,15 +304,12 @@ const auto& Texture2D<T, Components>::data() const {
 }
 
 /*template <typename T, typename Components>
-void Texture2D<T, Components>::load_png(const std::string& filepath, bool direct_upload, bool keep_data_on_cpu) {
-  if constexpr (std::is_same<Components, RGB>::value) {
-    png::image<png::rgb_pixel> image;
-    image.read(filepath);
-    m_width  = image.get_width();
-    m_height = image.get_height();
-    m_data.reserve(m_width * m_height * n);
-    for (png::uint_32 y = image.get_height(); y > 0; --y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+void Texture2D<T, Components>::load_png(const std::string& filepath, bool
+direct_upload, bool keep_data_on_cpu) { if constexpr (std::is_same<Components,
+RGB>::value) { png::image<png::rgb_pixel> image; image.read(filepath); m_width
+= image.get_width(); m_height = image.get_height(); m_data.reserve(m_width *
+m_height * n); for (png::uint_32 y = image.get_height(); y > 0; --y) for
+(png::uint_32 x = 0; x < image.get_width(); ++x) {
         m_data.push_back(static_cast<T>(image[y - 1][x].red));
         m_data.push_back(static_cast<T>(image[y - 1][x].green));
         m_data.push_back(static_cast<T>(image[y - 1][x].blue));
@@ -406,7 +435,9 @@ void Texture2D<T, Components>::save_png(const std::string& filepath) {
 }*/
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height, const std::vector<T>& data,
+void Texture2D<T, Components>::upload_data(unsigned int          width,
+                                           unsigned int          height,
+                                           const std::vector<T>& data,
                                            bool keep_data_on_cpu) {
   m_width         = width;
   m_height        = height;
@@ -416,8 +447,10 @@ void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int heig
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height, std::vector<T>&& data,
-                                           bool keep_data_on_cpu) {
+void Texture2D<T, Components>::upload_data(unsigned int     width,
+                                           unsigned int     height,
+                                           std::vector<T>&& data,
+                                           bool             keep_data_on_cpu) {
   m_width         = width;
   m_height        = height;
   m_data          = std::move(data);
@@ -426,7 +459,9 @@ void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int heig
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int height, std::initializer_list<T>&& list,
+void Texture2D<T, Components>::upload_data(unsigned int               width,
+                                           unsigned int               height,
+                                           std::initializer_list<T>&& list,
                                            bool keep_data_on_cpu) {
   m_width         = width;
   m_height        = height;
@@ -438,7 +473,8 @@ void Texture2D<T, Components>::upload_data(unsigned int width, unsigned int heig
 template <typename T, typename Components>
 void Texture2D<T, Components>::upload_data(bool keep_data_on_cpu) {
   if (!m_is_consistent) {
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0, format, type, &m_data[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
+                 format, type, &m_data[0]);
     gl_error_check("glTexImage2D");
     m_is_consistent = true;
   }
@@ -449,11 +485,19 @@ void Texture2D<T, Components>::upload_data(bool keep_data_on_cpu) {
 }
 
 template <typename T, typename Components>
+void Texture2D<T, Components>::set_data(const PixelUnpackBuffer<T>& pbo) {
+  bind();
+  pbo.bind();
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, type, 0);
+}
+
+template <typename T, typename Components>
 void Texture2D<T, Components>::resize(unsigned int width, unsigned int height) {
   if (m_width != width || m_height != height) {
     m_width  = width;
     m_height = height;
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0, format, type, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
+                 format, type, nullptr);
     gl_error_check("glTexImage2D");
     m_is_consistent = false;
   }
@@ -462,7 +506,8 @@ void Texture2D<T, Components>::resize(unsigned int width, unsigned int height) {
 template <typename T, typename Components>
 const auto& Texture2D<T, Components>::download_data() {
   m_data.resize(n * m_width * m_height);
-  glGetTextureImage(m_id, 0, format, type, m_width * m_height * n * sizeof(T), &m_data[0]);
+  glGetTextureImage(m_id, 0, format, type, m_width * m_height * n * sizeof(T),
+                    &m_data[0]);
   gl_error_check("glGetTextureImage");
   m_is_consistent = true;
   return m_data;

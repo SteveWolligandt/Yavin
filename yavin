@@ -1,3 +1,4 @@
+#include "yavin_include/shader_include_paths.h"
 #include "yavin_include/ComputeShader.h"
 #include "yavin_include/FragmentShader.h"
 #include "yavin_include/FrameBuffer.h"
@@ -24,6 +25,7 @@
 #include "yavin_include/VertexBuffer.h"
 #include "yavin_include/VertexShader.h"
 #include "yavin_include/Window.h"
+#include "yavin_include/OITWindow.h"
 #include "yavin_include/error_check.h"
 #include "yavin_include/gl_wrapper.h"
 #include "yavin_include/tiny_obj_loader.h"

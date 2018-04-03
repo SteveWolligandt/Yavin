@@ -1,4 +1,5 @@
 #include "ShaderStageParser.h"
+#include "shader_include_paths.h"
 
 namespace Yavin {
 
@@ -24,10 +25,11 @@ std::string ShaderStageParser::parse(const std::string&    filename,
                                      std::vector<GLSLVar>& vars) {
   std::string fileContent;
   std::string line;
-  std::string folder = filename.substr(0, filename.find_last_of("/\\") + 1);
 
+  std::string   folder = filename.substr(0, filename.find_last_of("/\\") + 1);
   std::ifstream file(filename.c_str());
 
+  if (!file.is_open()) file.open(shader_dir + filename);
   if (!file.is_open())
     throw std::runtime_error("ERROR: Unable to open file " + filename);
 

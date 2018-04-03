@@ -1,4 +1,4 @@
-#version 430
+#version 450
 
 struct linked_list_element {
   vec4  color;
@@ -38,7 +38,3 @@ void main() {
   }
 }
 
-uniform vec4 color;
-vec4 shading() {
-  return color;
-}

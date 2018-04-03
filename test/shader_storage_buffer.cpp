@@ -7,26 +7,12 @@ const unsigned int screen_height    = 600;
 const unsigned int num_pixels       = screen_width * screen_height;
 const unsigned int linked_list_size = num_pixels * 3;
 
-class ShaderStorageTestShader : public Shader {
+class ColorLinkedListShader : public Shader {
  public:
-  ShaderStorageTestShader(unsigned int screen_width, unsigned int screen_height,
-                          unsigned int linked_list_size)
-      : Shader() {
+  ColorLinkedListShader() : Shader() {
     add_shader_stage<VertexShader>("shader_storage_test.vert");
     add_shader_stage<FragmentShader>("shader_storage_test.frag");
     create();
-    set_screen_width(screen_width);
-    set_screen_height(screen_height);
-    set_linked_list_size(linked_list_size);
-  }
-  void set_screen_width(unsigned int screen_width) {
-    set_uniform("screen_width", screen_width);
-  }
-  void set_screen_height(unsigned int screen_height) {
-    set_uniform("screen_height", screen_height);
-  }
-  void set_linked_list_size(unsigned int size) {
-    set_uniform("linked_list_size", size);
   }
   void set_color(const glm::vec4 color) { set_uniform("color", color); }
 };
@@ -86,8 +72,7 @@ int main() {
   head_indices_tex.set_interpolation_mode(Texture::NEAREST);
   head_indices_tex.set_wrap_mode(Texture::REPEAT);
   head_indices_tex.unbind();
-  glBindImageTexture(0, head_indices_tex.id(), 0, GL_FALSE, 0, GL_READ_WRITE,
-                     GL_R32UI);
+  head_indices_tex.bind_image_texture(7);
 
   // used or clearing head_indices_tex
   PixelUnpackBuffer<unsigned int> clear_buffer;
@@ -96,13 +81,13 @@ int main() {
 
   // for index counting in shader
   AtomicCounterBuffer atomic_counter{0};
-  atomic_counter.bind(0);
+  atomic_counter.bind(5);
   // linked list shader
-  ShaderStorageTestShader shader(screen_width, screen_height, linked_list_size);
-  LinkedListRenderShader  linked_list_render_shader;
+  ColorLinkedListShader  shader;
+  LinkedListRenderShader linked_list_render_shader;
   // linked list
   ShaderStorageBuffer<linked_list_element> linked_list(linked_list_size);
-  linked_list.bind(0);
+  linked_list.bind(80);
 
   //--------------
   // scene objects
@@ -121,13 +106,8 @@ int main() {
     clear_color_buffer();
 
     // clear linked list
-    head_indices_tex.bind();
-    clear_buffer.bind();
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_width, screen_height,
-                    head_tex_t::format, head_tex_t::type, 0);
-    clear_buffer.unbind();
-    head_indices_tex.unbind();
     atomic_counter.to_zero();
+    head_indices_tex.set_data(clear_buffer);
 
     // render scene
     shader.bind();

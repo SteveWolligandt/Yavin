@@ -6,6 +6,8 @@ configure_file(bunny.obj bunny.obj COPYONLY)
 configure_file(quad.obj quad.obj COPYONLY)
 configure_file(shader_storage_test.frag shader_storage_test.frag COPYONLY)
 configure_file(shader_storage_test.vert shader_storage_test.vert COPYONLY)
+configure_file(oit_test.frag oit_test.frag COPYONLY)
+configure_file(oit_test.vert oit_test.vert COPYONLY)
 configure_file(linked_list_render.frag linked_list_render.frag COPYONLY)
 configure_file(linked_list_render.vert linked_list_render.vert COPYONLY)
 
@@ -14,3 +16,6 @@ target_link_libraries(vbo_test yavin)
 
 add_executable (shader_storage_buffer shader_storage_buffer.cpp)
 target_link_libraries(shader_storage_buffer yavin)
+
+add_executable (oit_test oit_test.cpp)
+target_link_libraries(oit_test yavin)

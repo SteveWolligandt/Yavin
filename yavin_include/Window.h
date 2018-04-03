@@ -6,8 +6,8 @@
 #include <iostream>
 #include <string>
 #include <thread>
-#include "gl_includes.h"
 #include "dll_export.h"
+#include "gl_includes.h"
 
 using namespace std::chrono_literals;
 
@@ -15,14 +15,17 @@ namespace Yavin {
 class Window {
  public:
   DLL_API Window();
-  DLL_API Window(const std::string& name, const int width, const unsigned int height,
-         const unsigned int major = 4, const unsigned int minor = 5);
+  DLL_API Window(const std::string& name, const int width,
+                 const unsigned int height, const unsigned int major = 4,
+                 const unsigned int minor = 5);
   DLL_API Window(std::function<void()> render_function);
-  DLL_API Window(std::function<void()> render_function, std::function<void(double)> update_function);
+  DLL_API Window(std::function<void()>       render_function,
+                 std::function<void(double)> update_function);
   DLL_API ~Window();
 
-  DLL_API void init(const std::string& name, const int width, const unsigned int height,
-            const unsigned int major = 4, const unsigned int minor = 5);
+  DLL_API void init(const std::string& name, const int width,
+                    const unsigned int height, const unsigned int major = 4,
+                    const unsigned int minor = 5);
 
   DLL_API void start_rendering();
 
@@ -46,13 +49,13 @@ class Window {
   GLFWwindow*  m_window;
   std::thread* m_render_thread = nullptr;
 
-  std::function<void()> m_render_function;
-  std::function<void(double dt)> m_update_function;
+  std::function<void()>                   m_render_function;
+  std::function<void(double dt)>          m_update_function;
   std::function<void(int, int, int, int)> m_key_callback_function;
-  std::function<void(int, int)>       m_resize_callback_function;
-  std::function<void(double, double)> m_cursor_pos_callback_function;
-  std::function<void(int, int, int)> m_mouse_button_callback_function;
-  double m_fps = 60.0;
+  std::function<void(int, int)>           m_resize_callback_function;
+  std::function<void(double, double)>     m_cursor_pos_callback_function;
+  std::function<void(int, int, int)>      m_mouse_button_callback_function;
+  double                                  m_fps = 60.0;
 };
 
 }  // namespace Yavin

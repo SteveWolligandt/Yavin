@@ -29,8 +29,12 @@ file(GLOB YAVIN_HEADERS yavin_include/*.h)
 add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_HEADERS})
 target_compile_definitions(yavin PRIVATE DLL_EXPORT)
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(yavin PRIVATE 
+  ${CMAKE_BINARY_DIR}/yavin_include
+)
 target_include_directories(yavin PUBLIC 
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_BINARY_DIR}
   ${OPENGL_INCLUDE_DIR} 
   ${GLM_INCLUDE_DIRS} 
   ${GLFW3_INCLUDE_DIRECTORIES}
@@ -48,5 +52,5 @@ target_link_libraries(yavin
 
 # This makes the project importable from the build directory
 export(TARGETS yavin FILE yavinConfig.cmake)
-
+configure_file(yavin_include/shader_include_paths.h.in yavin_include/shader_include_paths.h)
 add_subdirectory(test)
