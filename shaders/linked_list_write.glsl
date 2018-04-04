@@ -1,5 +1,3 @@
-#version 450
-
 #include "linked_list_element.glsl"
 #include "linked_list_layouts.glsl"
 
