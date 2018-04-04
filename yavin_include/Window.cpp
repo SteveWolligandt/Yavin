@@ -149,7 +149,7 @@ void Window::should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
 void Window::enable_multisample() { glEnable(GL_MULTISAMPLE); }
 void Window::disable_multisample() { glDisable(GL_MULTISAMPLE); }
-void Window::enable_dept_test() { glEnable(GL_DEPTH_TEST); }
-void Window::disable_dept_test() { glDisable(GL_DEPTH_TEST); }
+void Window::enable_depth_test() { glEnable(GL_DEPTH_TEST); }
+void Window::disable_depth_test() { glDisable(GL_DEPTH_TEST); }
 
 }  // namespace Yavin

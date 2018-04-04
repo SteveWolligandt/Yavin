@@ -40,8 +40,8 @@ class Window {
   DLL_API void make_context_current();
   DLL_API void enable_multisample();
   DLL_API void disable_multisample();
-  DLL_API void enable_dept_test();
-  DLL_API void disable_dept_test();
+  DLL_API void enable_depth_test();
+  DLL_API void disable_depth_test();
 
  private:
   GLFWwindow*  m_window;
