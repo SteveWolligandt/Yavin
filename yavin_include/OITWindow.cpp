@@ -80,21 +80,17 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
 
     m_head_indices_tex.bind();
     m_clear_buffer.unbind();
-    std::cout << "head_indices_tex.resize\n";
     m_head_indices_tex.resize(m_width, m_height);
     m_head_indices_tex.bind_image_texture(7);
 
-    std::cout << "m_linked_list.resize\n";
     m_linked_list.gpu_malloc(m_width * m_height * m_linked_list_size_factor);
     m_linked_list.bind(8);
 
-    std::cout << "set new cam options\n";
     OrthographicCamera cam(0, 1, 0, 1, -1, 1, m_width, m_height);
     m_linked_list_render_shader.bind();
     m_linked_list_render_shader.set_uniform("projection",
                                             cam.projection_matrix());
     m_linked_list_render_shader.set_uniform("modelview", cam.view_matrix());
-    std::cout << "all set\n";
 
     m_oit_resize_function(w, h);
   });

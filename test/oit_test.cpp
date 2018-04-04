@@ -26,8 +26,8 @@ class ColorLinkedListShader : public Shader {
 
 class OITTestWindow : public OITWindow {
  public:
-  OITTestWindow(const std::string& name)
-      : OITWindow(name, screen_width, screen_height),
+  OITTestWindow(const std::string& name, unsigned int linked_list_size_factor)
+      : OITWindow(name, screen_width, screen_height, linked_list_size_factor),
         cam(30, (float)screen_width / (float)screen_height, 0.01, 100,
             screen_width, screen_height),
         quads{
@@ -71,6 +71,6 @@ class OITTestWindow : public OITWindow {
 //==============================================================================
 
 int main() {
-  Yavin::Test::OITTestWindow w("OIT Test");
+  Yavin::Test::OITTestWindow w("OIT Test", 10);
   w.start_rendering();
 }

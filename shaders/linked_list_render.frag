@@ -1,16 +1,8 @@
 #version 430
 #define MAX_FRAGMENTS 20
 
-struct linked_list_element {
-  vec4  color;
-  uint  next_index;
-  float depth;
-};
-
-layout (binding = 7, r32ui) uniform uimage2D head_index;
-layout (std430, binding = 8) buffer linked_list { 
-  linked_list_element nodes[];
-};
+#include "linked_list_element.glsl"
+#include "linked_list_layouts.glsl"
 
 uniform vec4 clear_color;
 
