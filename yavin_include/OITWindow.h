@@ -59,8 +59,8 @@ class OITWindow : public Window {
   void set_render_function(std::function<void()> render_function) {
     m_oit_render_function = render_function;
   }
-  void set_resize_function(std::function<void(int, int)> resize_fun) {
-    m_oit_resize_function = resize_fun;
+  void set_resize_callback(std::function<void(int, int)> resize_fun) {
+    m_oit_resize_callback = resize_fun;
   }
   //----------------------------------------------------------------------------
   void set_clear_color(const glm::vec4& clear_color) {
@@ -69,7 +69,7 @@ class OITWindow : public Window {
 
  private:
   std::function<void()>         m_oit_render_function;
-  std::function<void(int, int)> m_oit_resize_function;
+  std::function<void(int, int)> m_oit_resize_callback;
 
   size_t m_width, m_height;
   size_t m_linked_list_size_factor;

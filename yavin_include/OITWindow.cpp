@@ -65,10 +65,6 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
     set_viewport(0, 0, m_width, m_height);
     m_linked_list_render_shader.bind();
     m_fullscreen_quad.draw();
-
-    // finish window
-    swap_buffers();
-    poll_events();
   });
   Window::set_resize_callback([this](int w, int h) {
     m_width  = w;
@@ -92,7 +88,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
                                             cam.projection_matrix());
     m_linked_list_render_shader.set_uniform("modelview", cam.view_matrix());
 
-    m_oit_resize_function(w, h);
+    m_oit_resize_callback(w, h);
   });
 }
 //==============================================================================

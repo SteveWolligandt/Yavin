@@ -17,21 +17,21 @@ class VertexArray {
   DLL_API VertexArray(VertexArray&& other);
   DLL_API ~VertexArray();
 
-  DLL_API void bind();
-  DLL_API void unbind();
-  DLL_API void draw(Primitive primitive, size_t num_primitives);
-  DLL_API void draw(size_t num_primitives);
-  DLL_API void draw_points(size_t num_primitives);
-  DLL_API void draw_line_strip(size_t num_primitives);
-  DLL_API void draw_line_loop(size_t num_primitives);
-  DLL_API void draw_lines(size_t num_primitives);
-  DLL_API void draw_line_strip_adjacency(size_t num_primitives);
-  DLL_API void draw_triangle_strip(size_t num_primitives);
-  DLL_API void draw_triangle_fan(size_t num_primitives);
-  DLL_API void draw_triangles(size_t num_primitives);
-  DLL_API void draw_triangle_strip_adjacency(size_t num_primitives);
-  DLL_API void draw_triangles_adjacency(size_t num_primitives);
-  DLL_API void draw_patches(size_t num_primitives);
+  DLL_API void bind() const;
+  DLL_API void unbind() const;
+  DLL_API void draw(Primitive primitive, size_t num_primitives) const;
+  DLL_API void draw(size_t num_primitives) const;
+  DLL_API void draw_points(size_t num_primitives) const;
+  DLL_API void draw_line_strip(size_t num_primitives) const;
+  DLL_API void draw_line_loop(size_t num_primitives) const;
+  DLL_API void draw_lines(size_t num_primitives) const;
+  DLL_API void draw_line_strip_adjacency(size_t num_primitives) const;
+  DLL_API void draw_triangle_strip(size_t num_primitives) const;
+  DLL_API void draw_triangle_fan(size_t num_primitives) const;
+  DLL_API void draw_triangles(size_t num_primitives) const;
+  DLL_API void draw_triangle_strip_adjacency(size_t num_primitives) const;
+  DLL_API void draw_triangles_adjacency(size_t num_primitives) const;
+  DLL_API void draw_patches(size_t num_primitives) const;
 
  protected:
   unsigned int m_id;

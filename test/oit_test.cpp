@@ -55,7 +55,7 @@ class OITTestWindow : public OITWindow {
       }  // namespace Yavin::Test
     });
 
-    set_resize_function([this](int w, int h) {
+    set_resize_callback([this](int w, int h) {
       cam.set_projection(30, (float)w / (float)h, 0.01, 100, w, h);
     });
   }

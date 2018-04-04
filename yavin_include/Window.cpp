@@ -1,14 +1,9 @@
 #include "Window.h"
+#include <chrono>
+#include <iostream>
 
+using namespace std::chrono_literals;
 namespace Yavin {
-
-Window::Window()
-    : m_render_function([]() {}),
-      m_update_function([](double) {}),
-      m_key_callback_function([](int, int, int, int) {}),
-      m_resize_callback_function([](int, int) {}),
-      m_cursor_pos_callback_function([](double, double) {}),
-      m_mouse_button_callback_function([](int, int, int) {}) {}
 
 Window::Window(const std::string& name, const int width,
                const unsigned int height, const unsigned int major,
@@ -19,34 +14,6 @@ Window::Window(const std::string& name, const int width,
       m_resize_callback_function([](int, int) {}),
       m_cursor_pos_callback_function([](double, double) {}),
       m_mouse_button_callback_function([](int, int, int) {}) {
-  init(name, width, height, major, minor);
-}
-
-Window::Window(std::function<void()> render_function)
-    : m_render_function(render_function),
-      m_update_function([](double) {}),
-      m_key_callback_function([](int, int, int, int) {}),
-      m_resize_callback_function([](int, int) {}),
-      m_cursor_pos_callback_function([](double, double) {}),
-      m_mouse_button_callback_function([](int, int, int) {}) {}
-
-Window::Window(std::function<void()>       render_function,
-               std::function<void(double)> update_function)
-    : m_render_function(render_function),
-      m_update_function(update_function),
-      m_key_callback_function([](int, int, int, int) {}),
-      m_resize_callback_function([](int, int) {}),
-      m_cursor_pos_callback_function([](double, double) {}),
-      m_mouse_button_callback_function([](int, int, int) {}) {}
-
-Window::~Window() {
-  glfwDestroyWindow(m_window);
-  glfwTerminate();
-}
-
-void Window::init(const std::string& name, const int width,
-                  const unsigned int height, const unsigned int major,
-                  const unsigned int minor) {
   if (!glfwInit()) {
     std::cerr << "glfwInit() failed.\n";
     return;
@@ -57,26 +24,20 @@ void Window::init(const std::string& name, const int width,
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
   glfwWindowHint(GLFW_SAMPLES, 8);
   m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
-  // m_window = glfwCreateWindow(width, height, name.c_str(),
-  // glfwGetPrimaryMonitor(), nullptr);
-
+  make_context_current();
   if (!m_window) {
-    std::cerr << "glfwCreateWindow() failed.\n";
     glfwTerminate();
-    return;
+    throw std::runtime_error("cannot create GLFW window");
   }
-
-  glfwMakeContextCurrent(m_window);
 
   glewExperimental = true;
   GLenum err       = glewInit();
   if (GLEW_OK != err) {
-    std::cerr << "GLEW is not initialized!\n";
-    return;
+    glfwDestroyWindow(m_window);
+    glfwTerminate();
+    throw std::runtime_error(std::string("cannot initialize GLEW: ") +
+                             std::string((char*)glewGetErrorString(err)));
   }
-
-  std::cout << "OpenGL " << glGetString(GL_VERSION) << ", GLSL "
-            << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
 
   glfwSetWindowUserPointer(m_window, this);
   glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode,
@@ -99,8 +60,12 @@ void Window::init(const std::string& name, const int width,
         ((Window*)glfwGetWindowUserPointer(window))
             ->m_mouse_button_callback_function(button, action, mods);
       });
+  print_versions();
+}
 
-  glEnable(GL_MULTISAMPLE);
+Window::~Window() {
+  glfwDestroyWindow(m_window);
+  glfwTerminate();
 }
 
 void Window::set_render_function(std::function<void()> render_function) {
@@ -135,6 +100,9 @@ void Window::start_rendering() {
 
     m_update_function(t);
     m_render_function();
+    swap_buffers();
+    poll_events();
+
     auto time_after      = timer.now();
     auto render_duration = time_after - time_before;
     auto render_time =
@@ -169,5 +137,19 @@ void Window::join_render_thread() {
   }
 }
 
+std::string Window::get_gl_version() { return (char*)glGetString(GL_VERSION); }
+std::string Window::get_glsl_version() {
+  return (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+}
+void Window::print_versions() {
+  std::cout << "OpenGL " << get_gl_version() << ", GLSL " << get_glsl_version()
+            << "\n";
+}
 void Window::should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
+void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
+void Window::enable_multisample() { glEnable(GL_MULTISAMPLE); }
+void Window::disable_multisample() { glDisable(GL_MULTISAMPLE); }
+void Window::enable_dept_test() { glEnable(GL_DEPTH_TEST); }
+void Window::disable_dept_test() { glDisable(GL_DEPTH_TEST); }
+
 }  // namespace Yavin

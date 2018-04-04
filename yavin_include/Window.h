@@ -1,31 +1,19 @@
 #ifndef __YAVIN_WINDOW__
 #define __YAVIN_WINDOW__
 
-#include <chrono>
 #include <functional>
-#include <iostream>
 #include <string>
 #include <thread>
 #include "dll_export.h"
 #include "gl_includes.h"
 
-using namespace std::chrono_literals;
-
 namespace Yavin {
 class Window {
  public:
-  DLL_API Window();
   DLL_API Window(const std::string& name, const int width,
                  const unsigned int height, const unsigned int major = 4,
                  const unsigned int minor = 5);
-  DLL_API Window(std::function<void()> render_function);
-  DLL_API Window(std::function<void()>       render_function,
-                 std::function<void(double)> update_function);
   DLL_API ~Window();
-
-  DLL_API void init(const std::string& name, const int width,
-                    const unsigned int height, const unsigned int major = 4,
-                    const unsigned int minor = 5);
 
   DLL_API void start_rendering();
 
@@ -44,6 +32,16 @@ class Window {
   DLL_API void set_fps(const double fps);
   DLL_API void join_render_thread();
   DLL_API void should_close(bool b);
+
+  DLL_API std::string get_gl_version();
+  DLL_API std::string get_glsl_version();
+  DLL_API void        print_versions();
+
+  DLL_API void make_context_current();
+  DLL_API void enable_multisample();
+  DLL_API void disable_multisample();
+  DLL_API void enable_dept_test();
+  DLL_API void disable_dept_test();
 
  private:
   GLFWwindow*  m_window;
