@@ -6,8 +6,8 @@
 #include "Primitive.h"
 #include "Type.h"
 #include "VertexBuffer.h"
-#include "error_check.h"
 #include "dll_export.h"
+#include "error_check.h"
 
 namespace Yavin {
 class VertexArray {
@@ -23,6 +23,7 @@ class VertexArray {
 
  protected:
   unsigned int m_id;
+  bool         m_dont_delete = false;
 };
 }  // namespace Yavin
 

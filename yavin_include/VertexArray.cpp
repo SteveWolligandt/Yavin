@@ -9,15 +9,17 @@ VertexArray::VertexArray() {
 VertexArray::VertexArray(const VertexArray& other) {
   glCreateVertexArrays(1, &m_id);
   gl_error_check("glGenVertexArrays");
-  std::cout << "COPY CONSTRUCTOR OF VAO\n";
 }
 VertexArray::VertexArray(VertexArray&& other) {
-  std::cout << "MOVE CONSTRUCTOR OF VAO\n";
+  other.m_delete = false;
+  m_id           = other.m_id;
 }
 
 VertexArray::~VertexArray() {
-  glDeleteVertexArrays(1, &m_id);
-  gl_error_check("glDeleteVertexArrays");
+  if (m_delete) {
+    glDeleteVertexArrays(1, &m_id);
+    gl_error_check("glDeleteVertexArrays");
+  }
 }
 
 void VertexArray::bind() {
