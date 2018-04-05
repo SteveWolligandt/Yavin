@@ -13,17 +13,17 @@ class AtomicCounterBuffer
     : public Buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int> {
  public:
   using parent_t = Buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int>;
-  static const parent_t::usage_t default_usage = parent_t::DYNAMIC_DRAW;
+  static const usage_t default_usage = DYNAMIC_DRAW;
 
-  DLL_API AtomicCounterBuffer(parent_t::usage_t usage = default_usage);
+  DLL_API AtomicCounterBuffer(usage_t usage = default_usage);
   DLL_API AtomicCounterBuffer(const AtomicCounterBuffer& other);
   DLL_API AtomicCounterBuffer(AtomicCounterBuffer&& other);
   DLL_API AtomicCounterBuffer(const std::vector<unsigned int>& data,
-                              parent_t::usage_t usage         = default_usage,
-                              bool              direct_upload = false,
-                              bool              keep_data_on_cpu = false);
+                              usage_t usage            = default_usage,
+                              bool    direct_upload    = false,
+                              bool    keep_data_on_cpu = false);
   DLL_API AtomicCounterBuffer(std::vector<unsigned int>&& data,
-                              parent_t::usage_t           usage = default_usage,
+                              usage_t                     usage = default_usage,
                               bool                        direct_upload = false,
                               bool keep_data_on_cpu = false);
   DLL_API AtomicCounterBuffer(std::initializer_list<unsigned int>&&);

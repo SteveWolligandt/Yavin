@@ -7,8 +7,7 @@
 namespace Yavin {
 //==============================================================================
 
-AtomicCounterBuffer::AtomicCounterBuffer(parent_t::usage_t usage)
-    : Buffer(usage) {}
+AtomicCounterBuffer::AtomicCounterBuffer(usage_t usage) : Buffer(usage) {}
 
 //------------------------------------------------------------------------------
 
@@ -23,16 +22,14 @@ AtomicCounterBuffer::AtomicCounterBuffer(AtomicCounterBuffer&& other)
 //------------------------------------------------------------------------------
 
 AtomicCounterBuffer::AtomicCounterBuffer(const std::vector<unsigned int>& data,
-                                         parent_t::usage_t                usage,
-                                         bool direct_upload,
+                                         usage_t usage, bool direct_upload,
                                          bool keep_data_on_cpu)
     : Buffer(data, usage, direct_upload, keep_data_on_cpu) {}
 
 //------------------------------------------------------------------------------
 
 AtomicCounterBuffer::AtomicCounterBuffer(std::vector<unsigned int>&& data,
-                                         parent_t::usage_t           usage,
-                                         bool direct_upload,
+                                         usage_t usage, bool direct_upload,
                                          bool keep_data_on_cpu)
     : Buffer(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
 

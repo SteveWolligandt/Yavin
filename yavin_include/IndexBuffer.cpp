@@ -6,7 +6,7 @@
 namespace Yavin {
 //==============================================================================
 
-IndexBuffer::IndexBuffer() : Buffer() {}
+IndexBuffer::IndexBuffer(usage_t usage) : Buffer(usage) {}
 
 //------------------------------------------------------------------------------
 
@@ -18,18 +18,18 @@ IndexBuffer::IndexBuffer(IndexBuffer&& other) : Buffer(std::move(other)) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(const std::vector<unsigned int>& data,
+IndexBuffer::IndexBuffer(const std::vector<unsigned int>& data, usage_t usage,
                          bool direct_upload, bool keep_data_on_cpu)
-    : Buffer(data, direct_upload, keep_data_on_cpu) {}
+    : Buffer(data, usage, direct_upload, keep_data_on_cpu) {}
 
-IndexBuffer::IndexBuffer(std::vector<unsigned int>&& data, bool direct_upload,
-                         bool keep_data_on_cpu)
-    : Buffer(std::move(data), direct_upload, keep_data_on_cpu) {}
+IndexBuffer::IndexBuffer(std::vector<unsigned int>&& data, usage_t usage,
+                         bool direct_upload, bool keep_data_on_cpu)
+    : Buffer(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
 
 //------------------------------------------------------------------------------
 
 IndexBuffer::IndexBuffer(std::initializer_list<unsigned int>&& list)
-    : Buffer(std::move(list)) {}
+    : Buffer(std::move(list), default_usage) {}
 
 //==============================================================================
 }  // namespace Yavin
