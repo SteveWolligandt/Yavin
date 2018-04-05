@@ -131,7 +131,7 @@ VertexBuffer<Ts...>::VertexBuffer(usage_t usage) : parent_t(usage) {}
 
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other)
-    : parent_t(other.usage) {
+    : parent_t(other.m_usage) {
   this->m_gpu_size      = other.m_gpu_size;
   this->m_is_consistent = other.m_is_consistent;
   this->m_dont_delete   = other.m_dont_delete;

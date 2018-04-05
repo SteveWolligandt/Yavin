@@ -16,11 +16,13 @@ namespace Yavin {
 template <typename T>
 class PixelUnpackBuffer : public Buffer<GL_PIXEL_UNPACK_BUFFER, T> {
  public:
-  using parent_t = Buffer<GL_PIXEL_UNPACK_BUFFER, T>;
+  using parent_t                     = Buffer<GL_PIXEL_UNPACK_BUFFER, T>;
+  using usage_t                      = typename parent_t::usage_t;
+  static const usage_t default_usage = usage_t::STATIC_COPY;
 
   //----------------------------------------------------------------------------
 
-  PixelUnpackBuffer() : parent_t() {}
+  PixelUnpackBuffer(usage_t usage = default_usage) : parent_t(usage) {}
 
   //----------------------------------------------------------------------------
 
@@ -32,24 +34,27 @@ class PixelUnpackBuffer : public Buffer<GL_PIXEL_UNPACK_BUFFER, T> {
 
   //----------------------------------------------------------------------------
 
-  PixelUnpackBuffer(size_t n) : parent_t(n) {}
+  PixelUnpackBuffer(size_t n, usage_t usage = default_usage)
+      : parent_t(n, usage) {}
 
   //----------------------------------------------------------------------------
 
   PixelUnpackBuffer(const std::vector<T>& data, bool direct_upload = true,
-                    bool keep_data_on_cpu = false)
-      : parent_t(data, direct_upload, keep_data_on_cpu) {}
+                    usage_t usage            = default_usage,
+                    bool    keep_data_on_cpu = false)
+      : parent_t(data, usage, direct_upload, keep_data_on_cpu) {}
 
   //----------------------------------------------------------------------------
 
   PixelUnpackBuffer(std::vector<T>&& data, bool direct_upload = true,
-                    bool keep_data_on_cpu = false)
-      : parent_t(std::move(data), direct_upload, keep_data_on_cpu) {}
+                    usage_t usage            = default_usage,
+                    bool    keep_data_on_cpu = false)
+      : parent_t(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
 
   //----------------------------------------------------------------------------
 
   PixelUnpackBuffer(std::initializer_list<T>&& list)
-      : parent_t(std::move(list)) {}
+      : parent_t(std::move(list), default_usage) {}
 };
 
 //==============================================================================
