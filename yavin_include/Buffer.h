@@ -34,16 +34,16 @@ class Buffer {
   constexpr static int array_type = _array_type;
 
   Buffer(usage_t usage);
-  Buffer(const Buffer& otherusage_t usage);
+  Buffer(const Buffer& other);
   Buffer(Buffer&& other);
   this_t& operator=(const Buffer& other);
   this_t& operator=(Buffer&& other);
-  Buffer(size_t nusage_t usage);
+  Buffer(size_t n, usage_t usage);
   Buffer(const std::vector<T>& data, usage_t usage, bool direct_upload = true,
          bool keep_data_on_cpu = false);
   Buffer(std::vector<T>&& data, usage_t usage, bool direct_upload = true,
          bool keep_data_on_cpu = false);
-  Buffer(std::initializer_list<T>&& list);
+  Buffer(std::initializer_list<T>&& list, usage_t usage);
   ~Buffer();
 
   void upload_data(bool keep_data_on_cpu = false);
@@ -118,7 +118,7 @@ Buffer<array_type, T>::Buffer(const Buffer& other)
     : m_gpu_size(other.m_gpu_size),
       m_is_consistent(other.m_is_consistent),
       m_dont_delete(other.m_dont_delete),
-      m_usage(other.usage),
+      m_usage(other.m_usage),
       m_data(other.m_data) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
@@ -132,7 +132,7 @@ Buffer<array_type, T>::Buffer(Buffer&& other)
     : m_id(other.m_id),
       m_gpu_size(other.m_gpu_size),
       m_is_consistent(other.m_is_consistent),
-      m_usage(other.usage),
+      m_usage(other.m_usage),
       m_data(std::move(other.m_data)) {
   other.m_dont_delete = true;
 }
@@ -232,7 +232,7 @@ void Buffer<array_type, T>::upload_data(bool keep_data_on_cpu) {
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::gpu_malloc_bytes(size_t bytes) {
-  glNamedBufferData(this->m_id, bytes, nullptr, usage);
+  glNamedBufferData(this->m_id, bytes, nullptr, m_usage);
 }
 
 //------------------------------------------------------------------------------

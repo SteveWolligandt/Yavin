@@ -12,15 +12,19 @@ namespace Yavin {
 class AtomicCounterBuffer
     : public Buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int> {
  public:
-  DLL_API AtomicCounterBuffer();
+  using parent_t = Buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int>;
+
+  DLL_API AtomicCounterBuffer(parent_t::usage_t usage = parent_t::DYNAMIC_DRAW);
   DLL_API AtomicCounterBuffer(const AtomicCounterBuffer& other);
   DLL_API AtomicCounterBuffer(AtomicCounterBuffer&& other);
   DLL_API AtomicCounterBuffer(const std::vector<unsigned int>& data,
-                              bool direct_upload    = false,
-                              bool keep_data_on_cpu = false);
+                              parent_t::usage_t usage = parent_t::DYNAMIC_DRAW,
+                              bool              direct_upload    = false,
+                              bool              keep_data_on_cpu = false);
   DLL_API AtomicCounterBuffer(std::vector<unsigned int>&& data,
-                              bool                        direct_upload = false,
-                              bool keep_data_on_cpu = false);
+                              parent_t::usage_t usage = parent_t::DYNAMIC_DRAW,
+                              bool              direct_upload    = false,
+                              bool              keep_data_on_cpu = false);
   DLL_API AtomicCounterBuffer(std::initializer_list<unsigned int>&&);
 
   DLL_API void set_all_to(unsigned int val);
