@@ -19,6 +19,8 @@ class VertexBuffer
   using parent_t = Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>;
   using parent_t::gpu_malloc;
   using parent_t::gpu_malloc_bytes;
+  using usage_t              = typename parent_t::usage_t;
+  static const usage_t usage = STATIC_DRAW;
 
   class iterator;
   class const_iterator;
@@ -28,7 +30,7 @@ class VertexBuffer
 
   using data_t = data_representation<Ts...>;
 
-  VertexBuffer();
+  VertexBuffer(usage_t usage = default_usage);
   VertexBuffer(const VertexBuffer& other);
   VertexBuffer(VertexBuffer&& other);
 
@@ -41,8 +43,8 @@ class VertexBuffer
    * @param[in]  keep_data_on_cpu  if direct upload is true, specify if data
    *                               shall be kept in cpu
    */
-  VertexBuffer(const std::vector<data_t>& data, bool direct_upload = true,
-               bool keep_data_on_cpu = false);
+  VertexBuffer(const std::vector<data_t>& data, usage_t usage = default_usage,
+               bool direct_upload = true, bool keep_data_on_cpu = false);
 
   /**
    * @brief      constructor initializing data on cpu via rvalue
@@ -53,8 +55,8 @@ class VertexBuffer
    * @param[in]  keep_data_on_cpu  if direct upload is true, specify if data
    *                               shall be kept in cpu
    */
-  VertexBuffer(std::vector<data_t>&& data, bool direct_upload = true,
-               bool keep_data_on_cpu = false);
+  VertexBuffer(std::vector<data_t>&& data, usage_t usage = default_usage,
+               bool direct_upload = true, bool keep_data_on_cpu = false);
 
   /**
    * @brief      constructor initializing data on cpu via initializer list
@@ -123,13 +125,13 @@ class VertexBuffer
 //------------------------------------------------------------------------------
 
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer()
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>() {}
+VertexBuffer<Ts...>::VertexBuffer(usage_t usage) : parent_t(usage) {}
 
 //------------------------------------------------------------------------------
 
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other) : parent_t() {
+VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other)
+    : parent_t(other.usage) {
   this->m_gpu_size      = other.m_gpu_size;
   this->m_is_consistent = other.m_is_consistent;
   this->m_dont_delete   = other.m_dont_delete;
@@ -141,29 +143,28 @@ VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other) : parent_t() {
 
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(VertexBuffer&& other)
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(other)) {}
+    : parent_t(std::move(other)) {}
 
 //------------------------------------------------------------------------------
 
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(const std::vector<data_t>& data,
-                                  bool direct_upload, bool keep_data_on_cpu)
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(data, direct_upload,
-                                                          keep_data_on_cpu) {}
+                                  usage_t usage, bool direct_upload,
+                                  bool keep_data_on_cpu)
+    : parent_t(data, usage, direct_upload, keep_data_on_cpu) {}
 
 //------------------------------------------------------------------------------
 
 template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(std::vector<data_t>&& data,
+VertexBuffer<Ts...>::VertexBuffer(std::vector<data_t>&& data, usage_t usage,
                                   bool direct_upload, bool keep_data_on_cpu)
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(
-          std::move(data), direct_upload, keep_data_on_cpu) {}
+    : parent_t(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
 
 //------------------------------------------------------------------------------
 
 template <typename... Ts>
 VertexBuffer<Ts...>::VertexBuffer(std::initializer_list<data_t>&& list)
-    : Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>(std::move(list)) {}
+    : parent_t(std::move(list), default_usage) {}
 
 //------------------------------------------------------------------------------
 
@@ -172,7 +173,7 @@ void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
   // gpu buffer neiter created nor initialized
   if (!m_gpu_buffer_created) {
     glNamedBufferData(this->m_id, size_of_attributes * this->cpu_size(),
-                      this->m_data.data(), GL_STATIC_DRAW);
+                      this->m_data.data(), usage);
     gl_error_check("glNamedBufferData");
 
     this->m_gpu_size = this->cpu_size();
