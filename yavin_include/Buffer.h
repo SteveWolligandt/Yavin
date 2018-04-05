@@ -19,35 +19,43 @@ struct first {
 template <int _array_type, typename T>
 class Buffer {
  public:
+  enum usage_t {
+    STREAM_DRAW  = GL_STREAM_DRAW,
+    STREAM_READ  = GL_STREAM_READ,
+    STREAM_COPY  = GL_STREAM_COPY,
+    STATIC_DRAW  = GL_STATIC_DRAW,
+    STATIC_READ  = GL_STATIC_READ,
+    STATIC_COPY  = GL_STATIC_COPY,
+    DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
+    DYNAMIC_READ = GL_DYNAMIC_READ,
+    DYNAMIC_COPY = GL_DYNAMIC_COPY
+  };
   using this_t                    = Buffer<_array_type, T>;
   constexpr static int array_type = _array_type;
 
-  Buffer();
-  Buffer(const Buffer& other);
+  Buffer(usage_t usage);
+  Buffer(const Buffer& otherusage_t usage);
   Buffer(Buffer&& other);
   this_t& operator=(const Buffer& other);
   this_t& operator=(Buffer&& other);
-  Buffer(size_t n);
-  Buffer(const std::vector<T>& data, bool direct_upload = true,
+  Buffer(size_t nusage_t usage);
+  Buffer(const std::vector<T>& data, usage_t usage, bool direct_upload = true,
          bool keep_data_on_cpu = false);
-  Buffer(std::vector<T>&& data, bool direct_upload = true,
+  Buffer(std::vector<T>&& data, usage_t usage, bool direct_upload = true,
          bool keep_data_on_cpu = false);
   Buffer(std::initializer_list<T>&& list);
   ~Buffer();
 
   void upload_data(bool keep_data_on_cpu = false);
-  void gpu_malloc_bytes(size_t bytes) {
-    glNamedBufferData(this->m_id, bytes, nullptr, GL_STATIC_DRAW);
-  }
-  void gpu_malloc(size_t n) {
-    m_gpu_size = n;
-    gpu_malloc_bytes(n * sizeof(T));
-  }
-  void gpu_malloc() { gpu_malloc(cpu_size()); }
+
+  void gpu_malloc_bytes(size_t bytes);
+  void gpu_malloc(size_t n);
+  void gpu_malloc();
 
   void        bind() const;
-  void        bind_as_copy_write_buffer() const;
   static void unbind();
+
+  void        bind_as_copy_write_buffer() const;
   static void unbind_as_copy_write_buffer();
 
   void copy(const this_t& other);
@@ -64,8 +72,6 @@ class Buffer {
   template <typename S>
   void push_back(const std::initializer_list<S>& data);
 
-  // template <typename... Ts>
-  // void push_back(const Ts&... ts);
   void emplace_back(T data);
 
   auto&       front() { return m_data.front(); }
@@ -93,13 +99,14 @@ class Buffer {
   size_t         m_gpu_size      = 0;
   bool           m_is_consistent = false;
   bool           m_dont_delete   = false;
+  usage_t        m_usage;
   std::vector<T> m_data;
 };
 
 //==============================================================================
 
 template <int array_type, typename T>
-Buffer<array_type, T>::Buffer() {
+Buffer<array_type, T>::Buffer(usage_t usage) : m_usage(usage) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
 }
@@ -111,6 +118,7 @@ Buffer<array_type, T>::Buffer(const Buffer& other)
     : m_gpu_size(other.m_gpu_size),
       m_is_consistent(other.m_is_consistent),
       m_dont_delete(other.m_dont_delete),
+      m_usage(other.usage),
       m_data(other.m_data) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
@@ -124,6 +132,7 @@ Buffer<array_type, T>::Buffer(Buffer&& other)
     : m_id(other.m_id),
       m_gpu_size(other.m_gpu_size),
       m_is_consistent(other.m_is_consistent),
+      m_usage(other.usage),
       m_data(std::move(other.m_data)) {
   other.m_dont_delete = true;
 }
@@ -135,6 +144,7 @@ Buffer<array_type, T>& Buffer<array_type, T>::operator=(const Buffer& other) {
   m_gpu_size      = other.m_gpu_size;
   m_is_consistent = other.m_is_consistent;
   m_dont_delete   = other.m_dont_delete;
+  m_usage         = other.usage;
   m_data          = other.m_data;
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
@@ -149,6 +159,7 @@ Buffer<array_type, T>& Buffer<array_type, T>::operator=(Buffer&& other) {
   m_id                = other.m_id;
   m_gpu_size          = other.m_gpu_size;
   m_is_consistent     = other.m_is_consistent;
+  m_usage             = other.usage;
   m_data              = std::move(other.m_data);
   other.m_dont_delete = true;
   return *this;
@@ -157,16 +168,16 @@ Buffer<array_type, T>& Buffer<array_type, T>::operator=(Buffer&& other) {
 //------------------------------------------------------------------------------
 
 template <int array_type, typename T>
-Buffer<array_type, T>::Buffer(size_t n) : Buffer() {
+Buffer<array_type, T>::Buffer(size_t n, usage_t usage) : Buffer(usage) {
   gpu_malloc(n);
 }
 
 //------------------------------------------------------------------------------
 
 template <int array_type, typename T>
-Buffer<array_type, T>::Buffer(const std::vector<T>& data, bool direct_upload,
-                              bool keep_data_on_cpu)
-    : m_data(data) {
+Buffer<array_type, T>::Buffer(const std::vector<T>& data, usage_t usage,
+                              bool direct_upload, bool keep_data_on_cpu)
+    : m_usage(usage), m_data(data) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
   if (direct_upload) upload_data(keep_data_on_cpu);
@@ -175,9 +186,9 @@ Buffer<array_type, T>::Buffer(const std::vector<T>& data, bool direct_upload,
 //------------------------------------------------------------------------------
 
 template <int array_type, typename T>
-Buffer<array_type, T>::Buffer(std::vector<T>&& data, bool direct_upload,
-                              bool keep_data_on_cpu)
-    : m_data(std::move(data)) {
+Buffer<array_type, T>::Buffer(std::vector<T>&& data, usage_t usage,
+                              bool direct_upload, bool keep_data_on_cpu)
+    : m_usage(usage), m_data(std::move(data)) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
   if (direct_upload) upload_data(keep_data_on_cpu);
@@ -186,8 +197,8 @@ Buffer<array_type, T>::Buffer(std::vector<T>&& data, bool direct_upload,
 //------------------------------------------------------------------------------
 
 template <int array_type, typename T>
-Buffer<array_type, T>::Buffer(std::initializer_list<T>&& list)
-    : m_data(std::move(list)) {
+Buffer<array_type, T>::Buffer(std::initializer_list<T>&& list, usage_t usage)
+    : m_usage(usage), m_data(std::move(list)) {
   glCreateBuffers(1, &m_id);
   gl_error_check("glCreateBuffers");
   upload_data(false);
@@ -205,8 +216,7 @@ Buffer<array_type, T>::~Buffer() {
 
 template <int array_type, typename T>
 void Buffer<array_type, T>::upload_data(bool keep_data_on_cpu) {
-  glNamedBufferData(m_id, sizeof(T) * cpu_size(), m_data.data(),
-                    GL_STATIC_DRAW);
+  glNamedBufferData(m_id, sizeof(T) * cpu_size(), m_data.data(), m_usage);
   gl_error_check("glNamedBufferData");
   m_gpu_size = cpu_size();
 
@@ -216,6 +226,28 @@ void Buffer<array_type, T>::upload_data(bool keep_data_on_cpu) {
     clear();
   else
     m_is_consistent = false;
+}
+
+//------------------------------------------------------------------------------
+
+template <int array_type, typename T>
+void Buffer<array_type, T>::gpu_malloc_bytes(size_t bytes) {
+  glNamedBufferData(this->m_id, bytes, nullptr, usage);
+}
+
+//------------------------------------------------------------------------------
+
+template <int array_type, typename T>
+void Buffer<array_type, T>::gpu_malloc(size_t n) {
+  m_gpu_size = n;
+  gpu_malloc_bytes(n * sizeof(T));
+}
+
+//------------------------------------------------------------------------------
+
+template <int array_type, typename T>
+void Buffer<array_type, T>::gpu_malloc() {
+  gpu_malloc(cpu_size());
 }
 
 //------------------------------------------------------------------------------
