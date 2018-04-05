@@ -3,10 +3,8 @@
 
 using namespace Yavin;
 
-const unsigned int screen_width     = 800;
-const unsigned int screen_height    = 600;
-const unsigned int num_pixels       = screen_width * screen_height;
-const unsigned int linked_list_size = num_pixels * 3;
+const unsigned int screen_width  = 800;
+const unsigned int screen_height = 600;
 
 //==============================================================================
 namespace Yavin::Test {
@@ -52,7 +50,7 @@ class OITTestWindow : public OITWindow {
       for (size_t i = 0; i < quads.size(); ++i) {
         shader.set_color(colors[i]);
         quads[i].draw();
-      }  // namespace Yavin::Test
+      }
     });
 
     set_resize_callback([this](int w, int h) {
@@ -71,6 +69,6 @@ class OITTestWindow : public OITWindow {
 //==============================================================================
 
 int main() {
-  Yavin::Test::OITTestWindow w("OIT Test", 10);
+  Yavin::Test::OITTestWindow w("OIT Test", 20);
   w.start_rendering();
 }

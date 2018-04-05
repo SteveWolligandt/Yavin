@@ -5,7 +5,7 @@
 uniform vec4 clear_color;
 
 out vec4 frag_color;
-const uint max_fragments_size = 8;
+const uint max_fragments_size = 30;
 
 void main() {
   uint running_index = imageLoad(head_index, ivec2(gl_FragCoord.xy)).r;

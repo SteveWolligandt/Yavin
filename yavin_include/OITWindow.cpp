@@ -25,6 +25,10 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
       m_linked_list_size_factor(linked_list_size_factor),
       m_atomic_counter{0},
       m_linked_list(width * height * m_linked_list_size_factor),
+      m_linked_list_size(
+          std::vector<unsigned int>{
+              (unsigned int)(width * height * m_linked_list_size_factor)},
+          ShaderStorageBuffer<unsigned int>::STATIC_DRAW),
       m_head_indices_tex(width, height) {
   m_linked_list_render_shader.add_shader_stage<VertexShader>(
       vertex_shader_path);
@@ -39,7 +43,8 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
   m_linked_list_render_shader.set_uniform("modelview", cam.view_matrix());
 
   m_atomic_counter.bind(5);
-  m_linked_list.bind(8);
+  m_linked_list_size.bind(8);
+  m_linked_list.bind(9);
 
   m_head_indices_tex.bind();
   m_head_indices_tex.set_interpolation_mode(Texture::NEAREST);
@@ -80,8 +85,9 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
     m_head_indices_tex.bind_image_texture(7);
 
     m_linked_list.gpu_malloc(m_width * m_height * m_linked_list_size_factor);
-    m_linked_list.bind(8);
-
+    m_linked_list_size.push_back(m_width * m_height *
+                                 m_linked_list_size_factor);
+    m_linked_list_size.upload_data();
     OrthographicCamera cam(0, 1, 0, 1, -1, 1, m_width, m_height);
     m_linked_list_render_shader.bind();
     m_linked_list_render_shader.set_uniform("projection",

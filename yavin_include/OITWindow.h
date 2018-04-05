@@ -10,6 +10,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "Window.h"
+#include "gl_wrapper.h"
 
 namespace Yavin {
 
@@ -50,7 +51,7 @@ class OITWindow : public Window {
   const static std::string fragment_shader_path;
   //----------------------------------------------------------------------------
   DLL_API OITWindow(const std::string& name, size_t width, size_t height,
-                    unsigned int linked_list_size_factor = 8,
+                    unsigned int linked_list_size_factor,
                     unsigned int major = 4, unsigned int minor = 5);
 
   //----------------------------------------------------------------------------
@@ -64,6 +65,8 @@ class OITWindow : public Window {
   }
   //----------------------------------------------------------------------------
   void set_clear_color(const glm::vec4& clear_color) {
+    Yavin::set_clear_color(clear_color.x, clear_color.y, clear_color.z,
+                           clear_color.w);
     m_linked_list_render_shader.set_uniform("clear_color", clear_color);
   }
 
@@ -77,6 +80,7 @@ class OITWindow : public Window {
   Shader                                   m_linked_list_render_shader;
   AtomicCounterBuffer                      m_atomic_counter;
   ShaderStorageBuffer<linked_list_element> m_linked_list;
+  ShaderStorageBuffer<unsigned int>        m_linked_list_size;
   Texture2D<unsigned int, R>               m_head_indices_tex;
   PixelUnpackBuffer<unsigned int>          m_clear_buffer;
   screen_quad_t                            m_fullscreen_quad;
