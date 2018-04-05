@@ -40,7 +40,7 @@ AtomicCounterBuffer::AtomicCounterBuffer(std::vector<unsigned int>&& data,
 
 AtomicCounterBuffer::AtomicCounterBuffer(
     std::initializer_list<unsigned int>&& list)
-    : Buffer(std::move(list), parent_t::DYNAMIC_DRAW) {}
+    : Buffer(std::move(list), default_usage) {}
 
 //------------------------------------------------------------------------------
 
