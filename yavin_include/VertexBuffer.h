@@ -19,8 +19,8 @@ class VertexBuffer
   using parent_t = Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>;
   using parent_t::gpu_malloc;
   using parent_t::gpu_malloc_bytes;
-  using usage_t              = typename parent_t::usage_t;
-  static const usage_t usage = STATIC_DRAW;
+  using usage_t                      = typename parent_t::usage_t;
+  static const usage_t default_usage = usage_t::STATIC_DRAW;
 
   class iterator;
   class const_iterator;
@@ -173,7 +173,7 @@ void VertexBuffer<Ts...>::upload_data(bool keep_data_on_cpu) {
   // gpu buffer neiter created nor initialized
   if (!m_gpu_buffer_created) {
     glNamedBufferData(this->m_id, size_of_attributes * this->cpu_size(),
-                      this->m_data.data(), usage);
+                      this->m_data.data(), this->m_usage);
     gl_error_check("glNamedBufferData");
 
     this->m_gpu_size = this->cpu_size();
