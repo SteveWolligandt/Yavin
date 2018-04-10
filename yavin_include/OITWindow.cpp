@@ -30,6 +30,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
               (unsigned int)(width * height * m_linked_list_size_factor)},
           ShaderStorageBuffer<unsigned int>::STATIC_DRAW),
       m_head_indices_tex(width, height) {
+  disable_multisampling();
   m_linked_list_render_shader.add_shader_stage<VertexShader>(
       vertex_shader_path);
   m_linked_list_render_shader.add_shader_stage<FragmentShader>(

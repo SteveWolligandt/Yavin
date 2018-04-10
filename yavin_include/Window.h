@@ -38,8 +38,9 @@ class Window {
   DLL_API void        print_versions();
 
   DLL_API void make_context_current();
-  DLL_API void enable_multisample();
-  DLL_API void disable_multisample();
+  DLL_API void enable_multisampling();
+  DLL_API void disable_multisampling();
+  DLL_API bool multisampling_enabled();
   DLL_API void enable_depth_test();
   DLL_API void disable_depth_test();
 
