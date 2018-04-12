@@ -22,6 +22,11 @@ find_package(OpenGL)
 # find_package(PNG REQUIRED)
 # find_package(PNG++ REQUIRED)
 
+# configuring catch2
+set(CATCH2_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/catch2/single_include)
+add_library(Catch2 INTERFACE)
+target_include_directories(Catch2 INTERFACE ${CATCH2_INCLUDE_DIR})
+
 file(GLOB YAVIN_SOURCES yavin_include/*.cpp)
 file(GLOB YAVIN_HEADERS yavin_include/*.h)
 

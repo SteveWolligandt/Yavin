@@ -21,17 +21,36 @@ AtomicCounterBuffer::AtomicCounterBuffer(AtomicCounterBuffer&& other)
 
 //------------------------------------------------------------------------------
 
-AtomicCounterBuffer::AtomicCounterBuffer(const std::vector<unsigned int>& data,
-                                         usage_t usage, bool direct_upload,
-                                         bool keep_data_on_cpu)
-    : Buffer(data, usage, direct_upload, keep_data_on_cpu) {}
+AtomicCounterBuffer& AtomicCounterBuffer::operator=(
+    const AtomicCounterBuffer& other) {
+  parent_t::operator=(other);
+  return *this;
+}
 
 //------------------------------------------------------------------------------
 
-AtomicCounterBuffer::AtomicCounterBuffer(std::vector<unsigned int>&& data,
-                                         usage_t usage, bool direct_upload,
-                                         bool keep_data_on_cpu)
-    : Buffer(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
+AtomicCounterBuffer& AtomicCounterBuffer::operator=(
+    AtomicCounterBuffer&& other) {
+  parent_t::operator=(std::move(other));
+  return *this;
+}
+
+//------------------------------------------------------------------------------
+
+AtomicCounterBuffer::AtomicCounterBuffer(size_t n, usage_t usage)
+    : Buffer(n, usage) {}
+
+//------------------------------------------------------------------------------
+
+AtomicCounterBuffer::AtomicCounterBuffer(size_t n, unsigned int initial,
+                                         usage_t usage)
+    : Buffer(n, initial, usage) {}
+
+//------------------------------------------------------------------------------
+
+AtomicCounterBuffer::AtomicCounterBuffer(const std::vector<unsigned int>& data,
+                                         usage_t                          usage)
+    : Buffer(data, usage) {}
 
 //------------------------------------------------------------------------------
 
@@ -43,16 +62,18 @@ AtomicCounterBuffer::AtomicCounterBuffer(
 
 void AtomicCounterBuffer::set_all_to(unsigned int val) {
   auto gpu_data = reinterpret_cast<unsigned char*>(
-      glMapNamedBuffer(this->m_id, GL_WRITE_ONLY));
+      glMapNamedBuffer(this->m_gl_handle, GL_WRITE_ONLY));
   gl_error_check("glMapNamedBuffer");
-  std::memset(gpu_data, val, sizeof(unsigned int) * m_gpu_size);
-  // for (size_t i = 0; i < m_gpu_size; ++i) gpu_data[i] = val;
-  glUnmapNamedBuffer(this->m_id);
+  std::memset(gpu_data, val, sizeof(unsigned int) * size());
+  glUnmapNamedBuffer(this->m_gl_handle);
 }
 
+//------------------------------------------------------------------------------
+
 void AtomicCounterBuffer::bind(size_t i) {
-  glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, i, this->m_id);
+  glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
 }
+
 //==============================================================================
 }  // namespace Yavin
 //==============================================================================

@@ -39,17 +39,13 @@ class PixelUnpackBuffer : public Buffer<GL_PIXEL_UNPACK_BUFFER, T> {
 
   //----------------------------------------------------------------------------
 
-  PixelUnpackBuffer(const std::vector<T>& data, bool direct_upload = true,
-                    usage_t usage            = default_usage,
-                    bool    keep_data_on_cpu = false)
-      : parent_t(data, usage, direct_upload, keep_data_on_cpu) {}
+  PixelUnpackBuffer(size_t n, const T& initial, usage_t usage = default_usage)
+      : parent_t(n, initial, usage) {}
 
   //----------------------------------------------------------------------------
 
-  PixelUnpackBuffer(std::vector<T>&& data, bool direct_upload = true,
-                    usage_t usage            = default_usage,
-                    bool    keep_data_on_cpu = false)
-      : parent_t(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
+  PixelUnpackBuffer(const std::vector<T>& data, usage_t usage = default_usage)
+      : parent_t(data, usage) {}
 
   //----------------------------------------------------------------------------
 

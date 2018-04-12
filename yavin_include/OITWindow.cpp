@@ -53,9 +53,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
   m_head_indices_tex.unbind();
   m_head_indices_tex.bind_image_texture(7);
 
-  for (size_t i = 0; i < m_width * m_height; ++i)
-    m_clear_buffer.push_back(0xffffffff);
-  m_clear_buffer.upload_data();
+  m_clear_buffer.upload_data(std::vector(m_width * m_height, 0xffffffff));
 
   Window::set_render_function([this]() {
     clear_color_buffer();
@@ -76,9 +74,8 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
     m_width  = w;
     m_height = h;
 
-    for (size_t i = 0; i < m_width * m_height; ++i)
-      m_clear_buffer.push_back(0xffffffff);
-    m_clear_buffer.upload_data();
+    m_clear_buffer.upload_data(
+        std::vector<unsigned int>(m_width * m_height, 0xffffffff));
 
     m_head_indices_tex.bind();
     m_clear_buffer.unbind();
@@ -86,9 +83,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
     m_head_indices_tex.bind_image_texture(7);
 
     m_linked_list.gpu_malloc(m_width * m_height * m_linked_list_size_factor);
-    m_linked_list_size.push_back(m_width * m_height *
-                                 m_linked_list_size_factor);
-    m_linked_list_size.upload_data();
+    m_linked_list_size.front() = m_width * m_height * m_linked_list_size_factor;
     OrthographicCamera cam(0, 1, 0, 1, -1, 1, m_width, m_height);
     m_linked_list_render_shader.bind();
     m_linked_list_render_shader.set_uniform("projection",

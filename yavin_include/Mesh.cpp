@@ -15,7 +15,7 @@ template class Mesh<vec3, vec3, vec2>;
 template <typename... Ts>
 void BaseMesh<Ts...>::draw() {
   for (unsigned int i = 0; i < m_vaos.size(); ++i) {
-    m_vaos[i].draw(Yavin::TRIANGLES, m_ibos[i].gpu_size());
+    m_vaos[i].draw(Yavin::TRIANGLES, m_ibos[i].size());
   }
 }
 

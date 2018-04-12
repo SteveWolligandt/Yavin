@@ -40,25 +40,23 @@ class ShaderStorageBuffer : public Buffer<GL_SHADER_STORAGE_BUFFER, T> {
 
   //----------------------------------------------------------------------------
 
-  ShaderStorageBuffer(const std::vector<T>& data, usage_t usage = default_usage,
-                      bool direct_upload = true, bool keep_data_on_cpu = false)
-      : parent_t(data, usage, direct_upload, keep_data_on_cpu) {}
+  ShaderStorageBuffer(size_t n, const T& initial, usage_t usage = default_usage)
+      : parent_t(n, initial, usage) {}
 
   //----------------------------------------------------------------------------
 
-  ShaderStorageBuffer(std::vector<T>&& data, usage_t usage = default_usage,
-                      bool direct_upload = true, bool keep_data_on_cpu = false)
-      : parent_t(std::move(data), usage, direct_upload, keep_data_on_cpu) {}
+  ShaderStorageBuffer(const std::vector<T>& data, usage_t usage = default_usage)
+      : parent_t(data, usage) {}
 
   //----------------------------------------------------------------------------
 
   ShaderStorageBuffer(std::initializer_list<T>&& list)
-      : parent_t(std::move(list)) {}
+      : parent_t(std::move(list), default_usage) {}
 
   //----------------------------------------------------------------------------
 
   void bind(size_t index) const {
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, this->m_id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, this->m_gl_handle);
     gl_error_check("glBindBufferBase");
   }
 };
