@@ -8,7 +8,6 @@
 #include "yavin_include/PixelUnpackBuffer.h"
 #include "yavin_include/ShaderStorageBuffer.h"
 #include "yavin_include/AtomicCounterBuffer.h"
-#include "yavin_include/Mesh.h"
 #include "yavin_include/Movable.h"
 #include "yavin_include/OrthographicCamera.h"
 #include "yavin_include/PerspectiveCamera.h"

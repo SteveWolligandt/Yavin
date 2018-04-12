@@ -5,7 +5,7 @@ using namespace Yavin;
 
 Window w("Buffer Test", 100, 50);
 
-TEST_CASE("Index Buffer") {
+TEST_CASE("IBO") {
   std::vector<unsigned int> correct_data{0, 1, 2};
   IndexBuffer               ibo{0, 1, 2};
   auto                      ibo_handle = ibo.gl_handle();
@@ -65,20 +65,14 @@ TEST_CASE("Index Buffer") {
   REQUIRE(move_constructed[1] == 1);
   REQUIRE(move_constructed[2] == 2);
   REQUIRE(move_constructed[3] == 20);
-
-  std::cout << move_constructed.capacity() << '\n';
 }
 
 TEST_CASE("VBO") {
-  VertexBuffer<vec3> vbo{vec3{1, 2, 3}, vec3{4, 5, 6}};
-  auto               copy = vbo;
+  VertexBuffer<vec3<float>> vbo{{{1, 2, 3}}, {{4, 5, 6}}};
 
-  auto front_copy = vbo.front();
-  auto mem        = reinterpret_cast<float*>(&front_copy);
-  REQUIRE(mem[0] == 1);
-  REQUIRE(mem[1] == 2);
-  REQUIRE(mem[2] == 3);
-  REQUIRE(mem[3] == 4);
-  REQUIRE(mem[4] == 5);
-  REQUIRE(mem[5] == 6);
+  std::tuple<vec3<float>> front = vbo.front();
+  vec3<float>             v     = std::get<0>(front);
+  REQUIRE(v.data[0] == 1);
+  REQUIRE(v.data[1] == 2);
+  REQUIRE(v.data[2] == 3);
 }

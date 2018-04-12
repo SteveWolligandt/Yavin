@@ -19,9 +19,10 @@ class OITWindow : public Window {
   //============================================================================
   class screen_quad_t {
    public:
-    using vbo_t = VertexBuffer<vec2>;
+    using vbo_t = VertexBuffer<vec2<float>>;
     screen_quad_t()
-        : m_vbo{vec2{0, 0}, vec2{1, 0}, vec2{0, 1}, vec2{1, 1}},
+        : m_vbo{vec2<float>{0, 0}, vec2<float>{1, 0}, vec2<float>{0, 1},
+                vec2<float>{1, 1}},
           m_ibo{0, 1, 2, 3} {
       m_vao.bind();
       m_vbo.bind();
@@ -41,10 +42,10 @@ class OITWindow : public Window {
   };
   //============================================================================
   struct linked_list_element {
-    vec4         color;
+    vec4<float>  color;
     unsigned int next_index;
     float        depth;
-    vec2         pad;
+    vec2<float>  pad;
   };
   //============================================================================
   const static std::string vertex_shader_path;

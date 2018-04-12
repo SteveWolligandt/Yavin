@@ -15,13 +15,12 @@ namespace Yavin {
 //==============================================================================
 
 template <typename... Ts>
-class VertexBuffer
-    : public Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>> {
+class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>> {
  public:
-  using parent_t = Buffer<GL_ARRAY_BUFFER, data_representation<Ts...>>;
+  using data_t   = std::tuple<Ts...>;
+  using parent_t = Buffer<GL_ARRAY_BUFFER, data_t>;
   using this_t   = VertexBuffer<Ts...>;
   using usage_t  = typename parent_t::usage_t;
-  using data_t   = data_representation<Ts...>;
 
   static constexpr unsigned int num_attributes = sizeof...(Ts);
   static const usage_t          default_usage  = usage_t::STATIC_DRAW;

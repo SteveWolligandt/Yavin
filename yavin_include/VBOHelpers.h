@@ -5,67 +5,13 @@
 #include <initializer_list>
 #include <iostream>
 #include <vector>
+#include "attribute.h"
 #include "gl_includes.h"
+#include "gl_type.h"
 
+//==============================================================================
 namespace Yavin {
-
-/**
- * @brief      Base Attribute
- *
- * @tparam     Ts    Data in attribute
- */
-template <typename... Ts>
-struct attrib {};
-
-/**
- * @brief      float
- */
-template <>
-struct attrib<float> {
-  float                         val;
-  static constexpr GLenum       type     = GL_FLOAT;
-  static constexpr unsigned int num_dims = 1;
-};
-
-/**
- * @brief      float vec2
- */
-template <>
-struct attrib<float, float> {
-  float                         x, y;
-  static constexpr GLenum       type     = GL_FLOAT;
-  static constexpr unsigned int num_dims = 2;
-};
-
-/**
- * @brief      float vec3
- */
-template <>
-struct attrib<float, float, float> {
-  float                         x, y, z;
-  static constexpr GLenum       type     = GL_FLOAT;
-  static constexpr unsigned int num_dims = 3;
-};
-
-/**
- * @brief      float vec4
- */
-template <>
-struct attrib<float, float, float, float> {
-  float                         x, y, z, w;
-  static constexpr GLenum       type     = GL_FLOAT;
-  static constexpr unsigned int num_dims = 4;
-};
-
-using scalar = attrib<float>;
-using vec2   = attrib<float, float>;
-using vec3   = attrib<float, float, float>;
-using vec4   = attrib<float, float, float, float>;
-
-template <typename... Ss>
-constexpr auto plus_fold(Ss... ss) {
-  return (... + ss);
-}
+//==============================================================================
 
 /**
  * @brief      value contains number of bytes of attribute
@@ -74,7 +20,7 @@ constexpr auto plus_fold(Ss... ss) {
  */
 template <typename... Ts>
 struct attrib_size {
-  static constexpr size_t value = plus_fold(sizeof(Ts)...);
+  static constexpr size_t value = (... + sizeof(Ts));
 };
 
 /**
@@ -84,7 +30,7 @@ struct attrib_size {
  */
 template <typename... Ts>
 struct attrib_pack_size {
-  static constexpr size_t value = plus_fold(attrib_size<Ts>::value...);
+  static constexpr size_t value = (... + attrib_size<Ts>::value);
 };
 
 ///////////// at compile time the attribute offsets, sizes, types and dimensions
@@ -257,161 +203,7 @@ struct AttribHolder {};
 template <class... Params>
 struct ParamHolder {};
 
-// this is used for the last step in recursion
-template <class Attrib, class Param>
-constexpr bool can_apply(AttribHolder<Attrib>, ParamHolder<Param>) {
-  return data_attrib_pair<Attrib, Param>::exists;
-}
-
-// for every attribute parameter tuple check if it data_attrib_pair is defined
-template <class FirstAttrib, class SecondAttrib, class... Attribs,
-          class FirstParam, class SecondParam, class... Params>
-constexpr bool can_apply(AttribHolder<FirstAttrib, SecondAttrib, Attribs...>,
-                         ParamHolder<FirstParam, SecondParam, Params...>) {
-  return data_attrib_pair<FirstAttrib, FirstParam>::exists &&
-         can_apply(AttribHolder<SecondAttrib, Attribs...>(),
-                   ParamHolder<SecondParam, Params...>());
-}
-
-//////// basic templates for data
-
-/**
- * @brief      data_size for more complicated types
- */
-template <class T>
-struct data_size {
-  static constexpr unsigned int value = sizeof(T);
-};
-
-/**
- * @brief      basic data to buffer inserter
- */
-template <class T>
-struct data_inserter {
-  static unsigned int insert(const T& data, char* buffer, unsigned int offset) {
-    *((T*)(&buffer[offset])) = data;
-    return data_size<T>::value;
-  }
-};
-
-// variadic template struct taking several attribs
-template <class... Attribs>
-struct data_representation {
-  // constructor takes variadic number of arguments
-  // and checks if the size of parameters matches
-  // the size of the attribs
-  template <class... DataTs>
-  data_representation(const DataTs&... data) {
-    static_assert(
-        can_apply(AttribHolder<Attribs...>(), ParamHolder<DataTs...>()),
-        "Data values do not match");
-
-    set_data<DataTs...>(0, data...);
-  }
-
-  data_representation() = default;
-
-  template <class... DataTs>
-  void operator=(const DataTs&... data) {
-    static_assert(
-        can_apply(AttribHolder<Attribs...>(), ParamHolder<DataTs...>()),
-        "Data values do not match");
-
-    set_data<DataTs...>(0, data...);
-  }
-
-  // assigns a value to a part of the internal memory buffer
-  template <class T>
-  void set_data(const unsigned int offset, const T& data) {
-    data_inserter<T>::insert(data, m_buffer, offset);
-  }
-
-  // recursively assigns values to parts of the internal memory buffer
-  template <class FirstDataT, class SecondDataT, class... DataTs>
-  void set_data(const unsigned int offset, const FirstDataT& first,
-                const SecondDataT& second, const DataTs&... data) {
-    auto num_data_inserted =
-        data_inserter<FirstDataT>::insert(first, m_buffer, offset);
-    set_data<SecondDataT, DataTs...>(offset + num_data_inserted, second,
-                                     data...);
-  }
-
-  char m_buffer[attrib_pack_size<Attribs...>::value];
-};
-
-//////// yavin implementation
-
-template <>
-struct data_size<vec2> {
-  static constexpr unsigned int value = sizeof(float) * 2;
-};
-template <>
-struct data_size<vec3> {
-  static constexpr unsigned int value = sizeof(float) * 3;
-};
-template <>
-struct data_size<vec4> {
-  static constexpr unsigned int value = sizeof(float) * 4;
-};
-
-template <>
-struct data_attrib_pair<vec2, vec2> {
-  static constexpr bool exists = true;
-};
-
-template <>
-struct data_attrib_pair<vec3, vec3> {
-  static constexpr bool exists = true;
-};
-
-template <>
-struct data_attrib_pair<vec4, vec4> {
-  static constexpr bool exists = true;
-};
-
-/**
- * specialized data to buffer inserter for vec2
- */
-template <>
-struct data_inserter<vec2> {
-  static unsigned int insert(const vec2& data, char* buffer,
-                             unsigned int offset) {
-    float* temp_buf = (float*)(&buffer[offset]);
-    temp_buf[0]     = data.x;
-    temp_buf[1]     = data.y;
-    return data_size<vec2>::value;
-  }
-};
-
-/**
- * specialized data to buffer inserter for vec3
- */
-template <>
-struct data_inserter<vec3> {
-  static unsigned int insert(const vec3& data, char* buffer,
-                             unsigned int offset) {
-    float* temp_buf = (float*)(&buffer[offset]);
-    temp_buf[0]     = data.x;
-    temp_buf[1]     = data.y;
-    temp_buf[2]     = data.z;
-    return data_size<vec3>::value;
-  }
-};
-
-/**
- * specialized data to buffer inserter for vec4
- */
-template <>
-struct data_inserter<vec4> {
-  static unsigned int insert(const vec4& data, char* buffer,
-                             unsigned int offset) {
-    float* temp_buf = (float*)(&buffer[offset]);
-    temp_buf[0]     = data.x;
-    temp_buf[1]     = data.y;
-    temp_buf[2]     = data.z;
-    temp_buf[3]     = data.w;
-    return data_size<vec4>::value;
-  }
-};
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 #endif
