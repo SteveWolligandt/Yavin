@@ -493,6 +493,17 @@ Buffer<array_type, T>& Buffer<array_type, T>::operator=(Buffer&& other) {
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
+void Buffer<array_type, T>::reserve(size_t size) {
+  if (capacity() < size) {
+    this_t tmp(*this);
+    gpu_malloc(size);
+    copy(tmp);
+  }
+}
+
+//------------------------------------------------------------------------------
+
+template <GLsizei array_type, typename T>
 Buffer<array_type, T>::Buffer(size_t n, usage_t usage) : Buffer(usage) {
   gpu_malloc(n);
 }
@@ -608,20 +619,15 @@ void Buffer<array_type, T>::copy(const this_t& other) {
   if (capacity() < other.size()) gpu_malloc(other.size());
   glCopyNamedBufferSubData(other.m_gl_handle, m_gl_handle, 0, 0,
                            sizeof(T) * other.size());
-  m_size = other.size();
   gl_error_check("glCopyNamedBufferSubData");
+  m_size = other.size();
 }
 
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::push_back(T&& t) {
-  if (m_capacity < m_size + 1) {
-    // reallocate
-    this_t tmp(*this);
-    gpu_malloc(m_size * 2.0);
-    copy(tmp);
-  }
+  if (m_capacity < m_size + 1) reserve(m_size * 2);
   at(size()) = std::forward<T>(t);
   ++m_size;
 }

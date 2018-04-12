@@ -3,9 +3,9 @@
 
 using namespace Yavin;
 
-TEST_CASE("Buffer - Index Buffer - Copy") {
-  Window w("Buffer Test", 100, 50);
+Window w("Buffer Test", 100, 50);
 
+TEST_CASE("Index Buffer") {
   std::vector<unsigned int> correct_data{0, 1, 2};
   IndexBuffer               ibo{0, 1, 2};
   auto                      ibo_handle = ibo.gl_handle();
@@ -35,9 +35,11 @@ TEST_CASE("Buffer - Index Buffer - Copy") {
     REQUIRE(correct_data[i] == copy_assigned_data[i]);
   }
 
-  ibo[0] = 10;
-  REQUIRE(ibo[0] == 10);
-  REQUIRE(copy_constructed[0] == 0);
+  SECTION("changing one value in gpu memory") {
+    ibo[0] = 10;
+    REQUIRE(ibo[0] == 10);
+    REQUIRE(copy_constructed[0] == 0);
+  }
 
   IndexBuffer move_constructed = std::move(ibo);
 
@@ -65,4 +67,18 @@ TEST_CASE("Buffer - Index Buffer - Copy") {
   REQUIRE(move_constructed[3] == 20);
 
   std::cout << move_constructed.capacity() << '\n';
+}
+
+TEST_CASE("VBO") {
+  VertexBuffer<vec3> vbo{vec3{1, 2, 3}, vec3{4, 5, 6}};
+  auto               copy = vbo;
+
+  auto front_copy = vbo.front();
+  auto mem        = reinterpret_cast<float*>(&front_copy);
+  REQUIRE(mem[0] == 1);
+  REQUIRE(mem[1] == 2);
+  REQUIRE(mem[2] == 3);
+  REQUIRE(mem[3] == 4);
+  REQUIRE(mem[4] == 5);
+  REQUIRE(mem[5] == 6);
 }
