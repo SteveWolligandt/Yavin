@@ -1,6 +1,7 @@
 #ifndef __YAVIN_ATTRIBUTE_H__
 #define __YAVIN_ATTRIBUTE_H__
 
+#include <ostream>
 #include "gl_includes.h"
 #include "gl_type.h"
 
@@ -13,12 +14,29 @@ namespace Yavin {
  *
  * @tparam     Ts    Data in attribute
  */
-template <unsigned int _n, typename T>
+template <unsigned int n, typename T>
 struct attrib {
   static constexpr GLenum       type     = gl_type<T>::type;
-  static constexpr unsigned int num_dims = _n;
-  T                             data[_n];
+  static constexpr unsigned int num_dims = n;
+  T                             data[n];
+
+  auto&       operator[](size_t i) { return data[i]; }
+  const auto& operator[](size_t i) const { return data[i]; }
+
+  const auto begin() const { return data; }
+  const auto end() const { return data + n; }
+
+  auto begin() { return data; }
+  auto end() { return data + n; }
 };
+
+template <unsigned int n, typename T>
+auto& operator<<(std::ostream& out, const attrib<n, T>& a) {
+  out << "[ ";
+  for (auto v : a) out << v << ' ';
+  out << ']';
+  return out;
+}
 
 //------------------------------------------------------------------------------
 

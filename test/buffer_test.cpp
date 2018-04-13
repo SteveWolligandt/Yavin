@@ -67,12 +67,38 @@ TEST_CASE("IBO") {
   REQUIRE(move_constructed[3] == 20);
 }
 
-TEST_CASE("VBO") {
-  VertexBuffer<vec3<float>> vbo{{{1, 2, 3}}, {{4, 5, 6}}};
+//------------------------------------------------------------------------------
 
-  std::tuple<vec3<float>> front = vbo.front();
-  vec3<float>             v     = std::get<0>(front);
-  REQUIRE(v.data[0] == 1);
-  REQUIRE(v.data[1] == 2);
-  REQUIRE(v.data[2] == 3);
+TEST_CASE("VBO download") {
+  using vbo_t = VertexBuffer<vec2<float>, vec3<float>>;
+  vbo_t vbo{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}};
+
+  auto down = vbo.download_data();
+  REQUIRE(std::get<0>(down[0])[0] == 1);
+  REQUIRE(std::get<0>(down[0])[1] == 2);
+  REQUIRE(std::get<1>(down[0])[0] == 3);
+  REQUIRE(std::get<1>(down[0])[1] == 4);
+  REQUIRE(std::get<0>(down[1])[0] == 5);
+  REQUIRE(std::get<0>(down[1])[1] == 6);
+  REQUIRE(std::get<1>(down[1])[0] == 7);
+  REQUIRE(std::get<1>(down[1])[1] == 8);
+}
+
+//------------------------------------------------------------------------------
+
+TEST_CASE("VBO element access") {
+  using vbo_t = VertexBuffer<vec3<float>>;
+  vbo_t vbo{{{1, 2, 3}}, {{4, 5, 6}}};
+
+  vbo_t::data_t front   = vbo.front();
+  vbo_t::data_t back    = vbo.back();
+  auto          v_front = std::get<0>(front);
+  auto          v_back  = std::get<0>(back);
+
+  REQUIRE(v_front[0] == 1);
+  REQUIRE(v_front[1] == 2);
+  REQUIRE(v_front[2] == 3);
+  REQUIRE(v_front[3] == 4);
+  REQUIRE(v_front[4] == 5);
+  REQUIRE(v_front[5] == 6);
 }
