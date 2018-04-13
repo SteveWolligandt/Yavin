@@ -427,6 +427,7 @@ class Buffer {
   void gpu_malloc(size_t n, const T& initial);
 
   void push_back(T&&);
+  void pop_back();
 
   template <typename... Ts>
   void emplace_back(Ts&&...);
@@ -666,6 +667,13 @@ void Buffer<array_type, T>::push_back(T&& t) {
   if (m_capacity < m_size + 1) reserve(m_size * 2);
   at(size()) = std::forward<T>(t);
   ++m_size;
+}
+
+//------------------------------------------------------------------------------
+
+template <GLsizei array_type, typename T>
+void Buffer<array_type, T>::pop_back(T&& t) {
+  --m_size;
 }
 
 //------------------------------------------------------------------------------
