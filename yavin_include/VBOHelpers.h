@@ -13,195 +13,123 @@
 namespace Yavin {
 //==============================================================================
 
-/**
- * @brief      value contains number of bytes of attribute
- *
- * @tparam     Ts    data of attribute
- */
-template <typename... Ts>
-struct attrib_size {
-  static constexpr size_t value = (... + sizeof(Ts));
-};
+template <size_t num_attrs, class... Ts>
+struct attr_offset;
 
-/**
- * @brief      value contains number of bytes of attributes
- *
- * @tparam     Ts    attributes
- */
-template <typename... Ts>
-struct attrib_pack_size {
-  static constexpr size_t value = (... + attrib_size<Ts>::value);
-};
+//------------------------------------------------------------------------------
 
-///////////// at compile time the attribute offsets, sizes, types and dimensions
-///////////// are generated and saved into an std::array
-template <unsigned int num_attrs, class... Ts>
-struct attr_generator_offset;
-
-template <unsigned int num_attrs>
-struct attr_generator_offset<num_attrs> {
-  constexpr static std::array<unsigned long, num_attrs> gen(unsigned long,
-                                                            unsigned int) {
-    return std::array<unsigned long, num_attrs>();
+template <size_t num_attrs>
+struct attr_offset<num_attrs> {
+  constexpr static std::array<size_t, num_attrs> gen(size_t, size_t) {
+    return std::array<size_t, num_attrs>();
   }
 };
 
-template <unsigned num_attrs, class FirstAttrib, class... RestAttribs>
-struct attr_generator_offset<num_attrs, FirstAttrib, RestAttribs...> {
-  constexpr static std::array<unsigned long, num_attrs> gen(unsigned long off,
-                                                            unsigned int  idx) {
-    auto arr = attr_generator_offset<num_attrs, RestAttribs...>::gen(
-        off + attrib_pack_size<FirstAttrib>::value, idx + 1);
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs, class FirstAttrib, class... RestAttribs>
+struct attr_offset<num_attrs, FirstAttrib, RestAttribs...> {
+  constexpr static std::array<size_t, num_attrs> gen(size_t off, size_t idx) {
+    auto arr = attr_offset<num_attrs, RestAttribs...>::gen(
+        off + sizeof(FirstAttrib), idx + 1);
     arr[idx] = off;
     return arr;
   }
 };
 
-template <unsigned int num_attrs, class... Ts>
+//==============================================================================
+
+template <size_t num_attrs, class... Ts>
 struct attr_generator_sizes;
 
-template <unsigned int num_attrs>
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs>
 struct attr_generator_sizes<num_attrs> {
-  constexpr static std::array<unsigned int, num_attrs> gen(unsigned int) {
-    return std::array<unsigned int, num_attrs>();
+  constexpr static std::array<size_t, num_attrs> gen(size_t) {
+    return std::array<size_t, num_attrs>();
   }
 };
 
-template <unsigned num_attrs, class FirstAttrib, class... RestAttribs>
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs, class FirstAttrib, class... RestAttribs>
 struct attr_generator_sizes<num_attrs, FirstAttrib, RestAttribs...> {
-  constexpr static std::array<unsigned int, num_attrs> gen(unsigned int idx) {
+  constexpr static std::array<size_t, num_attrs> gen(size_t idx) {
     auto arr = attr_generator_sizes<num_attrs, RestAttribs...>::gen(idx + 1);
-    arr[idx] = attrib_size<FirstAttrib>::value;
+    arr[idx] = sizeof(FirstAttrib);
     return arr;
   }
 };
 
-template <unsigned int num_attrs, class... Ts>
+//==============================================================================
+
+template <size_t num_attrs, class... Ts>
 struct attr_generator_num_dims;
 
-template <unsigned int num_attrs>
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs>
 struct attr_generator_num_dims<num_attrs> {
-  constexpr static std::array<unsigned int, num_attrs> gen(unsigned int) {
-    return std::array<unsigned int, num_attrs>();
+  constexpr static std::array<size_t, num_attrs> gen(size_t) {
+    return std::array<size_t, num_attrs>();
   }
 };
 
-template <unsigned num_attrs, class FirstAttrib, class... RestAttribs>
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs, class FirstAttrib, class... RestAttribs>
 struct attr_generator_num_dims<num_attrs, FirstAttrib, RestAttribs...> {
-  constexpr static std::array<unsigned int, num_attrs> gen(unsigned int idx) {
+  constexpr static std::array<size_t, num_attrs> gen(size_t idx) {
     auto arr = attr_generator_num_dims<num_attrs, RestAttribs...>::gen(idx + 1);
     arr[idx] = FirstAttrib::num_dims;
     return arr;
   }
 };
 
-template <unsigned int num_attrs, class... Ts>
+//==============================================================================
+
+template <size_t num_attrs, class... Ts>
 struct attr_generator_types;
 
-template <unsigned int num_attrs>
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs>
 struct attr_generator_types<num_attrs> {
-  constexpr static std::array<GLenum, num_attrs> gen(unsigned int) {
+  constexpr static std::array<GLenum, num_attrs> gen(size_t) {
     return std::array<GLenum, num_attrs>();
   }
 };
 
-template <unsigned num_attrs, class FirstAttrib, class... RestAttribs>
+//------------------------------------------------------------------------------
+
+template <size_t num_attrs, class FirstAttrib, class... RestAttribs>
 struct attr_generator_types<num_attrs, FirstAttrib, RestAttribs...> {
-  constexpr static std::array<GLenum, num_attrs> gen(unsigned int idx) {
+  constexpr static std::array<GLenum, num_attrs> gen(size_t idx) {
     auto arr = attr_generator_types<num_attrs, RestAttribs...>::gen(idx + 1);
     arr[idx] = FirstAttrib::type;
     return arr;
   }
 };
 
+//==============================================================================
+
 template <class... Ts>
 struct attr_prefs {
-  constexpr static unsigned int num_attrs = sizeof...(Ts);
-  constexpr static std::array<unsigned long, num_attrs> offsets =
-      attr_generator_offset<num_attrs, Ts...>::gen(0, 0);
-  constexpr static std::array<unsigned int, num_attrs> sizes =
+  constexpr static size_t num_attrs = sizeof...(Ts);
+
+  constexpr static std::array<size_t, num_attrs> offsets =
+      attr_offset<num_attrs, Ts...>::gen(0, 0);
+
+  constexpr static std::array<size_t, num_attrs> sizes =
       attr_generator_sizes<num_attrs, Ts...>::gen(0);
-  constexpr static std::array<unsigned int, num_attrs> num_dims =
+
+  constexpr static std::array<size_t, num_attrs> num_dims =
       attr_generator_num_dims<num_attrs, Ts...>::gen(0);
-  constexpr static std::array<unsigned int, num_attrs> types =
+
+  constexpr static std::array<GLenum, num_attrs> types =
       attr_generator_types<num_attrs, Ts...>::gen(0);
 };
-
-/////// Following structs are used for indexing vbo memory
-template <typename Data_t, unsigned int M, unsigned int N,
-          unsigned int PackSize, typename... Ts>
-struct tuple_constructor;
-
-template <typename Data_t, unsigned int M, unsigned int N,
-          unsigned int PackSize, typename T>
-struct tuple_constructor<Data_t, M, N, PackSize, T> {
-  static std::tuple<T&> construct(std::vector<Data_t>& buffer, unsigned int idx,
-                                  const std::array<unsigned long, M>& offsets) {
-    unsigned char* temp_buf = reinterpret_cast<unsigned char*>(&buffer[0]);
-    return std::tuple<T&>(
-        *reinterpret_cast<T*>(&temp_buf[idx * PackSize + offsets[N]]));
-  }
-
-  static std::tuple<const T&> construct(
-      const std::vector<Data_t>& buffer, unsigned int idx,
-      const std::array<unsigned long, M>& offsets) {
-    const unsigned char* temp_buf =
-        reinterpret_cast<const unsigned char*>(&buffer[0]);
-    return std::tuple<const T&>(
-        *reinterpret_cast<const T*>(&temp_buf[idx * PackSize + offsets[N]]));
-  }
-};
-
-template <typename Data_t, unsigned int M, unsigned int N,
-          unsigned int PackSize, typename T, typename... Ts>
-struct tuple_constructor<Data_t, M, N, PackSize, T, Ts...> {
-  static std::tuple<T&, Ts&...> construct(
-      std::vector<Data_t>& buffer, unsigned int idx,
-      const std::array<unsigned long, M>& offsets) {
-    return std::tuple_cat(
-        tuple_constructor<Data_t, M, N, PackSize, T>::construct(buffer, idx,
-                                                                offsets),
-        tuple_constructor<Data_t, M, N + 1, PackSize, Ts...>::construct(
-            buffer, idx, offsets));
-  }
-  static std::tuple<const T&, const Ts&...> construct(
-      const std::vector<Data_t>& buffer, unsigned int idx,
-      const std::array<unsigned long, M>& offsets) {
-    return std::tuple_cat(
-        tuple_constructor<Data_t, M, N, PackSize, T>::construct(buffer, idx,
-                                                                offsets),
-        tuple_constructor<Data_t, M, N + 1, PackSize, Ts...>::construct(
-            buffer, idx, offsets));
-  }
-};
-
-template <int N, typename... Ts>
-struct index_param_pack;
-
-template <typename T, typename... Ts>
-struct index_param_pack<0, T, Ts...> {
-  typedef T type;
-};
-template <int N, typename T, typename... Ts>
-struct index_param_pack<N, T, Ts...> {
-  typedef typename index_param_pack<N - 1, Ts...>::type type;
-};
-
-/**
- * data attribute acceptance. These structs are used for compile-time safety for
- * actual data specification
- */
-template <class Attrib, class T>
-struct data_attrib_pair {
-  static constexpr bool exists = false;
-};
-
-// the following is needed for static assertions of types
-template <class... Attribs>
-struct AttribHolder {};
-
-template <class... Params>
-struct ParamHolder {};
 
 //==============================================================================
 }  // namespace Yavin

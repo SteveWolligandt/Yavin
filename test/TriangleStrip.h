@@ -8,7 +8,7 @@ namespace Yavin::Test {
 //==============================================================================
 class TriangleStrip {
  public:
-  using vbo_t = VertexBuffer<vec3>;
+  using vbo_t = VertexBuffer<vec3<float>>;
 
   TriangleStrip(std::initializer_list<vbo_t::data_t>&& vertices)
       : size(vertices.size()), vbo(std::move(vertices)) {

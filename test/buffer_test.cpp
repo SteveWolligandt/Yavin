@@ -3,68 +3,118 @@
 
 using namespace Yavin;
 
-Window w("Buffer Test", 100, 50);
+Window                    w("Buffer Test", 100, 50);
+std::vector<unsigned int> correct_ibo_data{2, 1, 4, 0};
 
-TEST_CASE("IBO") {
-  std::vector<unsigned int> correct_data{0, 1, 2};
-  IndexBuffer               ibo{0, 1, 2};
-  auto                      ibo_handle = ibo.gl_handle();
-  IndexBuffer               copy_assigned{0, 1, 3, 4};
-  copy_assigned         = ibo;
-  auto copy_constructed = ibo;
+//------------------------------------------------------------------------------
 
-  REQUIRE(ibo.size() == 3);
-  REQUIRE(ibo.capacity() == 3);
+TEST_CASE("IBO download") {
+  IndexBuffer ibo{2, 1, 4, 0};
 
-  REQUIRE(copy_constructed.size() == 3);
-  REQUIRE(copy_constructed.capacity() == 3);
+  auto down = ibo.download_data();
+  for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == ibo[i]);
+}
 
-  REQUIRE(copy_assigned.size() == 3);
-  REQUIRE(copy_assigned.capacity() == 4);
+//------------------------------------------------------------------------------
 
-  auto ibo_data              = ibo.download_data();
-  auto copy_constructed_data = copy_constructed.download_data();
-  auto copy_assigned_data    = copy_assigned.download_data();
+TEST_CASE("IBO element access") {
+  IndexBuffer ibo{2, 1, 4, 0};
 
-  for (size_t i = 0; i < 3; ++i) {
-    REQUIRE(correct_data[i] == ibo[i]);
-    REQUIRE(correct_data[i] == copy_constructed[i]);
-    REQUIRE(correct_data[i] == ibo_data[i]);
-    REQUIRE(correct_data[i] == copy_constructed_data[i]);
-    REQUIRE(correct_data[i] == copy_assigned[i]);
-    REQUIRE(correct_data[i] == copy_assigned_data[i]);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == ibo[i]);
+
+  ibo[0] = 3;
+  REQUIRE(ibo[0] == 3);
+  for (size_t i = 1; i < 4; ++i) REQUIRE(correct_ibo_data[i] == ibo[i]);
+}
+
+//------------------------------------------------------------------------------
+
+TEST_CASE("IBO assignment") {
+  IndexBuffer ibo{2, 1, 4, 0};
+  IndexBuffer assigned{0, 1, 3, 4, 6, 7};  // some initializer data
+  assigned = ibo;
+
+  REQUIRE(ibo.size() == 4);
+  REQUIRE(ibo.capacity() == 4);
+
+  REQUIRE(assigned.size() == 4);
+  REQUIRE(assigned.capacity() == 6);
+
+  for (size_t i = 0; i < 4; ++i) {
+    REQUIRE(correct_ibo_data[i] == ibo[i]);
+    REQUIRE(correct_ibo_data[i] == assigned[i]);
+  }
+}
+
+//------------------------------------------------------------------------------
+
+TEST_CASE("IBO copy constructor") {
+  IndexBuffer ibo{2, 1, 4, 0};
+  IndexBuffer copy(ibo);
+
+  REQUIRE(ibo.size() == 4);
+  REQUIRE(ibo.capacity() == 4);
+
+  REQUIRE(copy.size() == 4);
+  REQUIRE(copy.capacity() == 4);
+
+  for (size_t i = 0; i < 4; ++i) {
+    REQUIRE(correct_ibo_data[i] == ibo[i]);
+    REQUIRE(correct_ibo_data[i] == copy[i]);
   }
 
-  SECTION("changing one value in gpu memory") {
-    ibo[0] = 10;
-    REQUIRE(ibo[0] == 10);
-    REQUIRE(copy_constructed[0] == 0);
-  }
+  ibo[0] = 10;
+  REQUIRE(ibo[0] == 10);
+  REQUIRE(copy[0] == 2);
+}
 
-  IndexBuffer move_constructed = std::move(ibo);
+//------------------------------------------------------------------------------
+
+TEST_CASE("IBO move assignment") {
+  IndexBuffer ibo{2, 1, 4, 0};
+  auto        ibo_handle = ibo.gl_handle();
+
+  REQUIRE(ibo.size() == 4);
+  REQUIRE(ibo.capacity() == 4);
+
+  IndexBuffer moved = std::move(ibo);
+
+  REQUIRE(ibo.size() == 0);
+  REQUIRE(ibo.capacity() == 0);
+
+  REQUIRE(moved.size() == 4);
+  REQUIRE(moved.capacity() == 4);
 
   REQUIRE(ibo.size() == 0);
   REQUIRE(ibo.capacity() == 0);
   REQUIRE(ibo.will_be_deleted() == false);
   REQUIRE(ibo.gl_handle() == 0);
-  REQUIRE(move_constructed.gl_handle() == ibo_handle);
+  REQUIRE(moved.gl_handle() == ibo_handle);
 
-  REQUIRE(move_constructed[0] == 10);
-  REQUIRE(move_constructed[1] == 1);
-  REQUIRE(move_constructed[2] == 2);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == moved[i]);
+}
 
-  copy_constructed.upload_data({5, 6});
-  REQUIRE(copy_constructed.capacity() == 3);
-  REQUIRE(copy_constructed.size() == 2);
+//------------------------------------------------------------------------------
 
-  REQUIRE(copy_constructed[0] == 5);
-  REQUIRE(copy_constructed[1] == 6);
+TEST_CASE("IBO push pop") {
+  IndexBuffer ibo{2, 1, 4, 0};
 
-  move_constructed.push_back(20);
-  REQUIRE(move_constructed[0] == 10);
-  REQUIRE(move_constructed[1] == 1);
-  REQUIRE(move_constructed[2] == 2);
-  REQUIRE(move_constructed[3] == 20);
+  REQUIRE(ibo.size() == 4);
+  REQUIRE(ibo.capacity() == 4);
+
+  ibo.push_back(3);
+
+  REQUIRE(ibo.size() == 5);
+  REQUIRE(ibo.capacity() == 8);
+
+  ibo.push_back(8);
+
+  REQUIRE(ibo.size() == 6);
+  REQUIRE(ibo.capacity() == 8);
+
+  for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == ibo[i]);
+  REQUIRE(ibo[4] == 3);
+  REQUIRE(ibo[5] == 8);
 }
 
 //------------------------------------------------------------------------------

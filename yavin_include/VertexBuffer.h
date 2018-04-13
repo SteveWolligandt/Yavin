@@ -17,9 +17,9 @@ namespace Yavin {
 template <typename... Ts>
 class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>> {
  public:
-  using data_t   = std::tuple<Ts...>;
-  using parent_t = Buffer<GL_ARRAY_BUFFER, data_t>;
+  using parent_t = Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>>;
   using this_t   = VertexBuffer<Ts...>;
+  using data_t   = typename parent_t::data_t;
   using usage_t  = typename parent_t::usage_t;
 
   static constexpr unsigned int num_attributes = sizeof...(Ts);
@@ -72,10 +72,9 @@ constexpr void VertexBuffer<Ts...>::activate_attributes() {
   for (unsigned int i = 0; i < attr_prefs<Ts...>::num_attrs; i++) {
     glEnableVertexAttribArray(i);
     gl_error_check("glEnableVertexAttribArray");
-    glVertexAttribPointer(i, attr_prefs<Ts...>::num_dims[i],
-                          attr_prefs<Ts...>::types[i], GL_FALSE,
-                          attrib_pack_size<Ts...>::value,
-                          (void*)attr_prefs<Ts...>::offsets[i]);
+    glVertexAttribPointer(
+        i, attr_prefs<Ts...>::num_dims[i], attr_prefs<Ts...>::types[i],
+        GL_FALSE, this_t::data_size, (void*)attr_prefs<Ts...>::offsets[i]);
     gl_error_check("glVertexAttribPointer");
   }
 }
