@@ -120,7 +120,7 @@ TEST_CASE("IBO push pop") {
 //------------------------------------------------------------------------------
 
 TEST_CASE("VBO download") {
-  using vbo_t = VertexBuffer<vec2<float>, vec3<float>>;
+  using vbo_t = VertexBuffer<vec2<float>, vec2<float>>;
   vbo_t vbo{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}};
 
   auto down = vbo.download_data();

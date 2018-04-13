@@ -672,7 +672,7 @@ void Buffer<array_type, T>::push_back(T&& t) {
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
-void Buffer<array_type, T>::pop_back(T&& t) {
+void Buffer<array_type, T>::pop_back() {
   --m_size;
 }
 
