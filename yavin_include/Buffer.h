@@ -21,11 +21,11 @@ class BufferMap {
   constexpr static size_t data_size = buffer_t::data_size;
 
   //! constructor gets a mapping to gpu_buffer
-  BufferMap(Buffer<array_type, T>* buffer, size_t start, size_t length,
+  BufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length,
             GLbitfield access)
-      : m_buffer(buffer), m_start(start), m_length(length), m_access(access) {
+      : m_buffer(buffer), m_offset(offset), m_length(length), m_access(access) {
     m_gpu_mapping = reinterpret_cast<T*>(
-        glMapNamedBufferRange(m_buffer->m_gl_handle, data_size * start,
+        glMapNamedBufferRange(m_buffer->m_gl_handle, data_size * offset,
                               data_size * m_length, m_access));
   }
 
@@ -56,9 +56,13 @@ class BufferMap {
   const auto begin() const { return m_gpu_mapping; }
   const auto end() const { return m_gpu_mapping + m_length; }
 
+  auto offset() const { return m_offset; }
+  auto length() const { return m_length; }
+  auto access() const { return m_access; }
+
  protected:
   Buffer<array_type, T>* m_buffer;
-  size_t                 m_start;
+  size_t                 m_offset;
   size_t                 m_length;
   GLbitfield             m_access;
   T*                     m_gpu_mapping;
@@ -68,22 +72,22 @@ class BufferMap {
 template <GLsizei array_type, typename T>
 class RBufferMap : public BufferMap<array_type, T> {
  public:
-  RBufferMap(Buffer<array_type, T>* buffer, size_t start, size_t length)
-      : BufferMap<array_type, T>(buffer, start, length, GL_MAP_READ_BIT) {}
+  RBufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length)
+      : BufferMap<array_type, T>(buffer, offset, length, GL_MAP_READ_BIT) {}
 };
 
 template <GLsizei array_type, typename T>
 class WBufferMap : public BufferMap<array_type, T> {
  public:
-  WBufferMap(Buffer<array_type, T>* buffer, size_t start, size_t length)
-      : BufferMap<array_type, T>(buffer, start, length, GL_MAP_WRITE_BIT) {}
+  WBufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length)
+      : BufferMap<array_type, T>(buffer, offset, length, GL_MAP_WRITE_BIT) {}
 };
 
 template <GLsizei array_type, typename T>
 class RWBufferMap : public BufferMap<array_type, T> {
  public:
-  RWBufferMap(Buffer<array_type, T>* buffer, size_t start, size_t length)
-      : BufferMap<array_type, T>(buffer, start, length,
+  RWBufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length)
+      : BufferMap<array_type, T>(buffer, offset, length,
                                  GL_MAP_WRITE_BIT | GL_MAP_READ_BIT) {}
 };
 
@@ -416,6 +420,7 @@ class Buffer {
   auto capacity() const { return m_capacity; }
 
   void reserve(size_t size);
+  void resize(size_t size);
   void clear() { m_size = 0; }
 
   void gpu_malloc(size_t n);
@@ -444,6 +449,16 @@ class Buffer {
 
   auto gl_handle() { return m_gl_handle; }
   auto will_be_deleted() { return m_delete; }
+
+  auto map() { return rw_map_t(this, 0, m_size); }
+  auto map() const { return r_map_t(this, 0, m_size); }
+
+  auto map(size_t offset, size_t length) {
+    return rw_map_t(this, offset, length);
+  }
+  auto map(size_t offset, size_t length) const {
+    return r_map_t(this, offset, length);
+  }
 
  protected:
   GLuint  m_gl_handle;
@@ -505,19 +520,9 @@ Buffer<array_type, T>& Buffer<array_type, T>::operator=(Buffer&& other) {
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
-void Buffer<array_type, T>::reserve(size_t size) {
-  if (capacity() < size) {
-    this_t tmp(*this);
-    gpu_malloc(size);
-    copy(tmp);
-  }
-}
-
-//------------------------------------------------------------------------------
-
-template <GLsizei array_type, typename T>
 Buffer<array_type, T>::Buffer(size_t n, usage_t usage) : Buffer(usage) {
   gpu_malloc(n);
+  m_size = n;
 }
 
 //------------------------------------------------------------------------------
@@ -526,6 +531,7 @@ template <GLsizei array_type, typename T>
 Buffer<array_type, T>::Buffer(size_t n, const T& initial, usage_t usage)
     : Buffer(usage) {
   gpu_malloc(n, initial);
+  m_size = n;
 }
 
 //------------------------------------------------------------------------------
@@ -576,6 +582,25 @@ void Buffer<array_type, T>::upload_data(const std::vector<T>& data) {
     glNamedBufferSubData(m_gl_handle, 0, data_size * data.size(), data.data());
     m_size = data.size();
   }
+}
+
+//------------------------------------------------------------------------------
+
+template <GLsizei array_type, typename T>
+void Buffer<array_type, T>::reserve(size_t size) {
+  if (capacity() < size) {
+    this_t tmp(*this);
+    gpu_malloc(size);
+    copy(tmp);
+  }
+}
+
+//------------------------------------------------------------------------------
+
+template <GLsizei array_type, typename T>
+void Buffer<array_type, T>::resize(size_t size) {
+  if (capacity() < size) reserve(size);
+  m_size = size;
 }
 
 //------------------------------------------------------------------------------

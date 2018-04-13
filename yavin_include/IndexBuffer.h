@@ -8,7 +8,10 @@
 #include "dll_export.h"
 #include "error_check.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 class IndexBuffer : public Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int> {
  public:
   using parent_t = Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int>;
@@ -29,6 +32,9 @@ class IndexBuffer : public Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int> {
                       usage_t                          usage = default_usage);
   DLL_API IndexBuffer(std::initializer_list<unsigned int>&& list);
 };
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

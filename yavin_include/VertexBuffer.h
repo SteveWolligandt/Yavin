@@ -25,59 +25,45 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>> {
   static constexpr unsigned int num_attributes = sizeof...(Ts);
   static const usage_t          default_usage  = usage_t::STATIC_DRAW;
 
-  static constexpr void activate_attributes();
+  //----------------------------------------------------------------------------
 
-  VertexBuffer(usage_t usage = default_usage);
-  VertexBuffer(const VertexBuffer& other);
-  VertexBuffer(VertexBuffer&& other);
+  VertexBuffer(usage_t usage = default_usage) : parent_t(usage) {}
+  VertexBuffer(const VertexBuffer& other) : parent_t(other) {}
+  VertexBuffer(VertexBuffer&& other) : parent_t(other) {}
 
-  VertexBuffer(const std::vector<data_t>& data, usage_t usage = default_usage);
-  VertexBuffer(std::initializer_list<data_t>&& list);
-};
-
-//------------------------------------------------------------------------------
-
-template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(usage_t usage) : parent_t(usage) {}
-
-//------------------------------------------------------------------------------
-
-template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(const VertexBuffer& other)
-    : parent_t(other) {}
-
-//------------------------------------------------------------------------------
-
-template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(VertexBuffer&& other)
-    : parent_t(std::move(other)) {}
-
-//------------------------------------------------------------------------------
-
-template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(const std::vector<data_t>& data,
-                                  usage_t                    usage)
-    : parent_t(data, usage) {}
-
-//------------------------------------------------------------------------------
-
-template <typename... Ts>
-VertexBuffer<Ts...>::VertexBuffer(std::initializer_list<data_t>&& list)
-    : parent_t(std::move(list), default_usage) {}
-
-//------------------------------------------------------------------------------
-
-template <typename... Ts>
-constexpr void VertexBuffer<Ts...>::activate_attributes() {
-  for (unsigned int i = 0; i < attr_prefs<Ts...>::num_attrs; i++) {
-    glEnableVertexAttribArray(i);
-    gl_error_check("glEnableVertexAttribArray");
-    glVertexAttribPointer(
-        i, attr_prefs<Ts...>::num_dims[i], attr_prefs<Ts...>::types[i],
-        GL_FALSE, this_t::data_size, (void*)attr_prefs<Ts...>::offsets[i]);
-    gl_error_check("glVertexAttribPointer");
+  auto& operator=(const this_t& other) {
+    parent_t::operator=(other);
+    return *this;
   }
-}
+
+  auto& operator=(this_t&& other) {
+    parent_t::operator=(std::move(other));
+    return *this;
+  }
+
+  VertexBuffer(size_t n, usage_t usage = default_usage) : parent_t(n, usage) {}
+  VertexBuffer(size_t n, const data_t& initial, usage_t usage = default_usage)
+      : parent_t(n, initial, usage) {}
+  VertexBuffer(const std::vector<data_t>& data, usage_t usage = default_usage)
+      : parent_t(data, usage) {}
+  VertexBuffer(std::initializer_list<data_t>&& list)
+      : parent_t(std::move(list), default_usage) {}
+
+  void push_back(Ts&&... ts) {
+    parent_t::push_back(std::make_tuple(std::forward<Ts>(ts)...));
+  }
+
+  static constexpr void activate_attributes() {
+    for (unsigned int i = 0; i < attr_prefs<Ts...>::num_attrs; i++) {
+      glEnableVertexAttribArray(i);
+      gl_error_check("glEnableVertexAttribArray");
+      glVertexAttribPointer(
+          i, attr_prefs<Ts...>::num_dims[i], attr_prefs<Ts...>::types[i],
+          GL_FALSE, this_t::data_size, (void*)attr_prefs<Ts...>::offsets[i]);
+      gl_error_check("glVertexAttribPointer");
+    }
+  }
+};
 
 //==============================================================================
 }  // namespace Yavin
