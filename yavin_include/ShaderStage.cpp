@@ -119,10 +119,7 @@ void ShaderStage::print_log() {
         }
       }
 
-      std::cerr << os.str() << '\n';
-
-      // throw std::runtime_error("[Shader Compilation Error] - " + stage() +
-      //                         '\n' + log_str);
+      throw std::runtime_error(os.str());
     }
   }
 }
