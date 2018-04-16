@@ -1,7 +1,11 @@
 #include "ShaderStageParser.h"
 #include "shader_include_paths.h"
 
+#include <sstream>
+
+//==============================================================================
 namespace Yavin {
+//==============================================================================
 
 /**
  * layout (location=<digit>)                   <- optional layout position
@@ -12,6 +16,8 @@ namespace Yavin {
 const std::regex ShaderStageParser::regex_var(
     R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|int|uint|sampler\dD|mat\d|vec\d)\s(.*)[;])");
 
+//------------------------------------------------------------------------------
+
 /**
  * #include <- keyword
  * "        <- string start
@@ -21,11 +27,21 @@ const std::regex ShaderStageParser::regex_var(
 const std::regex ShaderStageParser::regex_include(
     R"(#include\s+\"(.*)\")");
 
-std::string ShaderStageParser::parse(const std::string&    filename,
-                                     std::vector<GLSLVar>& vars) {
-  std::string fileContent;
-  std::string line;
+//==============================================================================
 
+std::string ShaderStageParser::parse(const std::string&    filename_or_source,
+                                     std::vector<GLSLVar>& vars,
+                                     StringType            string_type) {
+  if (string_type == FILE)
+    return parse_file(filename_or_source, vars);
+  else if (string_type == SOURCE)
+    return parse_source(filename_or_source, vars);
+}
+
+//------------------------------------------------------------------------------
+
+std::string ShaderStageParser::parse_file(const std::string&    filename,
+                                          std::vector<GLSLVar>& vars) {
   std::string   folder = filename.substr(0, filename.find_last_of("/\\") + 1);
   std::ifstream file(filename.c_str());
 
@@ -33,20 +49,20 @@ std::string ShaderStageParser::parse(const std::string&    filename,
   if (!file.is_open())
     throw std::runtime_error("ERROR: Unable to open file " + filename);
 
-  while (!file.eof()) {
-    getline(file, line);
-    auto parsed_var = parse_varname(line);
-    if (parsed_var) vars.push_back(parsed_var.value());
-
-    auto parsed_include = parse_include(line);
-    if (parsed_include)
-      fileContent += parse(folder + parsed_include.value(), vars);
-    else
-      fileContent += '\n' + line;
-  }
+  auto content = parse_stream(file, vars, folder);
   file.close();
-  return fileContent;
+  return content;
 }
+
+//------------------------------------------------------------------------------
+
+std::string ShaderStageParser::parse_source(const std::string&    source,
+                                            std::vector<GLSLVar>& vars) {
+  std::stringstream stream(source);
+  return parse_stream(stream, vars);
+}
+
+//------------------------------------------------------------------------------
 
 std::optional<GLSLVar> ShaderStageParser::parse_varname(
     const std::string& line) {
@@ -70,6 +86,8 @@ std::optional<GLSLVar> ShaderStageParser::parse_varname(
     return {};
 }
 
+//------------------------------------------------------------------------------
+
 std::optional<std::string> ShaderStageParser::parse_include(
     const std::string& line) {
   std::smatch match;
@@ -81,4 +99,7 @@ std::optional<std::string> ShaderStageParser::parse_include(
   else
     return {};
 }
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
