@@ -12,7 +12,7 @@ namespace Yavin {
 struct IncludeTree {
   int                    line_number;
   size_t                 num_lines;
-  std::string            file_name;
+  std::string            filename;
   std::list<IncludeTree> nested_include_trees;
   IncludeTree*           parent;
 
@@ -43,7 +43,7 @@ struct IncludeTree {
     std::cout << (line_number >= 0 ? (std::to_string(line_number) + "/" +
                                       std::to_string(num_lines) + ": ")
                                    : "")
-              << file_name << '\n';
+              << filename << '\n';
     for (const auto& nesting : nested_include_trees) nesting.print(indent + 2);
   }
 };

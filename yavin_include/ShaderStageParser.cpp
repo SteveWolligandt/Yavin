@@ -44,9 +44,9 @@ std::string ShaderStageParser::parse(const std::string&    filename_or_source,
 std::string ShaderStageParser::parse_file(const std::string&    filename,
                                           std::vector<GLSLVar>& vars,
                                           IncludeTree&          include_tree) {
-  include_tree.file_name = filename;
-  std::string   folder   = filename.substr(0, filename.find_last_of("/\\") + 1);
-  std::ifstream file(filename.c_str());
+  include_tree.filename = filename;
+  std::string   folder  = filename.substr(0, filename.find_last_of("/\\") + 1);
+  std::ifstream file(filename);
 
   if (!file.is_open()) file.open(shader_dir + filename);
   if (!file.is_open())
@@ -62,7 +62,7 @@ std::string ShaderStageParser::parse_file(const std::string&    filename,
 std::string ShaderStageParser::parse_source(const std::string&    source,
                                             std::vector<GLSLVar>& vars,
                                             IncludeTree& include_tree) {
-  include_tree.file_name = "from string";
+  include_tree.filename = "from string";
   std::stringstream stream(source);
   return parse_stream(stream, vars, include_tree);
 }

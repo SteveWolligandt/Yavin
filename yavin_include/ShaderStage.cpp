@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "ShaderStage.h"
 #include "ansi_format.h"
 #include "gl_includes.h"
@@ -7,12 +9,19 @@
 namespace Yavin {
 //==============================================================================
 
-const std::regex ShaderStage::regex_compiler(
+const std::regex ShaderStage::regex_nvidia_compiler_error(
     R"(\d+\((\d+)\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
+
+//------------------------------------------------------------------------------
+
+const std::regex ShaderStage::regex_mesa_compiler_error(
+    R"(\d+:(\d+)\(\d+\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
+
+//==============================================================================
 
 ShaderStage::ShaderStage(GLenum             shader_type,
                          const std::string &filename_or_source,
-                         StringType         string_type)
+                         StringType string_type, bool use_ansi_color)
     : m_id(glCreateShader(shader_type)),
       m_shader_type(shader_type),
       m_string_type(string_type),
@@ -29,19 +38,28 @@ ShaderStage::ShaderStage(GLenum             shader_type,
   // Compile Shader
   glCompileShader(id());
   gl_error_check("glCompileShader");
-  print_log();
+  print_log(use_ansi_color);
 }
 
+//------------------------------------------------------------------------------
+
 ShaderStage::ShaderStage(ShaderStage &&other)
-    : m_id(other.m_id), m_glsl_vars(std::move(other.m_glsl_vars)) {
+    : m_id(other.m_id),
+      m_shader_type(other.m_shader_type),
+      m_string_type(other.m_string_type),
+      m_filename_or_source(std::move(other.m_filename_or_source)),
+      m_glsl_vars(std::move(other.m_glsl_vars)),
+      m_include_tree(std::move(other.m_include_tree)) {
   other.dont_delete = true;
 }
+
+//------------------------------------------------------------------------------
 
 ShaderStage::~ShaderStage() {
   if (!dont_delete) glDeleteShader(m_id);
 }
 
-const GLuint &ShaderStage::id() const { return m_id; }
+//------------------------------------------------------------------------------
 
 std::string ShaderStage::type_to_string(GLenum shader_type) {
   switch (shader_type) {
@@ -55,9 +73,9 @@ std::string ShaderStage::type_to_string(GLenum shader_type) {
   }
 }
 
-std::string ShaderStage::stage() { return type_to_string(m_shader_type); }
+//------------------------------------------------------------------------------
 
-void ShaderStage::print_log() {
+void ShaderStage::print_log(bool use_ansi_color) {
   GLint   info_log_length = 0;
   GLsizei chars_written   = 0;
 
@@ -71,58 +89,81 @@ void ShaderStage::print_log() {
     gl_error_check("glGetShaderInfoLog");
 
     std::istringstream is(log);
-    std::ostringstream os;
     delete[] log;
+    std::ostringstream os;
 
     std::string line;
     while (std::getline(is, line)) {
       std::smatch match;
-      std::regex_match(line, match, regex_compiler);
-
-      if (match.str(1).size() > 0) {
-        size_t line_number = stoul(match.str(1));
-
-        auto [include_tree_ptr, error_line] =
-            m_include_tree.parse_line(line_number - 1);
-        // print file and include hierarchy
-        os << ansi::red_bold << "[GLSL " << stage() << " Shader "
-           << match.str(2) << "]" << ansi::reset << "\n  in file " << ansi::bold
-           << include_tree_ptr->file_name << ":" << error_line + 1
-           << ansi::reset << ": " << match.str(3) << '\n';
-        auto hierarchy = include_tree_ptr;
-        while (hierarchy->parent) {
-          os << "    included from " << hierarchy->parent->file_name
-             << " in line " << hierarchy->line_number << '\n';
-          hierarchy = hierarchy->parent;
-        }
-
-        // print actual error message
-
-        // print line that produces the error
-        std::ifstream file(include_tree_ptr->file_name);
-        if (!file.is_open())
-          file.open(shader_dir + include_tree_ptr->file_name);
-        if (file) {
-          std::string file_line;
-          size_t      line_cnt = 0;
-          while (std::getline(file, file_line)) {
-            if (line_cnt == error_line) {
-              os << "  " << file_line << '\n';
-              os << "  " << ansi::bold;
-              for (size_t i = 0; i < file_line.size(); ++i) os << '~';
-              os << ansi::reset;
-              break;
-            }
-            ++line_cnt;
-          }
-          file.close();
-        }
+      std::regex_match(line, match, regex_nvidia_compiler_error);
+      if (!match.str(0).empty())
+        parse_compile_error(match, os, use_ansi_color);
+      else {
+        std::regex_match(line, match, regex_mesa_compiler_error);
+        if (!match.str(0).empty())
+          parse_compile_error(match, os, use_ansi_color);
+        else
+          os << line << '\n';
       }
-
-      throw std::runtime_error(os.str());
     }
+    throw std::runtime_error(os.str());
   }
 }
+
+//------------------------------------------------------------------------------
+
+void ShaderStage::parse_compile_error(std::smatch &match, std::ostream &os,
+                                      bool use_ansi_color) {
+  const size_t line_number = stoul(match.str(1));
+  const auto [include_tree_ptr, error_line] =
+      m_include_tree.parse_line(line_number - 1);
+
+  // print file and include hierarchy
+  if (use_ansi_color) os << ansi::red_bold;
+  os << "[GLSL " << stage() << " Shader " << match.str(2) << "]\n";
+  if (use_ansi_color) os << ansi::reset;
+
+  os << "in file ";
+  if (use_ansi_color) os << ansi::bold;
+  os << include_tree_ptr->filename << ":" << error_line + 1;
+  if (use_ansi_color) os << ansi::reset;
+  os << ": " << match.str(3) << '\n';
+
+  auto hierarchy = include_tree_ptr;
+  while (hierarchy->parent) {
+    os << "    included from " << hierarchy->parent->filename << " in line "
+       << hierarchy->line_number << '\n';
+    hierarchy = hierarchy->parent;
+  }
+
+  print_line(include_tree_ptr->filename, error_line, os);
+}
+
+//------------------------------------------------------------------------------
+
+void ShaderStage::print_line(const std::string &filename, size_t line_number,
+                             std::ostream &os) {
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    file.open(shader_dir + filename);
+    std::cout << shader_dir << filename << '\n';
+  } else if (file) {
+    std::string line;
+    size_t      line_cnt = 0;
+    while (std::getline(file, line)) {
+      if (line_cnt == line_number) {
+        os << "  " << line << "\n  ";
+        os << ansi::bold;
+        for (size_t i = 0; i < line.size(); ++i) os << '~';
+        os << ansi::reset;
+        break;
+      }
+      ++line_cnt;
+    }
+    file.close();
+  }
+}
+
 //==============================================================================
 }  // namespace Yavin
 //==============================================================================
