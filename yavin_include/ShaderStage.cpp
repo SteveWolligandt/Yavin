@@ -1,4 +1,5 @@
 #include "ShaderStage.h"
+#include "ansi_format.h"
 #include "gl_includes.h"
 #include "shader_include_paths.h"
 
@@ -83,11 +84,11 @@ void ShaderStage::print_log() {
 
         auto [include_tree_ptr, error_line] =
             m_include_tree.parse_line(line_number - 1);
-
         // print file and include hierarchy
-        os << "\033[1;31m[GLSL " << stage() << " Shader " << match.str(2)
-           << "]\033[0m\n  in file \033[1m" << include_tree_ptr->file_name
-           << ":" << error_line + 1 << "\033[0m: " << match.str(3) << '\n';
+        os << ansi::red_bold << "[GLSL " << stage() << " Shader "
+           << match.str(2) << "]" << ansi::reset << "\n  in file " << ansi::bold
+           << include_tree_ptr->file_name << ":" << error_line + 1
+           << ansi::reset << ": " << match.str(3) << '\n';
         auto hierarchy = include_tree_ptr;
         while (hierarchy->parent) {
           os << "    included from " << hierarchy->parent->file_name
@@ -107,10 +108,9 @@ void ShaderStage::print_log() {
           while (std::getline(file, file_line)) {
             if (line_cnt == error_line) {
               os << "  " << file_line << '\n';
-              os << "  \033[1m";
+              os << "  " << ansi::bold;
               for (size_t i = 0; i < file_line.size(); ++i) os << '~';
-              os << "\033[0m";
-
+              os << ansi::reset;
               break;
             }
             ++line_cnt;
