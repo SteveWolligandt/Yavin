@@ -1,8 +1,13 @@
 #include "ShaderStage.h"
-
 #include "gl_includes.h"
+#include "shader_include_paths.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
+const std::regex ShaderStage::regex_compiler(
+    R"(\d+\((\d+)\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
 
 ShaderStage::ShaderStage(GLenum             shader_type,
                          const std::string &filename_or_source,
@@ -10,12 +15,13 @@ ShaderStage::ShaderStage(GLenum             shader_type,
     : m_id(glCreateShader(shader_type)),
       m_shader_type(shader_type),
       m_string_type(string_type),
-      m_filename_or_source(filename_or_source) {
+      m_filename_or_source(filename_or_source),
+      m_include_tree{-1, 0, "", {}, nullptr} {
   gl_error_check("glCreateShader");
 
-  auto source =
-      ShaderStageParser::parse(filename_or_source, m_glsl_vars, m_string_type);
-  const char *source_c = source.c_str();
+  auto  source   = ShaderStageParser::parse(filename_or_source, m_glsl_vars,
+                                         m_include_tree, m_string_type);
+  auto *source_c = source.c_str();
   glShaderSource(m_id, 1, &source_c, nullptr);
   gl_error_check("glShaderSource");
 
@@ -51,18 +57,75 @@ std::string ShaderStage::type_to_string(GLenum shader_type) {
 std::string ShaderStage::stage() { return type_to_string(m_shader_type); }
 
 void ShaderStage::print_log() {
-  GLint   infologLength = 0;
-  GLsizei charsWritten  = 0;
+  GLint   info_log_length = 0;
+  GLsizei chars_written   = 0;
 
-  glGetShaderiv(id(), GL_INFO_LOG_LENGTH, &infologLength);
+  glGetShaderiv(id(), GL_INFO_LOG_LENGTH, &info_log_length);
   gl_error_check("glGetShaderiv");
-  auto infoLog = new char[infologLength];
-  glGetShaderInfoLog(id(), infologLength, &charsWritten, infoLog);
-  gl_error_check("glGetShaderInfoLog");
-  if (infologLength >= 1) {
-    std::cout << "[Shader Compilation Error] - " << stage() << '\n';
-    std::cout << infoLog << '\n';
+
+  if (info_log_length > 0) {
+    auto log = new char[info_log_length];
+
+    glGetShaderInfoLog(m_id, info_log_length, &chars_written, log);
+    gl_error_check("glGetShaderInfoLog");
+
+    std::istringstream is(log);
+    std::ostringstream os;
+    delete[] log;
+
+    std::string line;
+    while (std::getline(is, line)) {
+      std::smatch match;
+      std::regex_match(line, match, regex_compiler);
+
+      if (match.str(1).size() > 0) {
+        size_t line_number = stoul(match.str(1));
+
+        auto [include_tree_ptr, error_line] =
+            m_include_tree.parse_line(line_number - 1);
+
+        // print file and include hierarchy
+        os << "\033[1;31m[GLSL " << stage() << " Shader " << match.str(2)
+           << "]\033[0m\n  in file \033[1m" << include_tree_ptr->file_name
+           << ":" << error_line + 1 << "\033[0m: " << match.str(3) << '\n';
+        auto hierarchy = include_tree_ptr;
+        while (hierarchy->parent) {
+          os << "    included from " << hierarchy->parent->file_name
+             << " in line " << hierarchy->line_number << '\n';
+          hierarchy = hierarchy->parent;
+        }
+
+        // print actual error message
+
+        // print line that produces the error
+        std::ifstream file(include_tree_ptr->file_name);
+        if (!file.is_open())
+          file.open(shader_dir + include_tree_ptr->file_name);
+        if (file) {
+          std::string file_line;
+          size_t      line_cnt = 0;
+          while (std::getline(file, file_line)) {
+            if (line_cnt == error_line) {
+              os << "  " << file_line << '\n';
+              os << "  \033[1m";
+              for (size_t i = 0; i < file_line.size(); ++i) os << '~';
+              os << "\033[0m";
+
+              break;
+            }
+            ++line_cnt;
+          }
+          file.close();
+        }
+      }
+
+      std::cerr << os.str() << '\n';
+
+      // throw std::runtime_error("[Shader Compilation Error] - " + stage() +
+      //                         '\n' + log_str);
+    }
   }
-  delete[] infoLog;
 }
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================

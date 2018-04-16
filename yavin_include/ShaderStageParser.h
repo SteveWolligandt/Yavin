@@ -8,6 +8,7 @@
 #include <regex>
 #include "GLSLVar.h"
 #include "dll_export.h"
+#include "include_tree.h"
 
 //==============================================================================
 namespace Yavin {
@@ -18,11 +19,14 @@ class ShaderStageParser {
   enum StringType { FILE, SOURCE };
   DLL_API static std::string parse(const std::string&    filename_or_source,
                                    std::vector<GLSLVar>& vars,
+                                   IncludeTree&          include_tree,
                                    StringType            string_type = FILE);
   DLL_API static std::string parse_file(const std::string& filename_or_source,
-                                        std::vector<GLSLVar>& vars);
+                                        std::vector<GLSLVar>& vars,
+                                        IncludeTree&          include_tree);
   DLL_API static std::string parse_source(const std::string& filename_or_source,
-                                          std::vector<GLSLVar>& vars);
+                                          std::vector<GLSLVar>& vars,
+                                          IncludeTree&          include_tree);
 
   DLL_API static std::optional<GLSLVar> parse_varname(const std::string& line);
   DLL_API static std::optional<std::string> parse_include(
@@ -31,20 +35,28 @@ class ShaderStageParser {
  private:
   template <typename Stream>
   static std::string parse_stream(Stream& stream, std::vector<GLSLVar>& vars,
+                                  IncludeTree&       include_tree,
                                   const std::string& folder = "") {
     std::string line;
     std::string content;
 
-    while (std::getline(stream, line)) {
-      auto parsed_var = parse_varname(line);
-      if (parsed_var) vars.push_back(parsed_var.value());
+    size_t line_number = 0;
 
-      auto parsed_include = parse_include(line);
-      if (parsed_include)
-        content += parse(folder + parsed_include.value(), vars);
-      else
-        content += '\n' + line;
+    while (std::getline(stream, line)) {
+      if (auto parsed_var = parse_varname(line); parsed_var)
+        vars.push_back(parsed_var.value());
+
+      if (auto parsed_include = parse_include(line); parsed_include) {
+        include_tree.nested_include_trees.push_back(
+            {line_number, 0, parsed_include.value(), {}, &include_tree});
+        content += parse_file(folder + parsed_include.value(), vars,
+                              include_tree.nested_include_trees.back());
+      } else
+        content += line + '\n';
+
+      ++line_number;
     }
+    include_tree.num_lines = line_number;
 
     return content;
   }

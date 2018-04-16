@@ -31,25 +31,28 @@ const std::regex ShaderStageParser::regex_include(
 
 std::string ShaderStageParser::parse(const std::string&    filename_or_source,
                                      std::vector<GLSLVar>& vars,
+                                     IncludeTree&          include_tree,
                                      StringType            string_type) {
   if (string_type == FILE)
-    return parse_file(filename_or_source, vars);
+    return parse_file(filename_or_source, vars, include_tree);
   else if (string_type == SOURCE)
-    return parse_source(filename_or_source, vars);
+    return parse_source(filename_or_source, vars, include_tree);
 }
 
 //------------------------------------------------------------------------------
 
 std::string ShaderStageParser::parse_file(const std::string&    filename,
-                                          std::vector<GLSLVar>& vars) {
-  std::string   folder = filename.substr(0, filename.find_last_of("/\\") + 1);
+                                          std::vector<GLSLVar>& vars,
+                                          IncludeTree&          include_tree) {
+  include_tree.file_name = filename;
+  std::string   folder   = filename.substr(0, filename.find_last_of("/\\") + 1);
   std::ifstream file(filename.c_str());
 
   if (!file.is_open()) file.open(shader_dir + filename);
   if (!file.is_open())
     throw std::runtime_error("ERROR: Unable to open file " + filename);
 
-  auto content = parse_stream(file, vars, folder);
+  auto content = parse_stream(file, vars, include_tree, folder);
   file.close();
   return content;
 }
@@ -57,9 +60,11 @@ std::string ShaderStageParser::parse_file(const std::string&    filename,
 //------------------------------------------------------------------------------
 
 std::string ShaderStageParser::parse_source(const std::string&    source,
-                                            std::vector<GLSLVar>& vars) {
+                                            std::vector<GLSLVar>& vars,
+                                            IncludeTree& include_tree) {
+  include_tree.file_name = "from string";
   std::stringstream stream(source);
-  return parse_stream(stream, vars);
+  return parse_stream(stream, vars, include_tree);
 }
 
 //------------------------------------------------------------------------------
