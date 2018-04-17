@@ -95,16 +95,20 @@ void ShaderStage::print_log(bool use_ansi_color) {
     std::string line;
     while (std::getline(is, line)) {
       std::smatch match;
+
       std::regex_match(line, match, regex_nvidia_compiler_error);
-      if (!match.str(0).empty())
+      if (!match.str(0).empty()) {
         parse_compile_error(match, os, use_ansi_color);
-      else {
-        std::regex_match(line, match, regex_mesa_compiler_error);
-        if (!match.str(0).empty())
-          parse_compile_error(match, os, use_ansi_color);
-        else
-          os << line << '\n';
+        os << '\n';
+        continue;
       }
+      std::regex_match(line, match, regex_mesa_compiler_error);
+      if (!match.str(0).empty()) {
+        parse_compile_error(match, os, use_ansi_color);
+        os << '\n';
+        continue;
+      }
+      os << line << '\n';
     }
     throw std::runtime_error(os.str());
   }
@@ -119,20 +123,27 @@ void ShaderStage::parse_compile_error(std::smatch &match, std::ostream &os,
       m_include_tree.parse_line(line_number - 1);
 
   // print file and include hierarchy
-  if (use_ansi_color) os << ansi::red_bold;
+  if (use_ansi_color) os << ansi::red << ansi::bold;
   os << "[GLSL " << stage() << " Shader " << match.str(2) << "]\n";
   if (use_ansi_color) os << ansi::reset;
 
   os << "in file ";
-  if (use_ansi_color) os << ansi::bold;
-  os << include_tree_ptr->filename << ":" << error_line + 1;
+  if (use_ansi_color) os << ansi::cyan << ansi::bold;
+  os << include_tree_ptr->filename << ":";
+
+  if (use_ansi_color) os << ansi::yellow << ansi::bold;
+  os << error_line + 1;
   if (use_ansi_color) os << ansi::reset;
   os << ": " << match.str(3) << '\n';
 
   auto hierarchy = include_tree_ptr;
   while (hierarchy->parent) {
-    os << "    included from " << hierarchy->parent->filename << " in line "
-       << hierarchy->line_number << '\n';
+    os << "    included from ";
+    if (use_ansi_color) os << ansi::bold;
+    os << hierarchy->parent->filename;
+
+    if (use_ansi_color) os << ansi::reset;
+    os << " in line " << hierarchy->line_number << '\n';
     hierarchy = hierarchy->parent;
   }
 
