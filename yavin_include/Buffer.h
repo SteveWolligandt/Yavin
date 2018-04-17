@@ -24,9 +24,9 @@ class BufferMap {
   BufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length,
             GLbitfield access)
       : m_buffer(buffer), m_offset(offset), m_length(length), m_access(access) {
-    m_gpu_mapping = reinterpret_cast<T*>(
-        glMapNamedBufferRange(m_buffer->m_gl_handle, data_size * offset,
-                              data_size * m_length, m_access));
+    m_gpu_mapping =
+        (T*)(glMapNamedBufferRange(m_buffer->m_gl_handle, data_size * offset,
+                                   data_size * m_length, m_access));
   }
 
   //! destructor unmaps the buffer

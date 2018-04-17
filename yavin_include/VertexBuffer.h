@@ -9,21 +9,29 @@
 #include "VBOHelpers.h"
 #include "error_check.h"
 #include "gl_includes.h"
+#include "tuple.h"
 
 //==============================================================================
 namespace Yavin {
 //==============================================================================
 
 template <typename... Ts>
-class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>> {
+class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
  public:
-  using parent_t = Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>>;
+  using parent_t = Buffer<GL_ARRAY_BUFFER, tuple<Ts...>>;
   using this_t   = VertexBuffer<Ts...>;
   using data_t   = typename parent_t::data_t;
   using usage_t  = typename parent_t::usage_t;
 
+  static constexpr size_t data_size = parent_t::data_size;
+
+  static const usage_t default_usage = usage_t::STATIC_DRAW;
+
   static constexpr unsigned int num_attributes = sizeof...(Ts);
-  static const usage_t          default_usage  = usage_t::STATIC_DRAW;
+  static constexpr std::array<size_t, num_attributes> num_dims{Ts::num_dims...};
+  static constexpr std::array<GLenum, num_attributes> types{Ts::type...};
+  static constexpr std::array<size_t, num_attributes> offsets =
+      attr_offset<num_attributes, Ts...>::gen(0, 0);
 
   //----------------------------------------------------------------------------
 
@@ -50,16 +58,16 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, std::tuple<Ts...>> {
       : parent_t(std::move(list), default_usage) {}
 
   void push_back(Ts&&... ts) {
-    parent_t::push_back(std::make_tuple(std::forward<Ts>(ts)...));
+    parent_t::push_back(make_tuple(std::forward<Ts>(ts)...));
   }
 
   static constexpr void activate_attributes() {
-    for (unsigned int i = 0; i < attr_prefs<Ts...>::num_attrs; i++) {
+    for (unsigned int i = 0; i < num_attributes; i++) {
       glEnableVertexAttribArray(i);
       gl_error_check("glEnableVertexAttribArray");
-      glVertexAttribPointer(
-          i, attr_prefs<Ts...>::num_dims[i], attr_prefs<Ts...>::types[i],
-          GL_FALSE, this_t::data_size, (void*)attr_prefs<Ts...>::offsets[i]);
+
+      glVertexAttribPointer(i, num_dims[i], types[i], GL_FALSE,
+                            this_t::data_size, (void*)offsets[i]);
       gl_error_check("glVertexAttribPointer");
     }
   }

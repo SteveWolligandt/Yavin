@@ -8,5 +8,8 @@ configure_file(oit_test.vert oit_test.vert COPYONLY)
 add_executable (buffer_test main.cpp buffer_test.cpp)
 target_link_libraries(buffer_test yavin Catch2)
 
+add_executable (tuple main.cpp tuple.cpp)
+target_link_libraries(tuple yavin Catch2)
+
 add_executable (oit_test oit_test.cpp)
 target_link_libraries(oit_test yavin Catch2)

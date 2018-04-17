@@ -41,69 +41,69 @@ auto& operator<<(std::ostream& out, const attrib<n, T>& a) {
 //------------------------------------------------------------------------------
 
 template <typename T>
-using scalar = attrib<1, T>;
+using Scalar = attrib<1, T>;
 template <typename T>
-using vec2 = attrib<2, T>;
+using Vec2 = attrib<2, T>;
 template <typename T>
-using vec3 = attrib<3, T>;
+using Vec3 = attrib<3, T>;
 template <typename T>
-using vec4 = attrib<4, T>;
+using Vec4 = attrib<4, T>;
 
 //------------------------------------------------------------------------------
 
-using scalar_f = attrib<1, float>;
-using vec2_f   = attrib<2, float>;
-using vec3_f   = attrib<3, float>;
-using vec4_f   = attrib<4, float>;
+using scalar = attrib<1, float>;
+using vec2   = attrib<2, float>;
+using vec3   = attrib<3, float>;
+using vec4   = attrib<4, float>;
 
 //------------------------------------------------------------------------------
 
-using scalar_d = attrib<1, double>;
-using vec2_d   = attrib<2, double>;
-using vec3_d   = attrib<3, double>;
-using vec4_d   = attrib<4, double>;
+using dscalar = attrib<1, double>;
+using dvec2   = attrib<2, double>;
+using dvec3   = attrib<3, double>;
+using dvec4   = attrib<4, double>;
 
 //------------------------------------------------------------------------------
 
-using scalar_i32 = attrib<1, int32_t>;
-using vec2_i32   = attrib<2, int32_t>;
-using vec3_i32   = attrib<3, int32_t>;
-using vec4_i32   = attrib<4, int32_t>;
+using i32scalar = attrib<1, int32_t>;
+using i32vec2   = attrib<2, int32_t>;
+using i32vec3   = attrib<3, int32_t>;
+using i32vec4   = attrib<4, int32_t>;
 
 //------------------------------------------------------------------------------
 
-using scalar_ui32 = attrib<1, uint32_t>;
-using vec2_ui32   = attrib<2, uint32_t>;
-using vec3_ui32   = attrib<3, uint32_t>;
-using vec4_ui32   = attrib<4, uint32_t>;
+using ui32scalar = attrib<1, uint32_t>;
+using ui32vec2   = attrib<2, uint32_t>;
+using ui32vec3   = attrib<3, uint32_t>;
+using ui32vec4   = attrib<4, uint32_t>;
 
 //------------------------------------------------------------------------------
 
-using scalar_i16 = attrib<1, int16_t>;
-using vec2_i16   = attrib<2, int16_t>;
-using vec3_i16   = attrib<3, int16_t>;
-using vec4_i16   = attrib<4, int16_t>;
+using i16scalar = attrib<1, int16_t>;
+using i16vec2   = attrib<2, int16_t>;
+using i16vec3   = attrib<3, int16_t>;
+using i16vec4   = attrib<4, int16_t>;
 
 //------------------------------------------------------------------------------
 
-using scalar_ui16 = attrib<1, uint16_t>;
-using vec2_ui16   = attrib<2, uint16_t>;
-using vec3_ui16   = attrib<3, uint16_t>;
-using vec4_ui16   = attrib<4, uint16_t>;
+using ui16scalar = attrib<1, uint16_t>;
+using ui16vec2   = attrib<2, uint16_t>;
+using ui16vec3   = attrib<3, uint16_t>;
+using ui16vec4   = attrib<4, uint16_t>;
 
 //------------------------------------------------------------------------------
 
-using scalar_i8 = attrib<1, int8_t>;
-using vec2_i8   = attrib<2, int8_t>;
-using vec3_i8   = attrib<3, int8_t>;
-using vec4_i8   = attrib<4, int8_t>;
+using i8scalar = attrib<1, int8_t>;
+using i8vec2   = attrib<2, int8_t>;
+using i8vec3   = attrib<3, int8_t>;
+using i8vec4   = attrib<4, int8_t>;
 
 //------------------------------------------------------------------------------
 
-using scalar_ui8 = attrib<1, uint8_t>;
-using vec2_ui8   = attrib<2, uint8_t>;
-using vec3_ui8   = attrib<3, uint8_t>;
-using vec4_ui8   = attrib<4, uint8_t>;
+using ui8scalar = attrib<1, uint8_t>;
+using ui8vec2   = attrib<2, uint8_t>;
+using ui8vec3   = attrib<3, uint8_t>;
+using ui8vec4   = attrib<4, uint8_t>;
 
 //==============================================================================
 }  // namespace Yavin
