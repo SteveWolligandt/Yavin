@@ -3,7 +3,7 @@
 
 using namespace Yavin;
 
-Window                    w("Buffer Test", 100, 50);
+extern Window             window;
 std::vector<unsigned int> correct_ibo_data{2, 1, 4, 0};
 
 //------------------------------------------------------------------------------
