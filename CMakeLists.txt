@@ -55,7 +55,7 @@ target_link_libraries(yavin
   ${GLEW_LIBRARY}
   )
 
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 # This makes the project importable from the build directory
 if (BUILD_TESTS)
   export(TARGETS yavin FILE yavinConfig.cmake)
@@ -64,7 +64,7 @@ if (BUILD_TESTS)
 endif (BUILD_TESTS)
 
 # first we can indicate the documentation build as an option and set it to ON by default
-option(BUILD_DOC "Generate documentation" ON)
+option(BUILD_DOC "Generate documentation" OFF)
 
 # check if Doxygen is installed
 find_package(Doxygen)
