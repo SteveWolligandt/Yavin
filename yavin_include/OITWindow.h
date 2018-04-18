@@ -28,7 +28,6 @@ class OITWindow : public Window {
       m_vao.bind();
       m_vbo.bind();
       m_ibo.bind();
-      vbo_t::activate_attributes();
     }
 
     void draw() {

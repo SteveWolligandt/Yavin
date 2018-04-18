@@ -57,6 +57,11 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
   VertexBuffer(std::initializer_list<data_t>&& list)
       : parent_t(std::move(list), default_usage) {}
 
+  void bind() const {
+    parent_t::bind();
+    activate_attributes();
+  }
+
   void push_back(Ts&&... ts) {
     parent_t::push_back(make_tuple(std::forward<Ts>(ts)...));
   }

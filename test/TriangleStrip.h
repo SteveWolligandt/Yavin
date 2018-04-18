@@ -18,7 +18,6 @@ class TriangleStrip {
     vao.bind();
     vbo.bind();
     ibo.bind();
-    vbo_t::activate_attributes();
     vao.unbind();
   }
 
@@ -27,7 +26,6 @@ class TriangleStrip {
     vao.bind();
     vbo.bind();
     ibo.bind();
-    vbo_t::activate_attributes();
     vao.unbind();
   }
 
