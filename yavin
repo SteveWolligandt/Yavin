@@ -27,7 +27,6 @@
 #include "yavin_include/OITWindow.h"
 #include "yavin_include/error_check.h"
 #include "yavin_include/gl_wrapper.h"
-#include "yavin_include/tiny_obj_loader.h"
 #include "yavin_include/ray.h"
 #include "yavin_include/scene.h"
 #include "yavin_include/scene_object.h"

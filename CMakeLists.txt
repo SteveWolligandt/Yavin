@@ -55,7 +55,44 @@ target_link_libraries(yavin
   ${GLEW_LIBRARY}
   )
 
+option(BUILD_TESTS "Build tests" ON)
 # This makes the project importable from the build directory
-export(TARGETS yavin FILE yavinConfig.cmake)
-configure_file(yavin_include/shader_include_paths.h.in yavin_include/shader_include_paths.h)
-add_subdirectory(test)
+if (BUILD_TESTS)
+  export(TARGETS yavin FILE yavinConfig.cmake)
+  configure_file(yavin_include/shader_include_paths.h.in yavin_include/shader_include_paths.h)
+  add_subdirectory(test)
+endif (BUILD_TESTS)
+
+# first we can indicate the documentation build as an option and set it to ON by default
+option(BUILD_DOC "Generate documentation" ON)
+
+# check if Doxygen is installed
+find_package(Doxygen)
+if (DOXYGEN_FOUND AND BUILD_DOC)
+    # set input and output files
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile)
+
+    # request to configure the file
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    configure_file(external/doxygen-bootstrapped/example-site/header.html doc/header.html COPYONLY)
+    configure_file(external/doxygen-bootstrapped/example-site/footer.html doc/footer.html COPYONLY)
+    configure_file(external/doxygen-bootstrapped/customdoxygen.css doc/html/customdoxygen.css COPYONLY)
+    configure_file(external/doxygen-bootstrapped/doxy-boot.js doc/html/doxy-boot.js COPYONLY)
+    configure_file(external/doxygen-bootstrapped/jquery.smartmenus.js doc/html/jquery.smartmenus.js COPYONLY)
+    configure_file(external/doxygen-bootstrapped/jquery.smartmenus.min.js doc/html/jquery.smartmenus.min.js COPYONLY)
+    configure_file(external/doxygen-bootstrapped/addons/bootstrap/jquery.smartmenus.bootstrap.css doc/html/jquery.smartmenus.bootstrap.css COPYONLY)
+    configure_file(external/doxygen-bootstrapped/addons/bootstrap/jquery.smartmenus.bootstrap.js doc/html/jquery.smartmenus.bootstrap.js COPYONLY)
+    configure_file(external/doxygen-bootstrapped/addons/bootstrap/jquery.smartmenus.bootstrap.min.js doc/html/jquery.smartmenus.bootstrap.min.js COPYONLY)
+    file(COPY ${CMAKE_SOURCE_DIR}/external/doxygen-bootstrapped/addons DESTINATION ${CMAKE_BINARY_DIR}/doc)
+
+    # note the option ALL which allows to build the docs together with the application
+    add_custom_target(doc_doxygen ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+
+    else (DOXYGEN_FOUND AND BUILD_DOC)
+  message("Doxygen need to be installed to generate the doxygen documentation")
+endif (DOXYGEN_FOUND AND BUILD_DOC)
