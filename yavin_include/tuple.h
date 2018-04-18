@@ -38,6 +38,8 @@ auto make_tuple(Head&& head, Tail&&... tail) {
                               make_tuple<Tail...>(std::forward<Tail>(tail)...)};
 }
 
+//==============================================================================
+
 template <std::size_t I, typename Head, typename... Tail>
 struct _tuple_get_t {
   static auto get(const tuple<Head, Tail...>& t) {
@@ -45,10 +47,14 @@ struct _tuple_get_t {
   }
 };
 
+//------------------------------------------------------------------------------
+
 template <typename Head, typename... Tail>
 struct _tuple_get_t<0, Head, Tail...> {
   static auto get(const tuple<Head, Tail...>& t) { return t.head; }
 };
+
+//------------------------------------------------------------------------------
 
 template <std::size_t I, typename... Ts>
 auto get(const tuple<Ts...>& t) {
