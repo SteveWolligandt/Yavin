@@ -161,7 +161,6 @@ void ShaderStage::print_line(const std::string &filename, size_t line_number,
   if (!file.is_open()) file.open(shader_dir + filename);
 
   if (file.is_open()) {
-    std::cout << "open\n";
     std::string line;
     size_t      line_cnt = 0;
     while (std::getline(file, line)) {

@@ -4,5 +4,5 @@
 uniform vec4 color;
 
 vec4 shading() {
-  eturn color;
+  return color;
 }
