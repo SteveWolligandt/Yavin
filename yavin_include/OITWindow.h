@@ -12,7 +12,9 @@
 #include "Window.h"
 #include "gl_wrapper.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
 
 class OITWindow : public Window {
  public:
@@ -31,7 +33,7 @@ class OITWindow : public Window {
 
     void draw() {
       m_vao.bind();
-      m_vao.draw(TRIANGLE_STRIP, 4);
+      m_vao.draw_triangle_strip(4);
     }
 
    private:
@@ -86,5 +88,7 @@ class OITWindow : public Window {
   screen_quad_t                            m_fullscreen_quad;
 };
 
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 #endif
