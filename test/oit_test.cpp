@@ -58,6 +58,10 @@ class OITTestWindow : public OITWindow {
     set_resize_callback([this](int w, int h) {
       cam.set_projection(30, (float)w / (float)h, 0.01, 100, w, h);
     });
+
+    set_key_callback([this](int key, int scancode, int action, int mods) {
+      if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) { shader.create(); }
+    });
   }
 
  private:

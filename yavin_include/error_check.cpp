@@ -1,13 +1,19 @@
 #include "error_check.h"
 #include <iostream>
+#include <sstream>
+#include "ansi_format.h"
 #include "gl_includes.h"
 
 //==============================================================================
 namespace Yavin {
 //==============================================================================
 
-gl_error::gl_error(const std::string& function_name, const std::string& message)
-    : std::runtime_error("[" + function_name + "] " + message) {}
+gl_error::gl_error(const std::string& function_name, const std::string& message,
+                   const std::string& file, size_t line)
+    : std::runtime_error(ansi::red + ansi::bold + "[" + function_name + "] " +
+                         ansi::reset + ansi::cyan + file + ansi::reset + ":" +
+                         ansi::yellow + std::to_string(line) + ansi::reset +
+                         "\n  " + message) {}
 
 //------------------------------------------------------------------------------
 
@@ -52,10 +58,11 @@ const std::string gl_framebuffer_error_to_string(GLenum status) {
 
 //------------------------------------------------------------------------------
 
-void gl_error_check(const std::string& function) {
+void _gl_error_check(const std::string& function, const std::string& file,
+                     size_t line) {
   auto err     = glGetError();
   auto err_str = gl_error_to_string(err);
-  if (err != GL_NO_ERROR) throw gl_error(function, err_str);
+  if (err != GL_NO_ERROR) throw gl_error(function, err_str, file, line);
 }
 
 //------------------------------------------------------------------------------

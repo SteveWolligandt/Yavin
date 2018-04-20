@@ -22,24 +22,10 @@ const std::regex ShaderStage::regex_mesa_compiler_error(
 ShaderStage::ShaderStage(GLenum             shader_type,
                          const std::string &filename_or_source,
                          StringType string_type, bool use_ansi_color)
-    : m_id(glCreateShader(shader_type)),
-      m_shader_type(shader_type),
+    : m_shader_type(shader_type),
       m_string_type(string_type),
       m_filename_or_source(filename_or_source),
-      m_include_tree{-1, 0, "", {}, nullptr} {
-  gl_error_check("glCreateShader");
-
-  auto  source   = ShaderStageParser::parse(filename_or_source, m_glsl_vars,
-                                         m_include_tree, m_string_type);
-  auto *source_c = source.c_str();
-  glShaderSource(m_id, 1, &source_c, nullptr);
-  gl_error_check("glShaderSource");
-
-  // Compile Shader
-  glCompileShader(id());
-  gl_error_check("glCompileShader");
-  print_log(use_ansi_color);
-}
+      m_include_tree{-1, 0, "", {}, nullptr} {}
 
 //------------------------------------------------------------------------------
 
@@ -50,13 +36,13 @@ ShaderStage::ShaderStage(ShaderStage &&other)
       m_filename_or_source(std::move(other.m_filename_or_source)),
       m_glsl_vars(std::move(other.m_glsl_vars)),
       m_include_tree(std::move(other.m_include_tree)) {
-  other.dont_delete = true;
+  other.m_delete = false;
 }
 
 //------------------------------------------------------------------------------
 
 ShaderStage::~ShaderStage() {
-  if (!dont_delete) glDeleteShader(m_id);
+  if (m_delete) delete_stage();
 }
 
 //------------------------------------------------------------------------------
@@ -75,7 +61,32 @@ std::string ShaderStage::type_to_string(GLenum shader_type) {
 
 //------------------------------------------------------------------------------
 
-void ShaderStage::print_log(bool use_ansi_color) {
+void ShaderStage::compile(bool use_ansi_color) {
+  delete_stage();
+  m_id = glCreateShader(m_shader_type);
+  gl_error_check("glCreateShader");
+  auto  source   = ShaderStageParser::parse(m_filename_or_source, m_glsl_vars,
+                                         m_include_tree, m_string_type);
+  auto *source_c = source.c_str();
+  glShaderSource(m_id, 1, &source_c, nullptr);
+  gl_error_check("glShaderSource");
+
+  // Compile Shader
+  glCompileShader(id());
+  gl_error_check("glCompileShader");
+  info_log(use_ansi_color);
+}
+
+//------------------------------------------------------------------------------
+
+void ShaderStage::delete_stage() {
+  if (m_id) glDeleteShader(m_id);
+  m_id = 0;
+}
+
+//------------------------------------------------------------------------------
+
+void ShaderStage::info_log(bool use_ansi_color) {
   GLint   info_log_length = 0;
   GLsizei chars_written   = 0;
 
@@ -124,7 +135,7 @@ void ShaderStage::parse_compile_error(std::smatch &match, std::ostream &os,
 
   // print file and include hierarchy
   if (use_ansi_color) os << ansi::red << ansi::bold;
-  os << "[GLSL " << stage() << " Shader " << match.str(2) << "]\n";
+  os << "[GLSL " << stage_name() << " Shader " << match.str(2) << "]\n";
   if (use_ansi_color) os << ansi::reset;
 
   os << "in file ";

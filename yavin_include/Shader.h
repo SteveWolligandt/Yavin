@@ -13,6 +13,7 @@
 #include "TesselationControlShader.h"
 #include "TesselationEvaluationShader.h"
 #include "VertexShader.h"
+#include "attribute.h"
 #include "dll_export.h"
 #include "error_check.h"
 
@@ -22,24 +23,18 @@ namespace Yavin {
 
 class Shader {
  public:
-  DLL_API Shader();
-  DLL_API ~Shader();
+  Shader() = default;
+  ~Shader() {
+    if (m_delete) delete_shader();
+  }
 
   template <typename T, typename... Args>
   void add_shader_stage(Args... args) {
     m_shader_stages.push_back(T(args...));
-    glAttachShader(m_id, m_shader_stages.back().id());
-    gl_error_check("glAttachShader - " + m_shader_stages.back().stage());
-    for (const auto& stage : m_shader_stages)
-      for (const auto& var : stage.glsl_vars()) {
-        if (var.modifier == GLSLVar::UNIFORM)
-          m_uniform_var_names.insert(var.name);
-        else if (std::is_same<VertexShader, T>::value &&
-                 var.modifier == GLSLVar::IN)
-          m_attribute_var_names.insert(var.name);
-      }
   }
+
   DLL_API void create();
+  DLL_API void delete_shader();
 
   DLL_API virtual void bind();
   DLL_API virtual void unbind();
@@ -48,15 +43,33 @@ class Shader {
   DLL_API GLint uniform(const std::string& uniformVarName);
   DLL_API GLint attribute(const std::string& attributeVarName);
 
-  DLL_API void set_uniform(const std::string& name, float value);
-  DLL_API void set_uniform(const std::string& name, int value);
-  DLL_API void set_uniform(const std::string& name, unsigned int value);
-  DLL_API void set_uniform(const std::string& name, const glm::mat4x4& value);
-  DLL_API void set_uniform(const std::string& name, const glm::mat3x3& value);
-  DLL_API void set_uniform(const std::string& name, const glm::mat2x2& value);
-  DLL_API void set_uniform(const std::string& name, const glm::vec4& value);
-  DLL_API void set_uniform(const std::string& name, const glm::vec3& value);
-  DLL_API void set_uniform(const std::string& name, const glm::vec2& value);
+  DLL_API void set_uniform(const std::string&, const glm::vec2&);
+  DLL_API void set_uniform(const std::string&, const glm::vec3&);
+  DLL_API void set_uniform(const std::string&, const glm::vec4&);
+
+  DLL_API void set_uniform(const std::string&, const glm::mat2x2&);
+  DLL_API void set_uniform(const std::string&, const glm::mat3x3&);
+  DLL_API void set_uniform(const std::string&, const glm::mat4x4&);
+
+  DLL_API void set_uniform(const std::string&, float);
+  DLL_API void set_uniform(const std::string&, int);
+  DLL_API void set_uniform(const std::string&, unsigned int);
+
+  DLL_API void set_uniform(const std::string&, Scalar<float>);
+  DLL_API void set_uniform(const std::string&, Scalar<int32_t>);
+  DLL_API void set_uniform(const std::string&, Scalar<uint32_t>);
+
+  DLL_API void set_uniform(const std::string&, const Vec2<float>&);
+  DLL_API void set_uniform(const std::string&, const Vec3<float>&);
+  DLL_API void set_uniform(const std::string&, const Vec4<float>&);
+
+  DLL_API void set_uniform(const std::string&, const Vec2<int32_t>&);
+  DLL_API void set_uniform(const std::string&, const Vec3<int32_t>&);
+  DLL_API void set_uniform(const std::string&, const Vec4<int32_t>&);
+
+  DLL_API void set_uniform(const std::string&, const Vec2<uint32_t>&);
+  DLL_API void set_uniform(const std::string&, const Vec3<uint32_t>&);
+  DLL_API void set_uniform(const std::string&, const Vec4<uint32_t>&);
 
   DLL_API void info_log();
 
@@ -64,9 +77,11 @@ class Shader {
   std::map<std::string, GLint>    m_uniform_locations;
   std::map<std::string, GLint>    m_attribute_locations;
   std::vector<Yavin::ShaderStage> m_shader_stages;
-  GLuint                          m_id;
+  GLuint                          m_id = 0;
   std::unordered_set<std::string> m_uniform_var_names;
   std::unordered_set<std::string> m_attribute_var_names;
+
+  bool m_delete = true;
 };
 
 }  // namespace Yavin
