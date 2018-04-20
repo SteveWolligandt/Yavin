@@ -50,7 +50,6 @@ void Shader::create() {
 
 void Shader::delete_shader() {
   if (m_id != 0) {
-    std::cout << "deleting shader id " << m_id << '\n';
     glDeleteProgram(m_id);
     gl_error_check("glDeleteProgram");
   }

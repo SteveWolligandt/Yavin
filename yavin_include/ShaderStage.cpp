@@ -80,7 +80,10 @@ void ShaderStage::compile(bool use_ansi_color) {
 //------------------------------------------------------------------------------
 
 void ShaderStage::delete_stage() {
-  if (m_id) glDeleteShader(m_id);
+  if (m_id) {
+    glDeleteShader(m_id);
+    gl_error_check("glDeleteShader");
+  }
   m_id = 0;
 }
 
