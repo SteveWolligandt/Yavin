@@ -15,7 +15,6 @@
 #include "VertexShader.h"
 #include "attribute.h"
 #include "dll_export.h"
-#include "error_check.h"
 
 #include "windows_undefines.h"
 
