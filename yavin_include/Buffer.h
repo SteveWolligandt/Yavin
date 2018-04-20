@@ -1,9 +1,10 @@
 #ifndef __YAVIN_GPUBUFFER__
 #define __YAVIN_GPUBUFFER__
 
+#include <mutex>
 #include <vector>
-#include "error_check.h"
 #include "gl_includes.h"
+#include "mutex_handler.h"
 
 //==============================================================================
 namespace Yavin {
@@ -24,17 +25,19 @@ class BufferMap {
   BufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length,
             GLbitfield access)
       : m_buffer(buffer), m_offset(offset), m_length(length), m_access(access) {
-    m_gpu_mapping =
-        (T*)(glMapNamedBufferRange(m_buffer->m_gl_handle, data_size * offset,
-                                   data_size * m_length, m_access));
+    m_gpu_mapping = (T*)gl::map_named_buffer_range(
+        m_buffer->m_gl_handle, data_size * offset, data_size * m_length,
+        m_access);
+    detail::mutex::gl_call.lock();
   }
 
   //! destructor unmaps the buffer
   ~BufferMap() { unmap(); }
 
   void unmap() {
+    detail::mutex::gl_call.unlock();
     if (!m_unmapped) {
-      glUnmapNamedBuffer(m_buffer->m_gl_handle);
+      gl::unmap_named_buffer(m_buffer->m_gl_handle);
       m_unmapped = true;
     }
   }
@@ -144,8 +147,9 @@ class WriteableBufferElement : public ReadableBufferElement<array_type, T> {
 
   //! for assigning single gpu data element.
   auto& operator=(T&& data) {
-    w_map_t map(this->m_buffer, this->m_idx, 1);
-    map.front() = data;
+    gl::named_buffer_sub_data(this->m_buffer->m_gl_handle,
+                              this->m_idx * buffer_t::data_size,
+                              buffer_t::data_size, &data);
     return *this;
   }
 };
@@ -554,16 +558,14 @@ Buffer<array_type, T>::~Buffer() {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::create_handle() {
-  glCreateBuffers(1, &m_gl_handle);
-  gl_error_check("glCreateBuffers");
+  gl::create_buffers(1, &m_gl_handle);
 }
 
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::destroy_handle() {
-  glDeleteBuffers(1, &m_gl_handle);
-  gl_error_check("glDeleteBuffers");
+  if (m_gl_handle != 0) gl::delete_buffers(1, &m_gl_handle);
   m_gl_handle = 0;
 }
 
@@ -571,16 +573,17 @@ void Buffer<array_type, T>::destroy_handle() {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::upload_data(const std::vector<T>& data) {
+  std::lock_guard lock(detail::mutex::buffer);
   if (capacity() < data.size()) {
     // reallocate new memory
-    glNamedBufferData(m_gl_handle, data_size * data.size(), data.data(),
-                      m_usage);
-    gl_error_check("glNamedBufferData");
+    gl::named_buffer_data(m_gl_handle, data_size * data.size(), data.data(),
+                          m_usage);
     m_size = m_capacity = data.size();
 
   } else {
     // just update buffer
-    glNamedBufferSubData(m_gl_handle, 0, data_size * data.size(), data.data());
+    gl::named_buffer_sub_data(m_gl_handle, 0, data_size * data.size(),
+                              data.data());
     m_size = data.size();
   }
 }
@@ -618,8 +621,7 @@ std::vector<T> Buffer<array_type, T>::download_data() {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::gpu_malloc(size_t n) {
-  glNamedBufferData(this->m_gl_handle, data_size * n, nullptr, m_usage);
-  gl_error_check("glNamedBufferData");
+  gl::named_buffer_data(this->m_gl_handle, data_size * n, nullptr, m_usage);
   m_capacity = n;
 }
 
@@ -627,9 +629,9 @@ void Buffer<array_type, T>::gpu_malloc(size_t n) {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::gpu_malloc(size_t n, const T& initial) {
-  std::vector<T> data(n, initial);
-  glNamedBufferData(this->m_gl_handle, data_size * n, data.data(), m_usage);
-  gl_error_check("glNamedBufferData");
+  std::lock_guard lock(detail::mutex::buffer);
+  std::vector<T>  data(n, initial);
+  gl::named_buffer_data(this->m_gl_handle, data_size * n, data.data(), m_usage);
   m_capacity = n;
 }
 
@@ -637,16 +639,14 @@ void Buffer<array_type, T>::gpu_malloc(size_t n, const T& initial) {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::bind() const {
-  glBindBuffer(array_type, m_gl_handle);
-  gl_error_check("glBindBuffer");
+  gl::bind_buffer(array_type, m_gl_handle);
 }
 
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::unbind() {
-  glBindBuffer(array_type, 0);
-  gl_error_check("glBindBuffer");
+  gl::bind_buffer(array_type, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -654,9 +654,8 @@ void Buffer<array_type, T>::unbind() {
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::copy(const this_t& other) {
   if (capacity() < other.size()) gpu_malloc(other.size());
-  glCopyNamedBufferSubData(other.m_gl_handle, m_gl_handle, 0, 0,
-                           data_size * other.size());
-  gl_error_check("glCopyNamedBufferSubData");
+  gl::copy_named_buffer_sub_data(other.m_gl_handle, m_gl_handle, 0, 0,
+                                 data_size * other.size());
   m_size = other.size();
 }
 

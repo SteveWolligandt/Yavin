@@ -93,6 +93,7 @@ void Window::set_mouse_button_callback(
 
 void Window::start_rendering() {
   // m_render_thread = new std::thread([&]() {
+  std::cout << "start\n";
   std::chrono::high_resolution_clock timer;
   double                             t = 0.0;
   while (!glfwWindowShouldClose(m_window)) {
