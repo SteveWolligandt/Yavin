@@ -28,14 +28,14 @@ class BufferMap {
     m_gpu_mapping = (T*)gl::map_named_buffer_range(
         m_buffer->m_gl_handle, data_size * offset, data_size * m_length,
         m_access);
-    // detail::mutex::gl_call.lock();
+    detail::mutex::gl_call.lock();
   }
 
   //! destructor unmaps the buffer
   ~BufferMap() { unmap(); }
 
   void unmap() {
-    // detail::mutex::gl_call.unlock();
+    detail::mutex::gl_call.unlock();
     if (!m_unmapped) {
       gl::unmap_named_buffer(m_buffer->m_gl_handle);
       m_unmapped = true;

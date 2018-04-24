@@ -1,27 +1,41 @@
 #include "VertexArray.h"
-#include "gl_includes.h"
 
 //==============================================================================
 namespace Yavin {
 //==============================================================================
 
-VertexArray::VertexArray() { gl::create_vertex_arrays(1, &m_id); }
+VertexArray::VertexArray() { gl::create_vertex_arrays(1, &m_gl_handle); }
 
 VertexArray::VertexArray(const VertexArray& other) {
-  glCreateVertexArrays(1, &m_id);
-  gl_error_check("glGenVertexArrays");
+  gl::create_vertex_arrays(1, &m_gl_handle);
 }
 
 VertexArray::VertexArray(VertexArray&& other) {
   other.m_delete = false;
-  m_id           = other.m_id;
+  m_gl_handle    = other.m_gl_handle;
+}
+
+VertexArray& VertexArray::operator=(const VertexArray& other) {
+  destroy_handle();
+  gl::create_vertex_arrays(1, &m_gl_handle);
+  return *this;
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& other) {
+  std::swap(m_gl_handle, other.m_gl_handle);
+  return *this;
 }
 
 VertexArray::~VertexArray() {
-  if (m_delete) gl::delete_vertex_arrays(1, &m_id);
+  if (m_delete) gl::delete_vertex_arrays(1, &m_gl_handle);
 }
 
-void VertexArray::bind() const { gl::bind_vertex_array(m_id); }
+void VertexArray::destroy_handle() {
+  if (m_gl_handle != 0) gl::delete_buffers(1, &m_gl_handle);
+  m_gl_handle = 0;
+}
+
+void VertexArray::bind() const { gl::bind_vertex_array(m_gl_handle); }
 
 void VertexArray::unbind() const { gl::bind_vertex_array(0); }
 

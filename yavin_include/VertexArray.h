@@ -7,16 +7,21 @@
 #include "Type.h"
 #include "VertexBuffer.h"
 #include "dll_export.h"
-#include "error_check.h"
+#include "gl_functions.h"
 
 namespace Yavin {
 class VertexArray {
  public:
+  using this_t = VertexArray;
+
   DLL_API VertexArray();
   DLL_API VertexArray(const VertexArray& other);
   DLL_API VertexArray(VertexArray&& other);
+  DLL_API VertexArray& operator=(const VertexArray& other);
+  DLL_API VertexArray& operator=(VertexArray&& other);
   DLL_API ~VertexArray();
 
+  DLL_API void destroy_handle();
   DLL_API void bind() const;
   DLL_API void unbind() const;
   DLL_API void draw(Primitive primitive, size_t num_primitives) const;
@@ -34,8 +39,8 @@ class VertexArray {
   DLL_API void draw_patches(size_t num_primitives) const;
 
  protected:
-  unsigned int m_id;
-  bool         m_delete = true;
+  GLuint m_gl_handle;
+  bool   m_delete = true;
 };
 }  // namespace Yavin
 
