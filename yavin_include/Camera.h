@@ -4,9 +4,12 @@
 #include <glm/glm.hpp>
 #include "Movable.h"
 #include "Transform.h"
-#include "gl_includes.h"
+#include "gl_functions.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 class Camera : public Movable {
  public:
   Camera(const float vp_x, const float vp_y, const float vp_width,
@@ -39,6 +42,17 @@ class Camera : public Movable {
   glm::vec4   m_viewport;
 };
 
+// namespace gl {
+// inline void viewport(const Camera& cam) {
+//   viewport(cam.viewport().x, cam.viewport().y, cam.viewport().z,
+//            cam.viewport().w);
+// }
+// //==============================================================================
+// }  // namespace gl
+// //==============================================================================
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

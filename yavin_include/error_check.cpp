@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include "ansi_format.h"
-#include "gl_includes.h"
+#include "gl_functions.h"
 
 //==============================================================================
 namespace Yavin {
@@ -60,7 +60,7 @@ const std::string gl_framebuffer_error_to_string(GLenum status) {
 
 void _gl_error_check(const std::string& function, const std::string& file,
                      size_t line) {
-  auto err     = glGetError();
+  auto err     = gl::get_error();
   auto err_str = gl_error_to_string(err);
   if (err != GL_NO_ERROR) throw gl_error(function, err_str, file, line);
 }
@@ -68,7 +68,7 @@ void _gl_error_check(const std::string& function, const std::string& file,
 //------------------------------------------------------------------------------
 
 void gl_framebuffer_not_complete_check(const GLuint fbo_id) {
-  auto status     = glCheckNamedFramebufferStatus(fbo_id, GL_FRAMEBUFFER);
+  auto status     = gl::check_named_framebuffer_status(fbo_id, GL_FRAMEBUFFER);
   auto status_str = gl_framebuffer_error_to_string(status);
   if (status != GL_FRAMEBUFFER_COMPLETE)
     throw gl_framebuffer_not_complete_error(status_str);

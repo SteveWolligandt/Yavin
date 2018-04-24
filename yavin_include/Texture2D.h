@@ -12,7 +12,10 @@
 #include "TexHelper.h"
 #include "Texture.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 template <typename T, typename Components>
 class Texture2D : public Yavin::Texture {
  public:
@@ -97,9 +100,9 @@ class Texture2D : public Yavin::Texture {
 };
 
 /*template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(const std::string& filepath, bool
-direct_upload, bool keep_data_on_cpu) { glCreateTextures(GL_TEXTURE_2D, 1,
-&m_id); gl_error_check("glCreateTextures");
+Texture2D<T, Components>::Texture2D(const std::string& filepath,
+                                    bool direct_upload, bool keep_data_on_cpu) {
+  gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   assert(filepath.substr(filepath.size() - 3, 3) == "png");
   if (direct_upload) bind();
   load_png(filepath, direct_upload, keep_data_on_cpu);
@@ -108,8 +111,7 @@ direct_upload, bool keep_data_on_cpu) { glCreateTextures(GL_TEXTURE_2D, 1,
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height)
     : Texture(), m_width(0), m_height(0) {
-  glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-  gl_error_check("glCreateTextures");
+  gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   bind();
   resize(width, height);
   m_is_consistent = false;
@@ -123,8 +125,7 @@ Texture2D<T, Components>::Texture2D(const Texture2D& other)
       m_is_consistent(other.m_is_consistent),
       m_data(other.m_data) {
   if (m_is_consistent) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(true);
   }
@@ -139,8 +140,7 @@ Texture2D<T, Components>::Texture2D(Texture2D&& other)
       m_data(std::move(other.m_data)) {
   other.m_dont_delete = false;
   if (m_is_consistent) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(true);
   }
@@ -152,8 +152,7 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
                                     bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(data) {
   if (direct_upload) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(keep_data_on_cpu);
   }
@@ -165,8 +164,7 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
                                     bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(std::move(data)) {
   if (direct_upload) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(keep_data_on_cpu);
   }
@@ -178,8 +176,7 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
                                     bool direct_upload, bool keep_data_on_cpu)
     : Texture(), m_width(width), m_height(height), m_data(std::move(list)) {
   if (direct_upload) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(keep_data_on_cpu);
   }
@@ -195,8 +192,7 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
   for (const auto& date : data) m_data.push_back(static_cast<T>(date));
 
   if (direct_upload) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(keep_data_on_cpu);
   }
@@ -210,8 +206,7 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
     : Texture(), m_width(width), m_height(height) {
   for (const auto& date : list) m_data.push_back(static_cast<T>(date));
   if (direct_upload) {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    gl_error_check("glCreateTextures");
+    gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
     bind();
     upload_data(keep_data_on_cpu);
   }
@@ -220,29 +215,25 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
 template <typename T, typename Components>
 void Texture2D<T, Components>::bind(unsigned int i) {
   assert(i < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-  glActiveTexture(GL_TEXTURE0 + i);
-  gl_error_check("glActiveTexture");
-  glBindTexture(GL_TEXTURE_2D, m_id);
-  gl_error_check("glBindTexture");
+  gl::active_texture(GL_TEXTURE0 + i);
+  gl::bind_texture(GL_TEXTURE_2D, m_id);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::unbind(unsigned int i) {
-  glActiveTexture(GL_TEXTURE0 + i);
-  gl_error_check("glActiveTexture");
-  glBindTexture(GL_TEXTURE_2D, 0);
-  gl_error_check("glBindTexture");
+  gl::active_texture(GL_TEXTURE0 + i);
+  gl::bind_texture(GL_TEXTURE_2D, 0);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::bind_image_texture(unsigned int i) {
-  glBindImageTexture(i, this->m_id, 0, GL_FALSE, 0, GL_READ_WRITE,
-                     internal_format);
+  gl::bind_image_texture(i, this->m_id, 0, GL_FALSE, 0, GL_READ_WRITE,
+                         internal_format);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::unbind_image_texture(unsigned int i) {
-  glBindImageTexture(i, 0, 0, GL_FALSE, 0, GL_READ_WRITE, internal_format);
+  gl::bind_image_texture(i, 0, 0, GL_FALSE, 0, GL_READ_WRITE, internal_format);
 }
 
 template <typename T, typename Components>
@@ -254,15 +245,13 @@ void Texture2D<T, Components>::set_interpolation_mode(InterpolationMode mode) {
 template <typename T, typename Components>
 void Texture2D<T, Components>::set_interpolation_mode_min(
     InterpolationMode mode) {
-  glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, mode);
-  gl_error_check("glTextureParameteri - GL_TEXTURE_MIN_FILTER");
+  gl::texture_parameter_i(m_id, GL_TEXTURE_MIN_FILTER, mode);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::set_interpolation_mode_mag(
     InterpolationMode mode) {
-  glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, mode);
-  gl_error_check("glTextureParameteri - GL_TEXTURE_MAG_FILTER");
+  gl::texture_parameter_i(m_id, GL_TEXTURE_MAG_FILTER, mode);
 }
 
 template <typename T, typename Components>
@@ -273,14 +262,12 @@ void Texture2D<T, Components>::set_wrap_mode(WrapMode mode) {
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::set_wrap_mode_s(WrapMode mode) {
-  glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, mode);
-  gl_error_check("glTextureParameteri - GL_TEXTURE_WRAP_S");
+  gl::texture_parameter_i(m_id, GL_TEXTURE_WRAP_S, mode);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::set_wrap_mode_t(WrapMode mode) {
-  glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, mode);
-  gl_error_check("glTextureParameteri - GL_TEXTURE_WRAP_T");
+  gl::texture_parameter_i(m_id, GL_TEXTURE_WRAP_T, mode);
 }
 
 template <typename T, typename Components>
@@ -473,9 +460,8 @@ void Texture2D<T, Components>::upload_data(unsigned int               width,
 template <typename T, typename Components>
 void Texture2D<T, Components>::upload_data(bool keep_data_on_cpu) {
   if (!m_is_consistent) {
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
-                 format, type, &m_data[0]);
-    gl_error_check("glTexImage2D");
+    gl::tex_image_2d(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
+                     format, type, &m_data[0]);
     m_is_consistent = true;
   }
   if (!keep_data_on_cpu) {
@@ -488,7 +474,8 @@ template <typename T, typename Components>
 void Texture2D<T, Components>::set_data(const PixelUnpackBuffer<T>& pbo) {
   bind();
   pbo.bind();
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, type, 0);
+  gl::tex_sub_image_2d(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, type,
+                       0);
 }
 
 template <typename T, typename Components>
@@ -496,9 +483,8 @@ void Texture2D<T, Components>::resize(unsigned int width, unsigned int height) {
   if (m_width != width || m_height != height) {
     m_width  = width;
     m_height = height;
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
-                 format, type, nullptr);
-    gl_error_check("glTexImage2D");
+    gl::tex_image_2d(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
+                     format, type, nullptr);
     m_is_consistent = false;
   }
 }
@@ -506,12 +492,14 @@ void Texture2D<T, Components>::resize(unsigned int width, unsigned int height) {
 template <typename T, typename Components>
 const auto& Texture2D<T, Components>::download_data() {
   m_data.resize(n * m_width * m_height);
-  glGetTextureImage(m_id, 0, format, type, m_width * m_height * n * sizeof(T),
-                    &m_data[0]);
-  gl_error_check("glGetTextureImage");
+  gl::get_texture_image(m_id, 0, format, type,
+                        m_width * m_height * n * sizeof(T), &m_data[0]);
   m_is_consistent = true;
   return m_data;
 }
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

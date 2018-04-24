@@ -3,7 +3,7 @@
 
 #include <mutex>
 #include <vector>
-#include "gl_includes.h"
+#include "gl_functions.h"
 #include "mutex_handler.h"
 
 //==============================================================================
@@ -28,14 +28,14 @@ class BufferMap {
     m_gpu_mapping = (T*)gl::map_named_buffer_range(
         m_buffer->m_gl_handle, data_size * offset, data_size * m_length,
         m_access);
-    detail::mutex::gl_call.lock();
+    // detail::mutex::gl_call.lock();
   }
 
   //! destructor unmaps the buffer
   ~BufferMap() { unmap(); }
 
   void unmap() {
-    detail::mutex::gl_call.unlock();
+    // detail::mutex::gl_call.unlock();
     if (!m_unmapped) {
       gl::unmap_named_buffer(m_buffer->m_gl_handle);
       m_unmapped = true;
@@ -573,7 +573,6 @@ void Buffer<array_type, T>::destroy_handle() {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::upload_data(const std::vector<T>& data) {
-  std::lock_guard lock(detail::mutex::buffer);
   if (capacity() < data.size()) {
     // reallocate new memory
     gl::named_buffer_data(m_gl_handle, data_size * data.size(), data.data(),
@@ -629,8 +628,7 @@ void Buffer<array_type, T>::gpu_malloc(size_t n) {
 
 template <GLsizei array_type, typename T>
 void Buffer<array_type, T>::gpu_malloc(size_t n, const T& initial) {
-  std::lock_guard lock(detail::mutex::buffer);
-  std::vector<T>  data(n, initial);
+  std::vector<T> data(n, initial);
   gl::named_buffer_data(this->m_gl_handle, data_size * n, data.data(), m_usage);
   m_capacity = n;
 }

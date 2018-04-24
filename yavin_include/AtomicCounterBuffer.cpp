@@ -62,16 +62,16 @@ AtomicCounterBuffer::AtomicCounterBuffer(
 
 void AtomicCounterBuffer::set_all_to(unsigned int val) {
   auto gpu_data = reinterpret_cast<unsigned char*>(
-      glMapNamedBuffer(this->m_gl_handle, GL_WRITE_ONLY));
+      gl::map_named_buffer(this->m_gl_handle, GL_WRITE_ONLY));
   gl_error_check("glMapNamedBuffer");
   std::memset(gpu_data, val, sizeof(unsigned int) * size());
-  glUnmapNamedBuffer(this->m_gl_handle);
+  gl::unmap_named_buffer(this->m_gl_handle);
 }
 
 //------------------------------------------------------------------------------
 
 void AtomicCounterBuffer::bind(size_t i) {
-  glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
+  gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
 }
 
 //==============================================================================

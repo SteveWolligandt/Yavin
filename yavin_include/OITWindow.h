@@ -66,8 +66,7 @@ class OITWindow : public Window {
   }
   //----------------------------------------------------------------------------
   void set_clear_color(const glm::vec4& clear_color) {
-    Yavin::set_clear_color(clear_color.x, clear_color.y, clear_color.z,
-                           clear_color.w);
+    gl::clear_color(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     m_linked_list_render_shader.set_uniform("clear_color", clear_color);
   }
 

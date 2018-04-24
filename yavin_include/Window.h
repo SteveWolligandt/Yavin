@@ -5,9 +5,12 @@
 #include <string>
 #include <thread>
 #include "dll_export.h"
-#include "gl_includes.h"
+#include "gl_functions.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 class Window {
  public:
   DLL_API Window(const std::string& name, const int width,
@@ -57,5 +60,7 @@ class Window {
   double                                  m_fps = 60.0;
 };
 
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 #endif

@@ -3,7 +3,10 @@
 #include <iostream>
 
 using namespace std::chrono_literals;
+
+//==============================================================================
 namespace Yavin {
+//==============================================================================
 
 Window::Window(const std::string& name, const int width,
                const unsigned int height, const unsigned int major,
@@ -138,9 +141,9 @@ void Window::join_render_thread() {
   }
 }
 
-std::string Window::get_gl_version() { return (char*)glGetString(GL_VERSION); }
+std::string Window::get_gl_version() { return gl::get_string(GL_VERSION); }
 std::string Window::get_glsl_version() {
-  return (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+  return gl::get_string(GL_SHADING_LANGUAGE_VERSION);
 }
 void Window::print_versions() {
   std::cout << "OpenGL " << get_gl_version() << ", GLSL " << get_glsl_version()
@@ -148,10 +151,15 @@ void Window::print_versions() {
 }
 void Window::should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
-void Window::enable_multisampling() { glEnable(GL_MULTISAMPLE); }
-void Window::disable_multisampling() { glDisable(GL_MULTISAMPLE); }
-bool Window::multisampling_enabled() { return glIsEnabled(GL_MULTISAMPLE); }
-void Window::enable_depth_test() { glEnable(GL_DEPTH_TEST); }
-void Window::disable_depth_test() { glDisable(GL_DEPTH_TEST); }
 
+void Window::enable_multisampling() { gl::enable(GL_MULTISAMPLE); }
+void Window::disable_multisampling() { gl::disable(GL_MULTISAMPLE); }
+
+bool Window::multisampling_enabled() { return gl::is_enabled(GL_MULTISAMPLE); }
+
+void Window::enable_depth_test() { gl::enable(GL_DEPTH_TEST); }
+void Window::disable_depth_test() { gl::disable(GL_DEPTH_TEST); }
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================

@@ -4,7 +4,10 @@
 #include "Camera.h"
 #include "dll_export.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 class OrthographicCamera : public Camera {
  public:
   DLL_API OrthographicCamera(const float left, const float right,
@@ -40,6 +43,9 @@ class OrthographicCamera : public Camera {
                               const float vp_x, const float vp_y,
                               float vp_width, float vp_height);
 };
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

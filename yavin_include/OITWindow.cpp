@@ -11,10 +11,12 @@ const std::string OITWindow::vertex_shader_path =
     shader_dir + std::string("linked_list_render.vert");
 
 //------------------------------------------------------------------------------
+
 const std::string OITWindow::fragment_shader_path =
     shader_dir + std::string("linked_list_render.frag");
 
 //------------------------------------------------------------------------------
+
 OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
                      unsigned int linked_list_size_factor, unsigned int major,
                      unsigned int minor)
@@ -66,7 +68,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
     m_oit_render_function();
 
     // draw linked list
-    set_viewport(0, 0, m_width, m_height);
+    gl::viewport(0, 0, m_width, m_height);
     m_linked_list_render_shader.bind();
     m_fullscreen_quad.draw();
   });
@@ -93,6 +95,7 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
     m_oit_resize_callback(w, h);
   });
 }
+
 //==============================================================================
 }  // namespace Yavin
 //==============================================================================

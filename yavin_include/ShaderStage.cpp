@@ -2,7 +2,7 @@
 
 #include "ShaderStage.h"
 #include "ansi_format.h"
-#include "gl_includes.h"
+#include "gl_functions.h"
 #include "shader_include_paths.h"
 
 //==============================================================================
@@ -63,47 +63,28 @@ std::string ShaderStage::type_to_string(GLenum shader_type) {
 
 void ShaderStage::compile(bool use_ansi_color) {
   delete_stage();
-  m_id = glCreateShader(m_shader_type);
-  gl_error_check("glCreateShader");
+  m_id           = gl::create_shader(m_shader_type);
   auto  source   = ShaderStageParser::parse(m_filename_or_source, m_glsl_vars,
                                          m_include_tree, m_string_type);
   auto *source_c = source.c_str();
-  glShaderSource(m_id, 1, &source_c, nullptr);
-  gl_error_check("glShaderSource");
-
-  // Compile Shader
-  glCompileShader(id());
-  gl_error_check("glCompileShader");
+  gl::shader_source(m_id, 1, &source_c, nullptr);
+  gl::compile_shader(m_id);
   info_log(use_ansi_color);
 }
 
 //------------------------------------------------------------------------------
 
 void ShaderStage::delete_stage() {
-  if (m_id) {
-    glDeleteShader(m_id);
-    gl_error_check("glDeleteShader");
-  }
+  if (m_id) gl::delete_shader(m_id);
   m_id = 0;
 }
 
 //------------------------------------------------------------------------------
 
 void ShaderStage::info_log(bool use_ansi_color) {
-  GLint   info_log_length = 0;
-  GLsizei chars_written   = 0;
-
-  glGetShaderiv(id(), GL_INFO_LOG_LENGTH, &info_log_length);
-  gl_error_check("glGetShaderiv");
-
+  auto info_log_length = gl::get_shader_info_log_length(m_id);
   if (info_log_length > 0) {
-    auto log = new char[info_log_length];
-
-    glGetShaderInfoLog(m_id, info_log_length, &chars_written, log);
-    gl_error_check("glGetShaderInfoLog");
-
-    std::istringstream is(log);
-    delete[] log;
+    std::istringstream is(gl::get_shader_info_log(m_id, info_log_length));
     std::ostringstream os;
 
     std::string line;

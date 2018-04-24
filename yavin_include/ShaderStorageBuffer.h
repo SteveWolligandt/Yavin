@@ -56,8 +56,7 @@ class ShaderStorageBuffer : public Buffer<GL_SHADER_STORAGE_BUFFER, T> {
   //----------------------------------------------------------------------------
 
   void bind(size_t index) const {
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, this->m_gl_handle);
-    gl_error_check("glBindBufferBase");
+    gl::bind_buffer_base(GL_SHADER_STORAGE_BUFFER, index, this->m_gl_handle);
   }
 };
 

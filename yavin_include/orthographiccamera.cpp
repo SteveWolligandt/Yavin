@@ -7,6 +7,7 @@
 //==============================================================================
 namespace Yavin {
 //==============================================================================
+
 OrthographicCamera::OrthographicCamera(const float left, const float right,
                                        const float bottom, const float top,
                                        const float near, const float far,
@@ -76,6 +77,7 @@ void OrthographicCamera::set_projection(const float left, const float right,
   m_projection_matrix = glm::ortho(left, right, bottom, top, near, far);
   set_viewport(vp_x, vp_y, vp_width, vp_height);
 }
+
 //==============================================================================
 }  // namespace Yavin
 //==============================================================================

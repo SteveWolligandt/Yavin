@@ -6,7 +6,10 @@
 #include "dll_export.h"
 #include "ray.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 class PerspectiveCamera : public Camera {
  public:
   DLL_API PerspectiveCamera(float fovy, float aspect, float near, float far,
@@ -38,6 +41,9 @@ class PerspectiveCamera : public Camera {
     return ray_t<T>(origin, glm::normalize(world_pos - origin));
   }
 };
+
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

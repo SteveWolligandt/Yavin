@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-#include "gl_includes.h"
+#include "gl_functions.h"
 
 //==============================================================================
 namespace Yavin {
@@ -62,14 +62,15 @@ void Shader::unbind() { gl::use_program(0); }
 
 void Shader::add_uniform(const std::string& uniformVarName) {
   m_uniform_locations.insert(std::pair<std::string, GLint>(
-      uniformVarName, glGetUniformLocation(m_id, uniformVarName.c_str())));
+      uniformVarName, gl::get_uniform_location(m_id, uniformVarName.c_str())));
 }
 
 //------------------------------------------------------------------------------
 
 void Shader::add_attribute(const std::string& attributeVarName) {
   m_attribute_locations.insert(std::pair<std::string, GLint>(
-      attributeVarName, glGetAttribLocation(m_id, attributeVarName.c_str())));
+      attributeVarName,
+      gl::get_uniform_location(m_id, attributeVarName.c_str())));
 }
 
 //------------------------------------------------------------------------------
@@ -193,8 +194,8 @@ void Shader::set_uniform(const std::string& name, const Vec2<int32_t>& value) {
 //------------------------------------------------------------------------------
 
 void Shader::set_uniform(const std::string& name, const Vec3<int32_t>& value) {
-  glProgramUniform3iv(m_id, m_uniform_locations[name], 1,
-                      reinterpret_cast<const int32_t*>(&value));
+  gl::program_uniform_3iv(m_id, m_uniform_locations[name], 1,
+                          reinterpret_cast<const int32_t*>(&value));
 }
 
 //------------------------------------------------------------------------------
@@ -221,8 +222,8 @@ void Shader::set_uniform(const std::string& name, const Vec3<uint32_t>& value) {
 //------------------------------------------------------------------------------
 
 void Shader::set_uniform(const std::string& name, const Vec4<uint32_t>& value) {
-  glProgramUniform4uiv(m_id, m_uniform_locations[name], 1,
-                       reinterpret_cast<const uint32_t*>(&value));
+  gl::program_uniform_4uiv(m_id, m_uniform_locations[name], 1,
+                           reinterpret_cast<const uint32_t*>(&value));
 }
 
 //------------------------------------------------------------------------------

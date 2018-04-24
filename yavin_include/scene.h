@@ -32,7 +32,8 @@ class scene_t : public std::vector<scene_object_t<T>> {
           closest_collision = c;
         }
 
-    if (closest_collision) closest_collision->object().on_collision(*closest_collision);
+    if (closest_collision)
+      closest_collision->object().on_collision(*closest_collision);
 
     return closest_collision;
   }
@@ -58,7 +59,8 @@ class scene_t : public std::vector<scene_object_t<T>> {
     return this->back();
   }
 
-  std::optional<collision_t<T>> cast_ray(const Yavin::ray_t<T>& r, T x, T y) const {
+  std::optional<collision_t<T>> cast_ray(const Yavin::ray_t<T>& r, T x,
+                                         T y) const {
     auto c = cast_ray(r);
     if (c) c->object().on_mouse_down(x, y);
     return c;
@@ -81,7 +83,7 @@ class scene_t : public std::vector<scene_object_t<T>> {
   }
 
   void on_render(const Yavin::Camera& cam) {
-    Yavin::set_viewport(cam.viewport());
+    gl::viewport(cam.viewport());
     for (auto& obj : *this) obj.on_render(cam);
   }
 

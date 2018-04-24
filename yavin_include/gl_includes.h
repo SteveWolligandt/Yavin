@@ -11,6 +11,4 @@
 
 #include <GLFW/glfw3.h>
 
-#include "gl_functions_wrapper.h"
-
 #endif

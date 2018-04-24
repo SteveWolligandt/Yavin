@@ -1,6 +1,9 @@
 #include "Texture2D.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
+
 template class Texture2D<int8_t, R>;
 template class Texture2D<int8_t, RG>;
 template class Texture2D<int8_t, RGB>;
@@ -54,4 +57,7 @@ template class Texture2D<int8_t, Depth8>;
 template class Texture2D<int16_t, Depth16>;
 template class Texture2D<float, Depth24>;
 template class Texture2D<float, Depth32>;
-}
+
+//==============================================================================
+}  // namespace Yavin
+//==============================================================================

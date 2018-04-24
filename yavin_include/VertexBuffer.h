@@ -68,12 +68,9 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
 
   static constexpr void activate_attributes() {
     for (unsigned int i = 0; i < num_attributes; i++) {
-      glEnableVertexAttribArray(i);
-      gl_error_check("glEnableVertexAttribArray");
-
-      glVertexAttribPointer(i, num_dims[i], types[i], GL_FALSE,
-                            this_t::data_size, (void*)offsets[i]);
-      gl_error_check("glVertexAttribPointer");
+      gl::enable_vertex_attrib_array(i);
+      gl::vertex_attrib_pointer(i, num_dims[i], types[i], GL_FALSE,
+                                this_t::data_size, (void*)offsets[i]);
     }
   }
 };
