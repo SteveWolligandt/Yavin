@@ -190,8 +190,13 @@ void gl::vertex_attrib_l_pointer(GLuint index, GLint size, GLenum type,
 
 void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateVertexArrays\n";
+  if (verbose) *out << "glCreateVertexArrays(" << n << ", " << arrays << ")";
   glCreateVertexArrays(n, arrays);
+  if (verbose) {
+    *out << " = [ ";
+    for (GLsizei i = 0; i < n; ++i) *out << arrays[i] << ' ';
+    *out << "]\n";
+  }
   gl_error_check("glCreateVertexArrays");
 }
 
@@ -199,7 +204,11 @@ void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
 
 void gl::delete_vertex_arrays(GLsizei n, GLuint* arrays) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDeleteVertexArrays\n";
+  if (verbose) {
+    *out << "glDeleteVertexArrays(" << n << ", " << arrays << ") = [ ";
+    for (GLsizei i = 0; i < n; ++i) *out << arrays[i] << ' ';
+    *out << "]\n";
+  }
   glDeleteVertexArrays(n, arrays);
   gl_error_check("glDeleteVertexArrays");
 }
@@ -263,7 +272,11 @@ void gl::create_buffers(GLsizei n, GLuint* buffers) {
 
 void gl::delete_buffers(GLsizei n, GLuint* buffers) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDeleteBuffers(" << n << ", " << buffers << ")\n";
+  if (verbose) {
+    *out << "glDeleteBuffers(" << n << ", " << buffers << ") = [ ";
+    for (GLsizei i = 0; i < n; ++i) *out << buffers[i] << ' ';
+    *out << "]\n";
+  }
   glDeleteBuffers(1, buffers);
   gl_error_check("glCreateBuffers");
 }
