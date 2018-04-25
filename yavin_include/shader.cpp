@@ -135,14 +135,73 @@ void Shader::set_uniform(const std::string& name, float value) {
 
 //------------------------------------------------------------------------------
 
+void Shader::set_uniform(const std::string& name, float x, float y) {
+  gl::program_uniform_2f(m_id, m_uniform_locations[name], x, y);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, float x, float y, float z) {
+  gl::program_uniform_3f(m_id, m_uniform_locations[name], x, y, z);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, float x, float y, float z,
+                         float w) {
+  gl::program_uniform_4f(m_id, m_uniform_locations[name], x, y, z, w);
+}
+
+//------------------------------------------------------------------------------
+
 void Shader::set_uniform(const std::string& name, int value) {
   gl::program_uniform_1i(m_id, m_uniform_locations[name], value);
 }
 
 //------------------------------------------------------------------------------
 
+void Shader::set_uniform(const std::string& name, int32_t x, int32_t y) {
+  gl::program_uniform_2i(m_id, m_uniform_locations[name], x, y);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, int32_t x, int32_t y,
+                         int32_t z) {
+  gl::program_uniform_3i(m_id, m_uniform_locations[name], x, y, z);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, int32_t x, int32_t y,
+                         int32_t z, int32_t w) {
+  gl::program_uniform_4i(m_id, m_uniform_locations[name], x, y, z, w);
+}
+
+//------------------------------------------------------------------------------
+
 void Shader::set_uniform(const std::string& name, unsigned int value) {
   gl::program_uniform_1ui(m_id, m_uniform_locations[name], value);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, uint32_t x, uint32_t y) {
+  gl::program_uniform_2ui(m_id, m_uniform_locations[name], x, y);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, uint32_t x, uint32_t y,
+                         uint32_t z) {
+  gl::program_uniform_3ui(m_id, m_uniform_locations[name], x, y, z);
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, uint32_t x, uint32_t y,
+                         uint32_t z, uint32_t w) {
+  gl::program_uniform_4ui(m_id, m_uniform_locations[name], x, y, z, w);
 }
 
 //------------------------------------------------------------------------------

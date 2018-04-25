@@ -56,6 +56,20 @@ class Shader {
   DLL_API void set_uniform(const std::string&, int);
   DLL_API void set_uniform(const std::string&, unsigned int);
 
+  DLL_API void set_uniform(const std::string&, float, float);
+  DLL_API void set_uniform(const std::string&, float, float, float);
+  DLL_API void set_uniform(const std::string&, float, float, float, float);
+
+  DLL_API void set_uniform(const std::string&, int32_t, int32_t);
+  DLL_API void set_uniform(const std::string&, int32_t, int32_t, int32_t);
+  DLL_API void set_uniform(const std::string&, int32_t, int32_t, int32_t,
+                           int32_t);
+
+  DLL_API void set_uniform(const std::string&, uint32_t, uint32_t);
+  DLL_API void set_uniform(const std::string&, uint32_t, uint32_t, uint32_t);
+  DLL_API void set_uniform(const std::string&, uint32_t, uint32_t, uint32_t,
+                           uint32_t);
+
   DLL_API void set_uniform(const std::string&, Scalar<float>);
   DLL_API void set_uniform(const std::string&, Scalar<int32_t>);
   DLL_API void set_uniform(const std::string&, Scalar<uint32_t>);
