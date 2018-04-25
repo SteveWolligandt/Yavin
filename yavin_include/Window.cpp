@@ -141,9 +141,11 @@ void Window::join_render_thread() {
   }
 }
 
-std::string Window::get_gl_version() { return gl::get_string(GL_VERSION); }
+std::string Window::get_gl_version() {
+  return (char*)gl::get_string(GL_VERSION);
+}
 std::string Window::get_glsl_version() {
-  return gl::get_string(GL_SHADING_LANGUAGE_VERSION);
+  return (char*)gl::get_string(GL_SHADING_LANGUAGE_VERSION);
 }
 void Window::print_versions() {
   std::cout << "OpenGL " << get_gl_version() << ", GLSL " << get_glsl_version()

@@ -30,8 +30,16 @@ target_include_directories(Catch2 INTERFACE ${CATCH2_INCLUDE_DIR})
 file(GLOB YAVIN_SOURCES yavin_include/*.cpp)
 file(GLOB YAVIN_HEADERS yavin_include/*.h)
 
+option(VERBOSE "verbose OpenGL calls" OFF)
+if (VERBOSE)
+  set(VERBOSE_GL "true")
+else(VERBOSE)
+  set(VERBOSE_GL "false")
+endif(VERBOSE)
+configure_file(yavin_include/gl_verbose.cpp.in yavin_include/gl_verbose.cpp)
+
 # create library target
-add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_HEADERS})
+add_library(yavin SHARED ${YAVIN_SOURCES} ${CMAKE_BINARY_DIR}/yavin_include/gl_verbose.cpp ${YAVIN_HEADERS})
 target_compile_definitions(yavin PRIVATE DLL_EXPORT)
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(yavin PRIVATE 
