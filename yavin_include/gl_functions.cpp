@@ -1,4 +1,5 @@
 #include "gl_functions.h"
+#include "to_string.h"
 
 //==============================================================================
 namespace Yavin {
@@ -238,7 +239,8 @@ void gl::draw_elements(GLenum mode, GLsizei count, GLenum type,
 
 void gl::bind_buffer(GLenum target, GLuint buffer) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glBindBuffer(" << target << ", " << buffer << ")\n";
+  if (verbose)
+    *out << "glBindBuffer(" << to_string(target) << ", " << buffer << ")\n";
   glBindBuffer(target, buffer);
   gl_error_check("glBindBuffer");
 }
@@ -248,8 +250,8 @@ void gl::bind_buffer(GLenum target, GLuint buffer) {
 void gl::bind_buffer_base(GLenum target, GLuint index, GLuint buffer) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
-    *out << "glBindBufferBase(" << target << ", " << index << ", " << buffer
-         << ")\n";
+    *out << "glBindBufferBase(" << to_string(target) << ", " << index << ", "
+         << buffer << ")\n";
   glBindBufferBase(target, index, buffer);
   gl_error_check("glBindBufferBase");
 }
@@ -297,7 +299,8 @@ void gl::copy_named_buffer_sub_data(GLuint readBuffer, GLuint writeBuffer,
 
 void* gl::map_named_buffer(GLuint buffer, GLenum access) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glMapNamedBuffer(" << buffer << ", " << access << ")\n";
+  if (verbose)
+    *out << "glMapNamedBuffer(" << buffer << ", " << to_string(access) << ")\n";
   auto result = glMapNamedBuffer(buffer, access);
   gl_error_check("glMapNamedBuffer");
   return result;
@@ -310,7 +313,7 @@ void* gl::map_named_buffer_range(GLuint buffer, GLintptr offset, GLsizei length,
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
     *out << "glMapNamedBufferRange(" << buffer << ", " << offset << ", "
-         << length << ", " << access << ")\n";
+         << length << ", " << map_access_to_string(access) << ")\n";
   auto result = glMapNamedBufferRange(buffer, offset, length, access);
   gl_error_check("glMapNamedBufferRange");
   return result;
@@ -323,7 +326,7 @@ void gl::named_buffer_data(GLuint buffer, GLsizei size, const void* data,
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
     *out << "glNamedBufferData(" << buffer << ", " << size << ", " << data
-         << ", " << usage << ")\n";
+         << ", " << to_string(usage) << ")\n";
   glNamedBufferData(buffer, size, data, usage);
   gl_error_check("glNamedBufferData");
 }

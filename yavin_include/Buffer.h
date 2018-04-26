@@ -484,9 +484,8 @@ Buffer<array_type, T>::Buffer(usage_t usage) : m_usage(usage) {
 
 template <GLsizei array_type, typename T>
 Buffer<array_type, T>::Buffer(const Buffer& other) : Buffer(other.m_usage) {
-  m_size     = 0;
-  m_capacity = 0;
-  m_delete   = other.m_delete;
+  m_delete = other.m_delete;
+  m_usage  = other.m_usage;
   copy(other);
 }
 
