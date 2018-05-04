@@ -1,8 +1,6 @@
 Yavin
 ===
 
-Yavin is an OpenGL 4.5 Wrapper using modern C++17 features.
-
 ## Usage
 #### Window
 ```cpp
