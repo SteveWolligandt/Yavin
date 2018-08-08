@@ -26,6 +26,7 @@ class Window {
   DLL_API void set_resize_callback(std::function<void(int, int)>);
   DLL_API void set_cursor_pos_callback(std::function<void(double, double)>);
   DLL_API void set_mouse_button_callback(std::function<void(int, int, int)>);
+  DLL_API void set_scroll_callback(std::function<void(double, double)>);
 
   DLL_API void swap_buffers();
 
@@ -57,6 +58,7 @@ class Window {
   std::function<void(int, int)>           m_resize_callback_function;
   std::function<void(double, double)>     m_cursor_pos_callback_function;
   std::function<void(int, int, int)>      m_mouse_button_callback_function;
+  std::function<void(int, int)>           m_scroll_callback_function;
   double                                  m_fps = 60.0;
 };
 

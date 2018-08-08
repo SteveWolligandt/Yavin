@@ -16,7 +16,8 @@ Window::Window(const std::string& name, const int width,
       m_key_callback_function([](int, int, int, int) {}),
       m_resize_callback_function([](int, int) {}),
       m_cursor_pos_callback_function([](double, double) {}),
-      m_mouse_button_callback_function([](int, int, int) {}) {
+      m_mouse_button_callback_function([](int, int, int) {}),
+      m_scroll_callback_function([](double, double) {}) {
   if (!glfwInit()) {
     std::cerr << "glfwInit() failed.\n";
     return;
@@ -63,6 +64,11 @@ Window::Window(const std::string& name, const int width,
         ((Window*)glfwGetWindowUserPointer(window))
             ->m_mouse_button_callback_function(button, action, mods);
       });
+  glfwSetScrollCallback(m_window,
+                        [](GLFWwindow* window, double xoffset, double yoffset) {
+                          ((Window*)glfwGetWindowUserPointer(window))
+                              ->m_scroll_callback_function(xoffset, yoffset);
+                        });
   print_versions();
 }
 
@@ -92,6 +98,10 @@ void Window::set_cursor_pos_callback(
 void Window::set_mouse_button_callback(
     std::function<void(int, int, int)> mouse_button_callback_function) {
   m_mouse_button_callback_function = mouse_button_callback_function;
+}
+void Window::set_scroll_callback(
+    std::function<void(double, double)> scroll_callback_function) {
+  m_scroll_callback_function = scroll_callback_function;
 }
 
 void Window::start_rendering() {
