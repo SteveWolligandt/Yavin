@@ -44,6 +44,10 @@ class Shader {
   DLL_API GLint uniform(const std::string& uniformVarName);
   DLL_API GLint attribute(const std::string& attributeVarName);
 
+  DLL_API void set_uniform(const std::string&, const glm::ivec2&);
+  DLL_API void set_uniform(const std::string&, const glm::ivec3&);
+  DLL_API void set_uniform(const std::string&, const glm::ivec4&);
+
   DLL_API void set_uniform(const std::string&, const glm::vec2&);
   DLL_API void set_uniform(const std::string&, const glm::vec3&);
   DLL_API void set_uniform(const std::string&, const glm::vec4&);

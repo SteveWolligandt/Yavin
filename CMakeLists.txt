@@ -19,8 +19,8 @@ find_package(GLFW3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenGL)
-# find_package(PNG REQUIRED)
-# find_package(PNG++ REQUIRED)
+find_package(PNG REQUIRED)
+find_package(PNG++ REQUIRED)
 
 # configuring catch2
 set(CATCH2_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/catch2/single_include)
@@ -71,7 +71,7 @@ if (BUILD_TESTS)
   add_subdirectory(test)
 endif (BUILD_TESTS)
 
-# first we can indicate the documentation build as an option and set it to ON by default
+ # first we can indicate the documentation build as an option and set it to ON by default
 option(BUILD_DOC "Generate documentation" OFF)
 
 # check if Doxygen is installed

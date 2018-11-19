@@ -4,7 +4,7 @@
 #include <cassert>
 #include <initializer_list>
 #include <iostream>
-// #include <png++/png.hpp>
+#include <png++/png.hpp>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -19,8 +19,8 @@ namespace Yavin {
 template <typename T, typename Components>
 class Texture2D : public Yavin::Texture {
  public:
-  // Texture2D(const std::string& filepath, bool direct_upload = true, bool
-  // keep_data_on_cpu = false);
+  Texture2D(const std::string& filepath, bool direct_upload = true, bool
+  keep_data_on_cpu = false);
 
   Texture2D(const Texture2D& other);
 
@@ -65,10 +65,10 @@ class Texture2D : public Yavin::Texture {
   auto        is_consistent() const;
   const auto& data() const;
 
-  // void load_png(const std::string& filepath, bool direct_upload = true, bool
-  // keep_data_on_cpu = false);
+  void load_png(const std::string& filepath, bool direct_upload = true, bool
+  keep_data_on_cpu = false);
 
-  // void save_png(const std::string& filepath);
+  void save_png(const std::string& filepath);
 
   void upload_data(unsigned int width, unsigned int height,
                    const std::vector<T>& data, bool keep_data_on_cpu = false);
@@ -99,14 +99,14 @@ class Texture2D : public Yavin::Texture {
   std::vector<T> m_data;
 };
 
-/*template <typename T, typename Components>
+template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(const std::string& filepath,
                                     bool direct_upload, bool keep_data_on_cpu) {
   gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   assert(filepath.substr(filepath.size() - 3, 3) == "png");
   if (direct_upload) bind();
   load_png(filepath, direct_upload, keep_data_on_cpu);
-}*/
+}
 
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height)
@@ -290,7 +290,7 @@ const auto& Texture2D<T, Components>::data() const {
   return m_data;
 }
 
-/*template <typename T, typename Components>
+template <typename T, typename Components>
 void Texture2D<T, Components>::load_png(const std::string& filepath, bool
 direct_upload, bool keep_data_on_cpu) { if constexpr (std::is_same<Components,
 RGB>::value) { png::image<png::rgb_pixel> image; image.read(filepath); m_width
@@ -350,9 +350,9 @@ m_height * n); for (png::uint_32 y = image.get_height(); y > 0; --y) for
   }
 
   if (direct_upload) upload_data(keep_data_on_cpu);
-}*/
+}
 
-/*template <typename T, typename Components>
+template <typename T, typename Components>
 void Texture2D<T, Components>::save_png(const std::string& filepath) {
   if constexpr (std::is_same<Components, RGB>::value) {
     png::image<png::rgb_pixel> image(m_width, m_height);
@@ -419,7 +419,23 @@ void Texture2D<T, Components>::save_png(const std::string& filepath) {
       }
     image.write(filepath);
   }
-}*/
+  else if constexpr (std::is_same<Components, R>::value) {
+    png::image<png::rgb_pixel> image(m_width, m_height);
+    for (unsigned int y = 0; y < image.get_height(); ++y)
+      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+        unsigned int idx                           = x + m_width * y;
+        image[image.get_height() - 1 - y][x].red   = m_data[idx];
+        image[image.get_height() - 1 - y][x].green = m_data[idx];
+        image[image.get_height() - 1 - y][x].blue  = m_data[idx];
+        if constexpr (std::is_same<float, T>::value) {
+          image[image.get_height() - 1 - y][x].red *= 255.0f;
+          image[image.get_height() - 1 - y][x].green *= 255.0f;
+          image[image.get_height() - 1 - y][x].blue *= 255.0f;
+        }
+      }
+    image.write(filepath);
+  }
+}
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::upload_data(unsigned int          width,

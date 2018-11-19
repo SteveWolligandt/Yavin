@@ -87,6 +87,27 @@ GLint Shader::attribute(const std::string& attributeVarName) {
 
 //------------------------------------------------------------------------------
 
+void Shader::set_uniform(const std::string& name, const glm::ivec2& value) {
+  gl::program_uniform_2iv(m_id, m_uniform_locations[name], 1,
+                          glm::value_ptr(value));
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, const glm::ivec3& value) {
+  gl::program_uniform_3iv(m_id, m_uniform_locations[name], 1,
+                          glm::value_ptr(value));
+}
+
+//------------------------------------------------------------------------------
+
+void Shader::set_uniform(const std::string& name, const glm::ivec4& value) {
+  gl::program_uniform_4iv(m_id, m_uniform_locations[name], 1,
+                          glm::value_ptr(value));
+}
+
+//------------------------------------------------------------------------------
+
 void Shader::set_uniform(const std::string& name, const glm::vec2& value) {
   gl::program_uniform_2fv(m_id, m_uniform_locations[name], 1,
                           glm::value_ptr(value));
