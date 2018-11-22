@@ -855,8 +855,16 @@ void gl::create_textures(GLenum target, GLsizei n, GLuint* textures) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glCreateTextures\n";
   glCreateTextures(target, n, textures);
-  if (verbose) *out << "gl_error_check\n";
   gl_error_check("glCreateTextures");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::delete_textures(GLsizei n, GLuint* textures) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose) *out << "glCreateTextures\n";
+  glDeleteTextures(n, textures);
+  gl_error_check("glDeleteTextures");
 }
 
 //------------------------------------------------------------------------------

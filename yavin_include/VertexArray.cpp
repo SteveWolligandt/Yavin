@@ -6,29 +6,25 @@ namespace Yavin {
 
 VertexArray::VertexArray() { gl::create_vertex_arrays(1, &m_gl_handle); }
 
-VertexArray::VertexArray(const VertexArray& other) {
-  gl::create_vertex_arrays(1, &m_gl_handle);
-}
+// VertexArray::VertexArray(const VertexArray& other) {
+//   gl::create_vertex_arrays(1, &m_gl_handle);
+// }
 
-VertexArray::VertexArray(VertexArray&& other) {
-  other.m_delete = false;
-  m_gl_handle    = other.m_gl_handle;
-}
+VertexArray::VertexArray(VertexArray&& other)
+    : m_gl_handle(std::exchange(other.m_gl_handle, 0)) {}
 
-VertexArray& VertexArray::operator=(const VertexArray& other) {
-  destroy_handle();
-  gl::create_vertex_arrays(1, &m_gl_handle);
-  return *this;
-}
+// VertexArray& VertexArray::operator=(const VertexArray& other) {
+//   destroy_handle();
+//   gl::create_vertex_arrays(1, &m_gl_handle);
+//   return *this;
+// }
 
 VertexArray& VertexArray::operator=(VertexArray&& other) {
-  std::swap(m_gl_handle, other.m_gl_handle);
+  m_gl_handle = std::exchange(other.m_gl_handle, 0);
   return *this;
 }
 
-VertexArray::~VertexArray() {
-  if (m_delete) gl::delete_vertex_arrays(1, &m_gl_handle);
-}
+VertexArray::~VertexArray() { destroy_handle(); }
 
 void VertexArray::destroy_handle() {
   if (m_gl_handle != 0) gl::delete_buffers(1, &m_gl_handle);

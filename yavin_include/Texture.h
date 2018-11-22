@@ -2,10 +2,11 @@
 #define __YAVIN_TEXTURE_H__
 
 #include <iostream>
+#include <utility>
 #include "Texture.h"
 #include "Type.h"
 #include "error_check.h"
-#include "gl_includes.h"
+#include "gl_functions.h"
 
 //==============================================================================
 namespace Yavin {
@@ -30,19 +31,16 @@ class Texture {
     LINEAR_MIPMAP_LINEAR   = GL_LINEAR_MIPMAP_LINEAR
   };
 
-  Texture() {}
+  Texture() : m_id{0} {}
+  Texture(Texture&& other) : m_id{std::exchange(other.m_id, 0)} {}
   ~Texture() {
-    if (!m_dont_delete) {
-      glDeleteTextures(1, &m_id);
-      gl_error_check("glDeleteTextures");
-    }
+    if (m_id) { gl::delete_textures(1, &m_id); }
   }
 
-  const GLuint& id() const { return m_id; }
+  auto id() const { return m_id; }
 
  protected:
   GLuint m_id;
-  bool   m_dont_delete = false;
 };
 
 //==============================================================================

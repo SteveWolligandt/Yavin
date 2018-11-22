@@ -9,15 +9,17 @@
 #include "dll_export.h"
 #include "gl_functions.h"
 
+//==============================================================================
 namespace Yavin {
+//==============================================================================
 class VertexArray {
  public:
   using this_t = VertexArray;
 
   DLL_API VertexArray();
-  DLL_API VertexArray(const VertexArray& other);
+  DLL_API VertexArray(const VertexArray& other) = delete;
   DLL_API VertexArray(VertexArray&& other);
-  DLL_API VertexArray& operator=(const VertexArray& other);
+  DLL_API VertexArray& operator=(const VertexArray& other) = delete;
   DLL_API VertexArray& operator=(VertexArray&& other);
   DLL_API ~VertexArray();
 
@@ -40,8 +42,9 @@ class VertexArray {
 
  protected:
   GLuint m_gl_handle;
-  bool   m_delete = true;
 };
+//==============================================================================
 }  // namespace Yavin
+//==============================================================================
 
 #endif

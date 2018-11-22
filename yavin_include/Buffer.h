@@ -54,10 +54,10 @@ class BufferMap {
   auto&       operator[](size_t i) { return at(i); }
   const auto& operator[](size_t i) const { return at(i); }
 
-  auto       begin() { return m_gpu_mapping; }
-  auto       end() { return m_gpu_mapping + m_length; }
-  const auto begin() const { return m_gpu_mapping; }
-  const auto end() const { return m_gpu_mapping + m_length; }
+  auto begin() { return m_gpu_mapping; }
+  auto end() { return m_gpu_mapping + m_length; }
+  auto begin() const { return m_gpu_mapping; }
+  auto end() const { return m_gpu_mapping + m_length; }
 
   auto offset() const { return m_offset; }
   auto length() const { return m_length; }
@@ -453,7 +453,6 @@ class Buffer {
   auto end() const { return const_iterator_t(this, m_size); }
 
   auto gl_handle() { return m_gl_handle; }
-  auto will_be_deleted() { return m_delete; }
 
   auto map() { return rw_map_t(this, 0, m_size); }
   auto map() const { return r_map_t(this, 0, m_size); }
@@ -469,7 +468,6 @@ class Buffer {
   GLuint  m_gl_handle;
   size_t  m_size     = 0;
   size_t  m_capacity = 0;
-  bool    m_delete   = true;
   usage_t m_usage;
 };
 
@@ -484,8 +482,7 @@ Buffer<array_type, T>::Buffer(usage_t usage) : m_usage(usage) {
 
 template <GLsizei array_type, typename T>
 Buffer<array_type, T>::Buffer(const Buffer& other) : Buffer(other.m_usage) {
-  m_delete = other.m_delete;
-  m_usage  = other.m_usage;
+  m_usage = other.m_usage;
   copy(other);
 }
 
@@ -496,16 +493,13 @@ Buffer<array_type, T>::Buffer(Buffer&& other)
     : m_gl_handle(std::exchange(other.m_gl_handle, 0)),
       m_size(std::exchange(other.m_size, 0)),
       m_capacity(std::exchange(other.m_capacity, 0)),
-      m_usage(other.m_usage) {
-  other.m_delete = false;
-}
+      m_usage(other.m_usage) {}
 
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
 Buffer<array_type, T>& Buffer<array_type, T>::operator=(const Buffer& other) {
-  m_delete = other.m_delete;
-  m_usage  = other.m_usage;
+  m_usage = other.m_usage;
   copy(other);
   return *this;
 }
@@ -550,7 +544,7 @@ Buffer<array_type, T>::Buffer(const std::vector<T>& data, usage_t usage)
 
 template <GLsizei array_type, typename T>
 Buffer<array_type, T>::~Buffer() {
-  if (m_delete) destroy_handle();
+  destroy_handle();
 }
 
 //------------------------------------------------------------------------------

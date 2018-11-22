@@ -23,18 +23,18 @@ void FrameBuffer::attachTex2D(const Texture2D<T, Components>& tex,
   gl_framebuffer_not_complete_check(m_id);
 }
 
-template void FrameBuffer::attachTex2D<float, R>(
-    const Texture2D<float, R>&, unsigned int);
-template void FrameBuffer::attachTex2D<int8_t, R>(
-    const Texture2D<int8_t, R>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint8_t, R>(
-    const Texture2D<uint8_t, R>&, unsigned int);
-template void FrameBuffer::attachTex2D<int16_t, R>(
-    const Texture2D<int16_t, R>&, unsigned int);
+template void FrameBuffer::attachTex2D<float, R>(const Texture2D<float, R>&,
+                                                 unsigned int);
+template void FrameBuffer::attachTex2D<int8_t, R>(const Texture2D<int8_t, R>&,
+                                                  unsigned int);
+template void FrameBuffer::attachTex2D<uint8_t, R>(const Texture2D<uint8_t, R>&,
+                                                   unsigned int);
+template void FrameBuffer::attachTex2D<int16_t, R>(const Texture2D<int16_t, R>&,
+                                                   unsigned int);
 template void FrameBuffer::attachTex2D<uint16_t, R>(
     const Texture2D<uint16_t, R>&, unsigned int);
-template void FrameBuffer::attachTex2D<int32_t, R>(
-    const Texture2D<int32_t, R>&, unsigned int);
+template void FrameBuffer::attachTex2D<int32_t, R>(const Texture2D<int32_t, R>&,
+                                                   unsigned int);
 template void FrameBuffer::attachTex2D<uint32_t, R>(
     const Texture2D<uint32_t, R>&, unsigned int);
 
@@ -66,6 +66,21 @@ template void FrameBuffer::attachTex2D<int32_t, RGB>(
     const Texture2D<int32_t, RGB>&, unsigned int);
 template void FrameBuffer::attachTex2D<uint32_t, RGB>(
     const Texture2D<uint32_t, RGB>&, unsigned int);
+
+template void FrameBuffer::attachTex2D<float, RG>(const Texture2D<float, RG>&,
+                                                  unsigned int);
+template void FrameBuffer::attachTex2D<int8_t, RG>(const Texture2D<int8_t, RG>&,
+                                                   unsigned int);
+template void FrameBuffer::attachTex2D<uint8_t, RG>(
+    const Texture2D<uint8_t, RG>&, unsigned int);
+template void FrameBuffer::attachTex2D<int16_t, RG>(
+    const Texture2D<int16_t, RG>&, unsigned int);
+template void FrameBuffer::attachTex2D<uint16_t, RG>(
+    const Texture2D<uint16_t, RG>&, unsigned int);
+template void FrameBuffer::attachTex2D<int32_t, RG>(
+    const Texture2D<int32_t, RG>&, unsigned int);
+template void FrameBuffer::attachTex2D<uint32_t, RG>(
+    const Texture2D<uint32_t, RG>&, unsigned int);
 
 void FrameBuffer::bind() { gl::bind_framebuffer(GL_FRAMEBUFFER, m_id); }
 void FrameBuffer::unbind() { gl::bind_framebuffer(GL_FRAMEBUFFER, 0); }
