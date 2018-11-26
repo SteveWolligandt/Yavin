@@ -58,7 +58,7 @@ const std::string gl_framebuffer_error_to_string(GLenum status) {
 
 //------------------------------------------------------------------------------
 
-void _gl_error_check(const std::string& function, const std::string& file,
+void _gl_error_check(const std::string& function, const char* file,
                      size_t line) {
   auto err     = gl::get_error();
   auto err_str = gl_error_to_string(err);

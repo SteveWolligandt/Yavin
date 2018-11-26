@@ -87,7 +87,6 @@ TEST_CASE("IBO move assignment") {
 
   REQUIRE(ibo.size() == 0);
   REQUIRE(ibo.capacity() == 0);
-  REQUIRE(ibo.will_be_deleted() == false);
   REQUIRE(ibo.gl_handle() == 0);
   REQUIRE(moved.gl_handle() == ibo_handle);
 
