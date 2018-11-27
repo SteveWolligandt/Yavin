@@ -18,30 +18,90 @@ namespace Yavin {
 
 template <typename T, typename Components>
 class Texture2D : public Yavin::Texture {
+  constexpr static InterpolationMode default_interpolation = LINEAR;
+  constexpr static WrapMode          default_wrap_mode     = REPEAT;
+
  public:
-  Texture2D(const std::string& filepath);
   // Texture2D(const Texture2D& other);
   Texture2D(Texture2D&& other);
-  Texture2D(unsigned int width, unsigned int height);
+
+  Texture2D(const std::string& filepath)
+      : Texture2D(filepath, default_interpolation, default_interpolation,
+                  default_wrap_mode, default_wrap_mode) {}
+  Texture2D(const std::string& filepath, InterpolationMode interp_mode,
+            WrapMode wrap_mode)
+      : Texture2D(filepath, interp_mode, interp_mode, wrap_mode, wrap_mode) {}
+  Texture2D(const std::string& filepath, InterpolationMode interp_mode_min,
+            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
+            WrapMode wrap_mode_t);
+
+  Texture2D(unsigned int width, unsigned int height)
+      : Texture2D(width, height, default_interpolation, default_interpolation,
+                  default_wrap_mode, default_wrap_mode) {}
   Texture2D(unsigned int width, unsigned int height,
-            const std::vector<T>& data);
+            InterpolationMode interp_mode, WrapMode wrap_mode)
+      : Texture2D(width, height, interp_mode, interp_mode, wrap_mode,
+                  wrap_mode) {}
+  Texture2D(unsigned int width, unsigned int height,
+            InterpolationMode interp_mode_min,
+            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
+            WrapMode wrap_mode_t);
+
+  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data)
+      : Texture2D(width, height, data, default_interpolation,
+                  default_interpolation, default_wrap_mode, default_wrap_mode) {
+  }
+  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
+            InterpolationMode interp_mode, WrapMode wrap_mode)
+      : Texture2D(width, height, data, interp_mode, interp_mode, wrap_mode,
+                  wrap_mode) {}
+  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
+            InterpolationMode interp_mode_min = default_interpolation,
+            InterpolationMode interp_mode_mag = default_interpolation,
+            WrapMode          wrap_mode_s     = default_wrap_mode,
+            WrapMode          wrap_mode_t     = default_wrap_mode);
 
   template <typename S>
-  Texture2D(unsigned int width, unsigned int height,
-            const std::vector<S>& data);
+  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data)
+      : Texture2D(width, height, data, default_interpolation,
+                  default_interpolation, default_wrap_mode, default_wrap_mode) {
+  }
+  template <typename S>
+  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
+            InterpolationMode interp_mode, WrapMode wrap_mode)
+      : Texture2D(width, height, data, interp_mode, interp_mode, wrap_mode,
+                  wrap_mode) {}
+
+  template <typename S>
+  Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
+            InterpolationMode interp_mode_min,
+            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
+            WrapMode wrap_mode_t);
 
   void        bind(unsigned int i = 0) const;
   static void unbind(unsigned int i = 0);
   void        bind_image_texture(unsigned int i = 0) const;
   static void unbind_image_texture(unsigned int i = 0);
 
-  void set_interpolation_mode(Yavin::Texture::InterpolationMode mode);
-  void set_interpolation_mode_min(Yavin::Texture::InterpolationMode mode);
-  void set_interpolation_mode_mag(Yavin::Texture::InterpolationMode mode);
+  void set_interpolation_mode(InterpolationMode mode);
+  void set_interpolation_mode_min(InterpolationMode mode);
+  void set_interpolation_mode_mag(InterpolationMode mode);
 
-  void set_wrap_mode(Yavin::Texture::WrapMode mode);
-  void set_wrap_mode_s(Yavin::Texture::WrapMode mode);
-  void set_wrap_mode_t(Yavin::Texture::WrapMode mode);
+  void set_wrap_mode(WrapMode mode);
+  void set_wrap_mode_s(WrapMode mode);
+  void set_wrap_mode_t(WrapMode mode);
+
+  template <typename _Components = Components,
+            typename = std::enable_if<std::is_same_v<_Components, Depth>>>
+  void set_compare_func(CompareFunc f) {
+    gl::texture_parameter_i(m_id, GL_TEXTURE_COMPARE_FUNC, f);
+  }
+
+  template <typename _Components = Components,
+            typename = std::enable_if<std::is_same_v<_Components, Depth>>>
+  void set_compare_mode(CompareMode m) {
+    gl::texture_parameter_i(m_id, GL_TEXTURE_COMPARE_MODE, m);
+  }
 
   auto width() const;
   auto height() const;
@@ -73,20 +133,35 @@ class Texture2D : public Yavin::Texture {
 };
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(const std::string& filepath) {
+Texture2D<T, Components>::Texture2D(const std::string& filepath,
+                                    InterpolationMode  interp_mode_min,
+                                    InterpolationMode  interp_mode_mag,
+                                    WrapMode           wrap_mode_s,
+                                    WrapMode           wrap_mode_t) {
   gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   assert(filepath.substr(filepath.size() - 3, 3) == "png");
   bind();
   load_png(filepath);
+  set_interpolation_mode_min(interp_mode_min);
+  set_interpolation_mode_mag(interp_mode_mag);
+  set_wrap_mode_s(wrap_mode_s);
+  set_wrap_mode_t(wrap_mode_t);
 }
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height)
+Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
+                                    InterpolationMode interp_mode_min,
+                                    InterpolationMode interp_mode_mag,
+                                    WrapMode wrap_mode_s, WrapMode wrap_mode_t)
     : Texture(), m_width(0), m_height(0) {
   gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   bind();
   resize(width, height);
   m_is_consistent = false;
+  set_interpolation_mode_min(interp_mode_min);
+  set_interpolation_mode_mag(interp_mode_mag);
+  set_wrap_mode_s(wrap_mode_s);
+  set_wrap_mode_t(wrap_mode_t);
 }
 
 // template <typename T, typename Components>
@@ -108,17 +183,27 @@ Texture2D<T, Components>::Texture2D(Texture2D&& other)
 
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<T>& data)
+                                    const std::vector<T>& data,
+                                    InterpolationMode     interp_mode_min,
+                                    InterpolationMode     interp_mode_mag,
+                                    WrapMode wrap_mode_s, WrapMode wrap_mode_t)
     : Texture(), m_width(width), m_height(height) {
   gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   bind();
   upload_data(data);
+  set_interpolation_mode_min(interp_mode_min);
+  set_interpolation_mode_mag(interp_mode_mag);
+  set_wrap_mode_s(wrap_mode_s);
+  set_wrap_mode_t(wrap_mode_t);
 }
 
 template <typename T, typename Components>
 template <typename S>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<S>& _data)
+                                    const std::vector<S>& _data,
+                                    InterpolationMode     interp_mode_min,
+                                    InterpolationMode     interp_mode_mag,
+                                    WrapMode wrap_mode_s, WrapMode wrap_mode_t)
     : Texture(), m_width(width), m_height(height) {
   std::vector<T> data;
   data.reserve(_data.size());
@@ -126,6 +211,10 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
   gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   bind();
   upload_data(data);
+  set_interpolation_mode_min(interp_mode_min);
+  set_interpolation_mode_mag(interp_mode_mag);
+  set_wrap_mode_s(wrap_mode_s);
+  set_wrap_mode_t(wrap_mode_t);
 }
 
 template <typename T, typename Components>

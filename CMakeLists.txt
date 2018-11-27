@@ -12,6 +12,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "-fdiagnostics-color=always")
 endif()
 
+set(OpenGL_GL_PREFERENCE "GLVND")
 # try to find required packages
 find_path(GLEW_INCLUDE_DIR GL/glew.h)
 find_library(GLEW_LIBRARY NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
@@ -41,7 +42,6 @@ configure_file(yavin_include/gl_verbose.cpp.in yavin_include/gl_verbose.cpp)
 # create library target
 add_library(yavin SHARED ${YAVIN_SOURCES} ${CMAKE_BINARY_DIR}/yavin_include/gl_verbose.cpp ${YAVIN_HEADERS})
 target_compile_definitions(yavin PRIVATE DLL_EXPORT)
-message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(yavin PRIVATE 
   ${CMAKE_BINARY_DIR}/yavin_include
 )
@@ -61,12 +61,13 @@ target_link_libraries(yavin
   ${PNG_LIBRARIES} 
   ${PNG+_LIBRARIES}
   ${GLEW_LIBRARY}
-  )
+)
+
+export(TARGETS yavin FILE yavinConfig.cmake)
 
 option(BUILD_TESTS "Build tests" OFF)
 # This makes the project importable from the build directory
 if (BUILD_TESTS)
-  export(TARGETS yavin FILE yavinConfig.cmake)
   configure_file(yavin_include/shader_include_paths.h.in yavin_include/shader_include_paths.h)
   add_subdirectory(test)
 endif (BUILD_TESTS)

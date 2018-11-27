@@ -53,10 +53,8 @@ template class Texture2D<float, RGBA>;
 template class Texture2D<float, BGR>;
 template class Texture2D<float, BGRA>;
 
-template class Texture2D<int8_t, Depth8>;
-template class Texture2D<int16_t, Depth16>;
-template class Texture2D<float, Depth24>;
-template class Texture2D<float, Depth32>;
+template class Texture2D<uint32_t, Depth>;
+template class Texture2D<float, Depth>;
 
 //==============================================================================
 }  // namespace Yavin

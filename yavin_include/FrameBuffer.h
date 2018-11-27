@@ -19,6 +19,8 @@ class FrameBuffer {
   template <typename T, typename Components>
   DLL_API void attachTex2D(const Texture2D<T, Components>& tex,
                            unsigned int                    i = 0);
+  template <typename T>
+  DLL_API void attachDepth(const Texture2D<T, Depth>& depth_tex);
 
   DLL_API void        bind();
   DLL_API static void unbind();

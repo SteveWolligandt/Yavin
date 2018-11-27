@@ -23,6 +23,12 @@ void FrameBuffer::attachTex2D(const Texture2D<T, Components>& tex,
   gl_framebuffer_not_complete_check(m_id);
 }
 
+template <typename T>
+void FrameBuffer::attachDepth(const Texture2D<T, Depth>& tex) {
+  gl::named_framebuffer_texture(m_id, GL_DEPTH_ATTACHMENT, tex.id(), 0);
+  gl_framebuffer_not_complete_check(m_id);
+}
+
 template void FrameBuffer::attachTex2D<float, R>(const Texture2D<float, R>&,
                                                  unsigned int);
 template void FrameBuffer::attachTex2D<int8_t, R>(const Texture2D<int8_t, R>&,
@@ -66,6 +72,10 @@ template void FrameBuffer::attachTex2D<int32_t, RGB>(
     const Texture2D<int32_t, RGB>&, unsigned int);
 template void FrameBuffer::attachTex2D<uint32_t, RGB>(
     const Texture2D<uint32_t, RGB>&, unsigned int);
+
+template void FrameBuffer::attachDepth<uint32_t>(
+    const Texture2D<uint32_t, Depth>&);
+template void FrameBuffer::attachDepth<float>(const Texture2D<float, Depth>&);
 
 template void FrameBuffer::attachTex2D<float, RG>(const Texture2D<float, RG>&,
                                                   unsigned int);

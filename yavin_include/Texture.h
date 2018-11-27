@@ -31,6 +31,21 @@ class Texture {
     LINEAR_MIPMAP_LINEAR   = GL_LINEAR_MIPMAP_LINEAR
   };
 
+  enum CompareFunc {
+    NEVER    = GL_NEVER,
+    LESS     = GL_LESS,
+    LEQUAL   = GL_LEQUAL,
+    GREATER  = GL_GREATER,
+    NOTEQUAL = GL_NOTEQUAL,
+    GEQUAL   = GL_GEQUAL,
+    ALWAYS   = GL_ALWAYS
+  };
+
+  enum CompareMode {
+    COMPARE_R_TO_TEXTURE = GL_COMPARE_R_TO_TEXTURE,
+    NONE                 = GL_NONE
+  };
+
   Texture() : m_id{0} {}
   Texture(Texture&& other) : m_id{std::exchange(other.m_id, 0)} {}
   ~Texture() {

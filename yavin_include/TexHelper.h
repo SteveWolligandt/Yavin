@@ -15,10 +15,7 @@ struct RGBA {};
 
 struct BGR {};
 struct BGRA {};
-struct Depth8 {};
-struct Depth16 {};
-struct Depth24 {};
-struct Depth32 {};
+struct Depth {};
 
 //==============================================================================
 namespace TexHelper {
@@ -372,31 +369,15 @@ struct comb<float, BGRA> {
 
 /////// Depth
 template <>
-struct comb<int8_t, Depth8> {
-  static constexpr GLint        internal_format = GL_DEPTH_COMPONENT;
+struct comb<uint32_t, Depth> {
+  static constexpr GLint        internal_format = GL_DEPTH_COMPONENT32;
   static constexpr GLenum       format          = GL_DEPTH_COMPONENT;
-  static constexpr GLenum       type            = GL_FLOAT;
+  static constexpr GLenum       type            = GL_UNSIGNED_INT;
   static constexpr unsigned int num_components  = 1;
 };
 
 template <>
-struct comb<int16_t, Depth16> {
-  static constexpr GLint        internal_format = GL_DEPTH_COMPONENT16;
-  static constexpr GLenum       format          = GL_DEPTH_COMPONENT;
-  static constexpr GLenum       type            = GL_FLOAT;
-  static constexpr unsigned int num_components  = 1;
-};
-
-template <>
-struct comb<float, Depth24> {
-  static constexpr GLint        internal_format = GL_DEPTH_COMPONENT24;
-  static constexpr GLenum       format          = GL_DEPTH_COMPONENT;
-  static constexpr GLenum       type            = GL_FLOAT;
-  static constexpr unsigned int num_components  = 1;
-};
-
-template <>
-struct comb<float, Depth32> {
+struct comb<float, Depth> {
   static constexpr GLint        internal_format = GL_DEPTH_COMPONENT32;
   static constexpr GLenum       format          = GL_DEPTH_COMPONENT;
   static constexpr GLenum       type            = GL_FLOAT;

@@ -24,8 +24,7 @@ const std::regex ShaderStageParser::regex_var(
  * <any>    <- path
  * "        <- string end
  */
-const std::regex ShaderStageParser::regex_include(
-    R"(#include\s+\"(.*)\")");
+const std::regex ShaderStageParser::regex_include(R"(#include\s+\"(.*)\")");
 
 //==============================================================================
 
@@ -35,7 +34,7 @@ std::string ShaderStageParser::parse(const std::string&    filename_or_source,
                                      StringType            string_type) {
   if (string_type == FILE)
     return parse_file(filename_or_source, vars, include_tree);
-  else if (string_type == SOURCE)
+  else /*if (string_type == SOURCE)*/
     return parse_source(filename_or_source, vars, include_tree);
 }
 
