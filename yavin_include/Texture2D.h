@@ -107,7 +107,7 @@ class Texture2D : public Yavin::Texture {
   auto height() const;
 
   void load_png(const std::string& filepath);
-  void save_png(const std::string& filepath);
+  void save_png(const std::string& filepath, T scale_factor = 1);
 
  private:
   void upload_data(const std::vector<T>& data);
@@ -352,7 +352,8 @@ void Texture2D<T, Components>::load_png(const std::string& filepath) {
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::save_png(const std::string& filepath) {
+void Texture2D<T, Components>::save_png(const std::string& filepath,
+                                        T                  scale_factor) {
   auto data = download_data();
   if constexpr (std::is_same<Components, RGB>::value) {
     png::image<png::rgb_pixel> image(m_width, m_height);
@@ -425,14 +426,16 @@ void Texture2D<T, Components>::save_png(const std::string& filepath) {
     png::image<png::rgb_pixel> image(m_width, m_height);
     for (unsigned int y = 0; y < image.get_height(); ++y)
       for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        unsigned int idx                           = x + m_width * y;
-        image[image.get_height() - 1 - y][x].red   = data[idx];
-        image[image.get_height() - 1 - y][x].green = data[idx];
-        image[image.get_height() - 1 - y][x].blue  = data[idx];
+        unsigned int idx = x + m_width * y;
         if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].red *= 255.0f;
-          image[image.get_height() - 1 - y][x].green *= 255.0f;
-          image[image.get_height() - 1 - y][x].blue *= 255.0f;
+          image[image.get_height() - 1 - y][x].red =
+              image[image.get_height() - 1 - y][x].green =
+                  image[image.get_height() - 1 - y][x].blue =
+                      data[idx] * 255.0f * scale_factor;
+        } else {
+          image[image.get_height() - 1 - y][x].red   = data[idx];
+          image[image.get_height() - 1 - y][x].green = data[idx];
+          image[image.get_height() - 1 - y][x].blue  = data[idx];
         }
       }
     image.write(filepath);
