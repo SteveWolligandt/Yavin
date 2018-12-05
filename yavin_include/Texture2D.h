@@ -377,16 +377,17 @@ void Texture2D<T, Components>::save_png(const std::string& filepath,
     png::image<png::rgba_pixel> image(m_width, m_height);
     for (unsigned int y = 0; y < image.get_height(); ++y)
       for (unsigned int x = 0; x < image.get_width(); ++x) {
-        unsigned int idx                           = x + m_width * y;
-        image[image.get_height() - 1 - y][x].red   = data[idx * n];
-        image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
-        image[image.get_height() - 1 - y][x].blue  = data[idx * n + 2];
-        image[image.get_height() - 1 - y][x].alpha = data[idx * n + 3];
+        unsigned int idx = x + m_width * y;
         if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].red *= 255.0f;
-          image[image.get_height() - 1 - y][x].green *= 255.0f;
-          image[image.get_height() - 1 - y][x].blue *= 255.0f;
-          image[image.get_height() - 1 - y][x].alpha *= 255.0f;
+          image[image.get_height() - 1 - y][x].red   = data[idx * n] * 255.0f;
+          image[image.get_height() - 1 - y][x].green = data[idx * n] * 255.0f;
+          image[image.get_height() - 1 - y][x].blue  = data[idx * n] * 255.0f;
+          image[image.get_height() - 1 - y][x].alpha = data[idx * n] * 255.0f;
+        } else {
+          image[image.get_height() - 1 - y][x].red   = data[idx * n];
+          image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
+          image[image.get_height() - 1 - y][x].blue  = data[idx * n + 2];
+          image[image.get_height() - 1 - y][x].alpha = data[idx * n + 3];
         }
       }
     image.write(filepath);
