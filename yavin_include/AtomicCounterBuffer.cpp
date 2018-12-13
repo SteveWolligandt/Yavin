@@ -74,6 +74,12 @@ void AtomicCounterBuffer::bind(size_t i) {
   gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
 }
 
+//------------------------------------------------------------------------------
+
+void AtomicCounterBuffer::unbind(size_t i) {
+  gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, 0);
+}
+
 //==============================================================================
 }  // namespace Yavin
 //==============================================================================

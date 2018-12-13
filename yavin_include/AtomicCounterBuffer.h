@@ -35,6 +35,7 @@ class AtomicCounterBuffer
   DLL_API void set_all_to(unsigned int val);
   void         to_zero() { set_all_to(0); }
   DLL_API void bind(size_t i);
+  DLL_API static void unbind(size_t i);
 };
 
 //==============================================================================
