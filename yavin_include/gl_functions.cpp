@@ -9,7 +9,7 @@ namespace Yavin {
 
 void gl::enable(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glEnable\n";
+  if (verbose) *out << "glEnable(" << to_string(cap) << ")\n";
   glEnable(cap);
   gl_error_check("glEnable");
 }
@@ -18,7 +18,7 @@ void gl::enable(GLenum cap) {
 
 GLboolean gl::is_enabled(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glIsEnabled\n";
+  if (verbose) *out << "glIsEnabled(" << to_string(cap) << ")\n";
   auto result = glIsEnabled(cap);
   gl_error_check("glIsEnabled");
   return result;
@@ -28,7 +28,7 @@ GLboolean gl::is_enabled(GLenum cap) {
 
 void gl::disable(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDisable\n";
+  if (verbose) *out << "glDisable(" << to_string(cap) << ")\n";
   glDisable(cap);
   gl_error_check("glDisable");
 }
@@ -62,7 +62,9 @@ void gl::clear(GLbitfield mask) {
 
 void gl::clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glClearColor\n";
+  if (verbose)
+    *out << "glClearColor(" << red << ", " << green << ", " << blue << ", "
+         << alpha << ")\n";
   glClearColor(red, green, blue, alpha);
   gl_error_check("glClearColor");
 }
@@ -71,7 +73,9 @@ void gl::clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
 
 void gl::viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glViewport\n";
+  if (verbose)
+    *out << "glViewport(" << x << ", " << y << ", " << width << ", " << height
+         << ")\n";
   glViewport(x, y, width, height);
   gl_error_check("glViewport");
 }
@@ -93,7 +97,7 @@ void gl::flush() {
 
 void gl::depth_mask(GLboolean flag) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDepthMask\n";
+  if (verbose) *out << "glDepthMask(" << flag << ")\n";
   glDepthMask(flag);
   gl_error_check("glDepthMask");
 }
@@ -102,7 +106,7 @@ void gl::depth_mask(GLboolean flag) {
 
 void gl::blend_func(GLenum sfactor, GLenum dfactor) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glBlendFunc\n";
+  if (verbose) *out << "glBlendFunc(" << sfactor << ", " << dfactor << ")\n";
   glBlendFunc(sfactor, dfactor);
   gl_error_check("glBlendFunc");
 }
@@ -111,7 +115,9 @@ void gl::blend_func(GLenum sfactor, GLenum dfactor) {
 
 void gl::blend_funci(GLuint buf, GLenum sfactor, GLenum dfactor) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glBlendFunci\n";
+  if (verbose)
+    *out << "glBlendFunci(" << buf << ", " << sfactor << ", " << dfactor
+         << ")\n";
   glBlendFunci(buf, sfactor, dfactor);
   gl_error_check("glBlendFunci");
 }
@@ -122,7 +128,7 @@ void gl::blend_funci(GLuint buf, GLenum sfactor, GLenum dfactor) {
 
 void gl::enable_vertex_attrib_array(GLuint index) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glEnableVertexAttribArray\n";
+  if (verbose) *out << "glEnableVertexAttribArray(" << index << ")\n";
   glEnableVertexAttribArray(index);
   gl_error_check("glEnableVertexAttribArray");
 }
@@ -131,7 +137,7 @@ void gl::enable_vertex_attrib_array(GLuint index) {
 
 void gl::disable_vertex_attrib_array(GLuint index) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDisableVertexAttribArray\n";
+  if (verbose) *out << "glDisableVertexAttribArray(" << index << ")\n";
   glDisableVertexAttribArray(index);
   gl_error_check("glDisableVertexAttribArray");
 }
@@ -140,7 +146,8 @@ void gl::disable_vertex_attrib_array(GLuint index) {
 
 void gl::enable_vertex_attrib_array(GLuint vaobj, GLuint index) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glEnableVertexArrayAttrib\n";
+  if (verbose)
+    *out << "glEnableVertexArrayAttrib(" << vaobj << ", " << index << ")\n";
   glEnableVertexArrayAttrib(vaobj, index);
   gl_error_check("glEnableVertexArrayAttrib");
 }
@@ -396,7 +403,7 @@ void gl::delete_program(GLuint program) {
 
 void gl::use_program(GLuint program) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glUseProgram\n";
+  if (verbose) *out << "glUseProgram(" << program << ")\n";
   glUseProgram(program);
   gl_error_check("glUseProgram");
 }
@@ -853,8 +860,13 @@ GLint gl::get_uniform_location(GLuint program, const GLchar* name) {
 
 void gl::create_textures(GLenum target, GLsizei n, GLuint* textures) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateTextures\n";
   glCreateTextures(target, n, textures);
+  if (verbose) {
+    *out << "glCreateTextures(" << to_string(target) << ", " << n << ", "
+         << textures << ") = [ ";
+    for (GLsizei i = 0; i < n; ++i) *out << textures[i] << ' ';
+    *out << "]\n";
+  }
   gl_error_check("glCreateTextures");
 }
 
@@ -871,7 +883,7 @@ void gl::delete_textures(GLsizei n, GLuint* textures) {
 
 void gl::active_texture(GLenum texture) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glActiveTexture\n";
+  if (verbose) *out << "glActiveTexture(" << texture - GL_TEXTURE0 << ")\n";
   glActiveTexture(texture);
   gl_error_check("glActiveTexture");
 }
@@ -880,7 +892,8 @@ void gl::active_texture(GLenum texture) {
 
 void gl::bind_texture(GLenum target, GLuint texture) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glBindTexture(" << target << ", " << texture << ")\n";
+  if (verbose)
+    *out << "glBindTexture(" << to_string(target) << ", " << texture << ")\n";
   glBindTexture(target, texture);
   gl_error_check("glBindTexture");
 }
@@ -891,7 +904,10 @@ void gl::bind_image_texture(GLuint unit, GLuint texture, GLint level,
                             GLboolean layered, GLint layer, GLenum access,
                             GLenum format) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glBindImageTexture\n";
+  if (verbose)
+    *out << "glBindImageTexture(" << unit << ", " << texture << ", " << level
+         << ", " << layered << ", " << layer << ", " << access << ", " << format
+         << ")\n";
   glBindImageTexture(unit, texture, level, layered, layer, access, format);
   gl_error_check("glBindImageTexture");
 }
@@ -902,7 +918,10 @@ void gl::tex_image_2d(GLenum target, GLint level, GLint internalFormat,
                       GLsizei width, GLsizei height, GLint border,
                       GLenum format, GLenum type, const GLvoid* data) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTexImage2D\n";
+  if (verbose)
+    *out << "glTexImage2D(" << to_string(target) << ", " << level << ", "
+         << internalFormat << ", " << width << ", " << height << ", " << border
+         << ", " << to_string(format) << ", " << to_string(type) << ", " << data << ")\n";
   glTexImage2D(target, level, internalFormat, width, height, border, format,
                type, data);
   gl_error_check("glTexImage2D");

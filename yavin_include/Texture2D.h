@@ -18,19 +18,29 @@ namespace Yavin {
 
 template <typename T, typename Components>
 class Texture2D : public Yavin::Texture {
-  constexpr static InterpolationMode default_interpolation = LINEAR;
-  constexpr static WrapMode          default_wrap_mode     = REPEAT;
-
  public:
-  // Texture2D(const Texture2D& other);
+  static constexpr bool              is_float = std::is_same<float, T>::value;
+  static constexpr InterpolationMode default_interpolation = LINEAR;
+  static constexpr WrapMode          default_wrap_mode     = REPEAT;
+  template <typename C>
+  static constexpr bool is_loadable =
+      std::is_same_v<C, R> || std::is_same_v<C, RGB> ||
+      std::is_same_v<C, RGBA> || std::is_same_v<C, BGR> ||
+      std::is_same_v<C, BGRA>;
   Texture2D(Texture2D&& other);
 
+  template <typename c = Components,
+            typename   = std::enable_if_t<is_loadable<c>>>
   Texture2D(const std::string& filepath)
       : Texture2D(filepath, default_interpolation, default_interpolation,
                   default_wrap_mode, default_wrap_mode) {}
+  template <typename c = Components,
+            typename   = std::enable_if_t<is_loadable<c>>>
   Texture2D(const std::string& filepath, InterpolationMode interp_mode,
             WrapMode wrap_mode)
       : Texture2D(filepath, interp_mode, interp_mode, wrap_mode, wrap_mode) {}
+  template <typename c = Components,
+            typename   = std::enable_if_t<is_loadable<c>>>
   Texture2D(const std::string& filepath, InterpolationMode interp_mode_min,
             InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
             WrapMode wrap_mode_t);
@@ -106,7 +116,11 @@ class Texture2D : public Yavin::Texture {
   auto width() const;
   auto height() const;
 
+  template <typename c = Components,
+            typename   = std::enable_if_t<is_loadable<c>>>
   void load_png(const std::string& filepath);
+  template <typename c = Components,
+            typename   = std::enable_if_t<is_loadable<c>>>
   void save_png(const std::string& filepath, T scale_factor = 1);
 
  private:
@@ -132,7 +146,164 @@ class Texture2D : public Yavin::Texture {
   bool         m_is_consistent = false;
 };
 
+template <typename T, typename tex_t>
+struct tex_png;
+template <typename T>
+struct tex_png<T, R> {
+  static constexpr size_t n        = R::n;
+  using type                       = png::image<png::rgb_pixel>;
+  static constexpr auto load_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y) {
+    data.push_back(static_cast<T>(image[y - 1][x].red));
+    data.push_back(static_cast<T>(image[y - 1][x].green));
+    data.push_back(static_cast<T>(image[y - 1][x].blue));
+  };
+  static constexpr auto save_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y, size_t idx,
+                                        float scale_factor) {
+    if constexpr (std::is_same_v<float, T>) {
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n] * 255.0f * scale_factor;
+    } else {
+      image[image.get_height() - 1 - y][x].red   = data[idx * n] * scale_factor;
+      image[image.get_height() - 1 - y][x].green = data[idx * n] * scale_factor;
+      image[image.get_height() - 1 - y][x].blue  = data[idx * n] * scale_factor;
+    }
+  };
+};
+template <typename T>
+struct tex_png<T, RGB> {
+  static constexpr size_t n        = RGB::n;
+  using type                       = png::image<png::rgb_pixel>;
+  static constexpr auto load_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y) {
+    data.push_back(static_cast<T>(image[y - 1][x].red));
+    data.push_back(static_cast<T>(image[y - 1][x].green));
+    data.push_back(static_cast<T>(image[y - 1][x].blue));
+  };
+  static constexpr auto save_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y, size_t idx,
+                                        float scale_factor) {
+    if constexpr (std::is_same_v<float, T>) {
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n + 2] * 255.0f * scale_factor;
+    } else {
+      image[image.get_height() - 1 - y][x].red = data[idx * n] * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * scale_factor;
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n + 2] * scale_factor;
+    }
+  };
+};
+template <typename T>
+struct tex_png<T, BGR> {
+  static constexpr size_t n        = BGR::n;
+  using type                       = png::image<png::rgb_pixel>;
+  static constexpr auto load_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y) {
+    data.push_back(static_cast<T>(image[y - 1][x].blue));
+    data.push_back(static_cast<T>(image[y - 1][x].green));
+    data.push_back(static_cast<T>(image[y - 1][x].red));
+  };
+  static constexpr auto save_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y, size_t idx,
+                                        float scale_factor) {
+    if constexpr (std::is_same_v<float, T>) {
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n + 2] * 255.0f * scale_factor;
+    } else {
+      image[image.get_height() - 1 - y][x].blue = data[idx * n] * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * scale_factor;
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n + 2] * scale_factor;
+    }
+  };
+};
+template <typename T>
+struct tex_png<T, RGBA> {
+  static constexpr size_t n        = RGBA::n;
+  using type                       = png::image<png::rgba_pixel>;
+  static constexpr auto load_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y) {
+    data.push_back(static_cast<T>(image[y - 1][x].red));
+    data.push_back(static_cast<T>(image[y - 1][x].green));
+    data.push_back(static_cast<T>(image[y - 1][x].blue));
+    data.push_back(static_cast<T>(image[y - 1][x].alpha));
+  };
+  static constexpr auto save_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y, size_t idx,
+                                        float scale_factor) {
+    if constexpr (std::is_same_v<float, T>) {
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n + 2] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].alpha =
+          data[idx * n + 3] * 255.0f * scale_factor;
+    } else {
+      image[image.get_height() - 1 - y][x].red = data[idx * n] * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * scale_factor;
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n + 2] * scale_factor;
+      image[image.get_height() - 1 - y][x].alpha =
+          data[idx * n + 3] * scale_factor;
+    }
+  };
+};
+template <typename T>
+struct tex_png<T, BGRA> {
+  static constexpr size_t n        = BGRA::n;
+  using type                       = png::image<png::rgba_pixel>;
+  static constexpr auto load_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y) {
+    data.push_back(static_cast<T>(image[y - 1][x].blue));
+    data.push_back(static_cast<T>(image[y - 1][x].green));
+    data.push_back(static_cast<T>(image[y - 1][x].red));
+    data.push_back(static_cast<T>(image[y - 1][x].alpha));
+  };
+  static constexpr auto save_pixel = [](std::vector<T>& data, type& image,
+                                        size_t x, size_t y, size_t idx,
+                                        float scale_factor) {
+    if constexpr (std::is_same_v<float, T>) {
+      image[image.get_height() - 1 - y][x].blue =
+          data[idx * n] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n + 2] * 255.0f * scale_factor;
+      image[image.get_height() - 1 - y][x].alpha =
+          data[idx * n + 3] * 255.0f * scale_factor;
+    } else {
+      image[image.get_height() - 1 - y][x].blue = data[idx * n] * scale_factor;
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * n + 1] * scale_factor;
+      image[image.get_height() - 1 - y][x].red =
+          data[idx * n + 2] * scale_factor;
+      image[image.get_height() - 1 - y][x].alpha =
+          data[idx * n + 3] * scale_factor;
+    }
+  };
+};
+
 template <typename T, typename Components>
+template <typename, typename>
 Texture2D<T, Components>::Texture2D(const std::string& filepath,
                                     InterpolationMode  interp_mode_min,
                                     InterpolationMode  interp_mode_mag,
@@ -163,17 +334,6 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
   set_wrap_mode_s(wrap_mode_s);
   set_wrap_mode_t(wrap_mode_t);
 }
-
-// template <typename T, typename Components>
-// Texture2D<T, Components>::Texture2D(const Texture2D& other)
-//     : Texture(),
-//       m_width(other.m_width),
-//       m_height(other.m_height),
-//       m_is_consistent(other.m_is_consistent) {
-//   gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
-//   bind();
-//   upload_data(true);
-// }
 
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(Texture2D&& other)
@@ -286,175 +446,39 @@ auto Texture2D<T, Components>::height() const {
 }
 
 template <typename T, typename Components>
+template <typename, typename>
 void Texture2D<T, Components>::load_png(const std::string& filepath) {
+  using tex_png_t = tex_png<T, Components>;
+  typename tex_png_t::type image;
+  image.read(filepath);
+  m_width  = image.get_width();
+  m_height = image.get_height();
   std::vector<T> data;
-  if constexpr (std::is_same<Components, RGB>::value) {
-    png::image<png::rgb_pixel> image;
-    image.read(filepath);
-    m_width  = image.get_width();
-    m_height = image.get_height();
-    data.reserve(m_width * m_height * n);
-    for (png::uint_32 y = image.get_height(); y > 0; --y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        data.push_back(static_cast<T>(image[y - 1][x].red));
-        data.push_back(static_cast<T>(image[y - 1][x].green));
-        data.push_back(static_cast<T>(image[y - 1][x].blue));
-      }
-    if constexpr (std::is_same<float, T>::value)
-      for (auto& date : data) date /= 255.0f;
-  } else if constexpr (std::is_same<Components, RGBA>::value) {
-    png::image<png::rgba_pixel> image;
-    image.read(filepath);
-    m_width  = image.get_width();
-    m_height = image.get_height();
-    data.reserve(m_width * m_height * n);
-    for (png::uint_32 y = image.get_height(); y > 0; --y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        data.push_back(static_cast<T>(image[y - 1][x].red));
-        data.push_back(static_cast<T>(image[y - 1][x].green));
-        data.push_back(static_cast<T>(image[y - 1][x].blue));
-        data.push_back(static_cast<T>(image[y - 1][x].alpha));
-      }
-    if constexpr (std::is_same<float, T>::value)
-      for (auto& date : data) date /= 255.0f;
-  } else if constexpr (std::is_same<Components, BGR>::value) {
-    png::image<png::rgb_pixel> image;
-    image.read(filepath);
-    m_width  = image.get_width();
-    m_height = image.get_height();
-    data.reserve(m_width * m_height * n);
-    for (png::uint_32 y = image.get_height(); y > 0; --y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        data.push_back(static_cast<T>(image[y - 1][x].blue));
-        data.push_back(static_cast<T>(image[y - 1][x].green));
-        data.push_back(static_cast<T>(image[y - 1][x].red));
-      }
-    if constexpr (std::is_same<float, T>::value)
-      for (auto& date : data) date /= 255.0f;
-  } else if constexpr (std::is_same<Components, BGRA>::value) {
-    png::image<png::rgba_pixel> image;
-    image.read(filepath);
-    m_width  = image.get_width();
-    m_height = image.get_height();
-    data.reserve(m_width * m_height * n);
-    for (png::uint_32 y = image.get_height(); y > 0; --y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        data.push_back(static_cast<T>(image[y - 1][x].blue));
-        data.push_back(static_cast<T>(image[y - 1][x].green));
-        data.push_back(static_cast<T>(image[y - 1][x].red));
-        data.push_back(static_cast<T>(image[y - 1][x].alpha));
-      }
-    if constexpr (std::is_same<float, T>::value)
-      for (auto& date : data) date /= 255.0f;
+  data.reserve(m_width * m_height * n);
+  for (png::uint_32 y = image.get_height(); y > 0; --y)
+    for (png::uint_32 x = 0; x < image.get_width(); ++x)
+      tex_png_t::load_pixel(data, image, x, y);
+  if constexpr (is_float) {
+    auto normalize = [](auto d) { return d / 255.0f; };
+    std::transform(begin(data), end(data), begin(data), normalize);
   }
 
   upload_data(data);
 }
 
 template <typename T, typename Components>
+template <typename, typename>
 void Texture2D<T, Components>::save_png(const std::string& filepath,
                                         T                  scale_factor) {
-  auto data = download_data();
-  if constexpr (std::is_same<Components, RGB>::value) {
-    png::image<png::rgb_pixel> image(m_width, m_height);
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        unsigned int idx = x + m_width * y;
-        if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].red = data[idx * n] * 255.0f;
-          image[image.get_height() - 1 - y][x].green =
-              data[idx * n + 1] * 255.0f;
-          image[image.get_height() - 1 - y][x].blue =
-              data[idx * n + 2] * 255.0f;
-        } else {
-          image[image.get_height() - 1 - y][x].red   = data[idx * n];
-          image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
-          image[image.get_height() - 1 - y][x].blue  = data[idx * n + 2];
-        }
-      }
-    image.write(filepath);
-  } else if constexpr (std::is_same<Components, RGBA>::value) {
-    png::image<png::rgba_pixel> image(m_width, m_height);
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (unsigned int x = 0; x < image.get_width(); ++x) {
-        unsigned int idx = x + m_width * y;
-        if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].red   = data[idx * n] * 255.0f;
-          image[image.get_height() - 1 - y][x].green = data[idx * n] * 255.0f;
-          image[image.get_height() - 1 - y][x].blue  = data[idx * n] * 255.0f;
-          image[image.get_height() - 1 - y][x].alpha = data[idx * n] * 255.0f;
-        } else {
-          image[image.get_height() - 1 - y][x].red   = data[idx * n];
-          image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
-          image[image.get_height() - 1 - y][x].blue  = data[idx * n + 2];
-          image[image.get_height() - 1 - y][x].alpha = data[idx * n + 3];
-        }
-      }
-    image.write(filepath);
-  } else if constexpr (std::is_same<Components, BGR>::value) {
-    png::image<png::rgba_pixel> image(m_width, m_height);
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (unsigned int x = 0; x < image.get_width(); ++x) {
-        unsigned int idx                           = x + m_width * y;
-        image[image.get_height() - 1 - y][x].blue  = data[idx * n];
-        image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
-        image[image.get_height() - 1 - y][x].red   = data[idx * n + 2];
-        if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].blue *= 255.0f;
-          image[image.get_height() - 1 - y][x].green *= 255.0f;
-          image[image.get_height() - 1 - y][x].red *= 255.0f;
-        }
-      }
-    image.write(filepath);
-  } else if constexpr (std::is_same<Components, BGRA>::value) {
-    png::image<png::rgba_pixel> image(m_width, m_height);
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (unsigned int x = 0; x < image.get_width(); ++x) {
-        unsigned int idx                           = x + m_width * y;
-        image[image.get_height() - 1 - y][x].blue  = data[idx * n];
-        image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
-        image[image.get_height() - 1 - y][x].red   = data[idx * n + 2];
-        image[image.get_height() - 1 - y][x].alpha = data[idx * n + 3];
-        if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].blue *= 255.0f;
-          image[image.get_height() - 1 - y][x].green *= 255.0f;
-          image[image.get_height() - 1 - y][x].red *= 255.0f;
-          image[image.get_height() - 1 - y][x].alpha *= 255.0f;
-        }
-      }
-    image.write(filepath);
-  } else if constexpr (std::is_same<Components, R>::value) {
-    png::image<png::rgb_pixel> image(m_width, m_height);
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        unsigned int idx = x + m_width * y;
-        if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].red =
-              image[image.get_height() - 1 - y][x].green =
-                  image[image.get_height() - 1 - y][x].blue =
-                      data[idx] * 255.0f * scale_factor;
-        } else {
-          image[image.get_height() - 1 - y][x].red   = data[idx];
-          image[image.get_height() - 1 - y][x].green = data[idx];
-          image[image.get_height() - 1 - y][x].blue  = data[idx];
-        }
-      }
-    image.write(filepath);
-  } else if constexpr (std::is_same<Components, RG>::value) {
-    png::image<png::rgb_pixel> image(m_width, m_height);
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        unsigned int idx                           = x + m_width * y;
-        image[image.get_height() - 1 - y][x].red   = data[idx * n];
-        image[image.get_height() - 1 - y][x].green = data[idx * n + 1];
-        image[image.get_height() - 1 - y][x].blue  = 0;
-        if constexpr (std::is_same<float, T>::value) {
-          image[image.get_height() - 1 - y][x].red *= 255.0f;
-          image[image.get_height() - 1 - y][x].green *= 255.0f;
-        }
-      }
-    image.write(filepath);
-  }
+  using tex_png_t               = tex_png<T, Components>;
+  auto                     data = download_data();
+  typename tex_png_t::type image(m_width, m_height);
+  for (unsigned int y = 0; y < image.get_height(); ++y)
+    for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+      unsigned int idx = x + m_width * y;
+      tex_png_t::save_pixel(data, image, x, y, idx, scale_factor);
+    }
+  image.write(filepath);
 }
 
 template <typename T, typename Components>

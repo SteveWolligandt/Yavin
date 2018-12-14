@@ -8,14 +8,27 @@
 namespace Yavin {
 //==============================================================================
 
-struct R {};
-struct RG {};
-struct RGB {};
-struct RGBA {};
-
-struct BGR {};
-struct BGRA {};
-struct Depth {};
+struct R {
+  static constexpr size_t n = 1;
+};
+struct RG {
+  static constexpr size_t n = 2;
+};
+struct RGB {
+  static constexpr size_t n = 3;
+};
+struct RGBA {
+  static constexpr size_t n = 4;
+};
+struct BGR {
+  static constexpr size_t n = 3;
+};
+struct BGRA {
+  static constexpr size_t n = 4;
+};
+struct Depth {
+  static constexpr size_t n = 1;
+};
 
 //==============================================================================
 namespace TexHelper {
