@@ -920,7 +920,7 @@ void gl::tex_image_2d(GLenum target, GLint level, GLint internalFormat,
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
     *out << "glTexImage2D(" << to_string(target) << ", " << level << ", "
-         << internalFormat << ", " << width << ", " << height << ", " << border
+         << to_string(internalFormat) << ", " << width << ", " << height << ", " << border
          << ", " << to_string(format) << ", " << to_string(type) << ", " << data << ")\n";
   glTexImage2D(target, level, internalFormat, width, height, border, format,
                type, data);
