@@ -236,6 +236,11 @@ struct gl {
 
   //------------------------------------------------------------------------------
 
+  DLL_API static void dispatch_compute(GLuint num_groups_x, GLuint num_groups_y,
+                                       GLuint num_groups_z);
+
+  //------------------------------------------------------------------------------
+
   DLL_API static void get_shader_iv(GLuint shader, GLenum pname, GLint* params);
 
   //------------------------------------------------------------------------------

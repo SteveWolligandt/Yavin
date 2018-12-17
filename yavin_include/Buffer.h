@@ -22,7 +22,7 @@ class BufferMap {
   constexpr static size_t data_size = buffer_t::data_size;
 
   //! constructor gets a mapping to gpu_buffer
-  BufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length,
+  BufferMap(const buffer_t* buffer, size_t offset, size_t length,
             GLbitfield access)
       : m_buffer(buffer), m_offset(offset), m_length(length), m_access(access) {
     m_gpu_mapping = (T*)gl::map_named_buffer_range(
@@ -64,18 +64,18 @@ class BufferMap {
   auto access() const { return m_access; }
 
  protected:
-  Buffer<array_type, T>* m_buffer;
-  size_t                 m_offset;
-  size_t                 m_length;
-  GLbitfield             m_access;
-  T*                     m_gpu_mapping;
-  bool                   m_unmapped = false;
+  const buffer_t* m_buffer;
+  size_t          m_offset;
+  size_t          m_length;
+  GLbitfield      m_access;
+  T*              m_gpu_mapping;
+  bool            m_unmapped = false;
 };
 
 template <GLsizei array_type, typename T>
 class RBufferMap : public BufferMap<array_type, T> {
  public:
-  RBufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length)
+  RBufferMap(const Buffer<array_type, T>* buffer, size_t offset, size_t length)
       : BufferMap<array_type, T>(buffer, offset, length, GL_MAP_READ_BIT) {}
 };
 
@@ -102,7 +102,7 @@ class ReadableBufferElement {
   using buffer_t = Buffer<array_type, T>;
   using r_map_t  = RBufferMap<array_type, T>;
 
-  ReadableBufferElement(buffer_t* buffer, size_t idx)
+  ReadableBufferElement(const buffer_t* buffer, size_t idx)
       : m_buffer(buffer), m_idx(idx) {}
   ReadableBufferElement(const ReadableBufferElement& other)
       : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
@@ -118,8 +118,8 @@ class ReadableBufferElement {
   }
 
  protected:
-  Buffer<array_type, T>* m_buffer;
-  size_t                 m_idx;
+  const buffer_t* m_buffer;
+  size_t          m_idx;
 };
 
 template <GLsizei array_type, typename T>

@@ -2,7 +2,6 @@
 #define __YAVIN_TEXTURE2D_H__
 
 #include <cassert>
-#include <initializer_list>
 #include <iostream>
 #include <png++/png.hpp>
 #include <string>
@@ -502,6 +501,7 @@ void Texture2D<T, Components>::set_data(const PixelUnpackBuffer<T>& pbo) {
   pbo.bind();
   gl::tex_sub_image_2d(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, type,
                        0);
+  pbo.unbind();
 }
 
 template <typename T, typename Components>

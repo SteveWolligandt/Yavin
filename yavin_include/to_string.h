@@ -204,7 +204,6 @@ std::string to_string(GLenum e) {
     case GL_UNSIGNED_INT_2_10_10_10_REV:
       return "GL_UNSIGNED_INT_2_10_10_10_REV";
 
-
       // framebuffer attachements
     case GL_COLOR_ATTACHMENT0: return "GL_COLOR_ATTACHEMENT0";
     case GL_COLOR_ATTACHMENT1: return "GL_COLOR_ATTACHEMENT1";
@@ -224,7 +223,23 @@ std::string to_string(GLenum e) {
     case GL_COLOR_ATTACHMENT15: return "GL_COLOR_ATTACHEMENT15";
     case GL_DEPTH_ATTACHMENT: return "GL_DEPTH_ATTACHMENT";
     case GL_STENCIL_ATTACHMENT: return "GL_STENCIL_ATTACHMENT";
-    case GL_DEPTH_STENCIL_ATTACHMENT: return "GL_DEPTH_STENCIL_ATTACHMENT";
+    case GL_DEPTH_STENCIL_ATTACHMENT:
+      return "GL_DEPTH_STENCIL_ATTACHMENT";
+
+      // primitives
+    case GL_POINTS: return "GL_POINTS";
+    case GL_LINE_STRIP: return "GL_LINE_STRIP";
+    case GL_LINE_LOOP: return "GL_LINE_LOOP";
+    case GL_LINES: return "GL_LINES";
+    case GL_LINE_STRIP_ADJACENCY: return "GL_LINE_STRIP_ADJACENCY";
+    case GL_LINES_ADJACENCY: return "GL_LINES_ADJACENCY";
+    case GL_TRIANGLE_STRIP: return "GL_TRIANGLE_STRIP";
+    case GL_TRIANGLE_FAN: return "GL_TRIANGLE_FAN";
+    case GL_TRIANGLES: return "GL_TRIANGLES";
+    case GL_TRIANGLE_STRIP_ADJACENCY: return "GL_TRIANGLE_STRIP_ADJACENCY";
+    case GL_TRIANGLES_ADJACENCY: return "GL_TRIANGLES_ADJACENCY";
+    case GL_PATCHES: return "GL_PATCHES";
+
     default: return "GLenum(" + std::to_string(e) + ")";
   }
 }

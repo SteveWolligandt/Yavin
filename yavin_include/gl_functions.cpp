@@ -53,7 +53,29 @@ GLenum gl::get_error() { return glGetError(); }
 
 void gl::clear(GLbitfield mask) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glClear(" << mask << ")\n";
+  if (verbose) {
+    *out << "glClear(";
+    bool write_pipe = false;
+    if (mask & GL_COLOR_BUFFER_BIT) {
+      *out << "GL_COLOR_BUFFER_BIT";
+      write_pipe = true;
+    }
+    if (mask & GL_DEPTH_BUFFER_BIT) {
+      if (write_pipe) *out << " | ";
+      *out << "GL_DEPTH_BUFFER_BIT";
+      write_pipe = true;
+    }
+    if (mask & GL_STENCIL_BUFFER_BIT) {
+      if (write_pipe) *out << " | ";
+      *out << "GL_STENCIL_BUFFER_BIT";
+      write_pipe = true;
+    }
+    if (mask & GL_ACCUM_BUFFER_BIT) {
+      if (write_pipe) *out << " | ";
+      *out << "GL_ACCUM_BUFFER_BIT";
+    }
+    *out << ")\n";
+  }
   glClear(mask);
   gl_error_check("glClear");
 }
@@ -97,7 +119,7 @@ void gl::flush() {
 
 void gl::depth_mask(GLboolean flag) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDepthMask(" << flag << ")\n";
+  if (verbose) *out << "glDepthMask(" << (flag ? "true" : "false") << ")\n";
   glDepthMask(flag);
   gl_error_check("glDepthMask");
 }
@@ -447,6 +469,18 @@ void gl::delete_shader(GLuint shader) {
   if (verbose) *out << "glDeleteShader(" << shader << ")\n";
   glDeleteShader(shader);
   gl_error_check("glDeleteShader");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::dispatch_compute(GLuint num_groups_x, GLuint num_groups_y,
+                          GLuint num_groups_z) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glDispatchCompute(" << num_groups_x << ", " << num_groups_y << ", "
+         << num_groups_z << ")\n";
+  glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+  gl_error_check("glDispatchCompute");
 }
 
 //------------------------------------------------------------------------------
@@ -931,8 +965,8 @@ void gl::bind_image_texture(GLuint unit, GLuint texture, GLint level,
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
     *out << "glBindImageTexture(" << unit << ", " << texture << ", " << level
-         << ", " << layered << ", " << layer << ", " << access << ", " << format
-         << ")\n";
+         << ", " << (layered ? "true" : "false") << ", " << layer << ", "
+         << to_string(access) << ", " << to_string(format) << ")\n";
   glBindImageTexture(unit, texture, level, layered, layer, access, format);
   gl_error_check("glBindImageTexture");
 }
@@ -959,7 +993,11 @@ void gl::tex_sub_image_2d(GLenum target, GLint level, GLint xoffset,
                           GLint yoffset, GLsizei width, GLsizei height,
                           GLenum format, GLenum type, const GLvoid* pixels) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTexSubImage2D\n";
+  if (verbose)
+    *out << "glTexSubImage2D(" << to_string(target) << ", " << level << ", "
+         << xoffset << ", " << yoffset << ", " << width << ", " << height
+         << ", " << to_string(format) << ", " << to_string(type) << ", "
+         << pixels << ")\n";
   glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
                   pixels);
   gl_error_check("glTexSubImage2D");
