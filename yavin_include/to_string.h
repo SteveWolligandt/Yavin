@@ -142,6 +142,46 @@ std::string to_string(GLenum e) {
     case GL_STENCIL_INDEX: return "GL_STENCIL_INDEX";
     case GL_DEPTH_COMPONENT: return "GL_DEPTH_COMPONENT";
     case GL_DEPTH_STENCIL: return "GL_DEPTH_STENCIL";
+    case GL_R8: return "GL_R8";
+    case GL_RG8: return "GL_RG8";
+    case GL_RGB8: return "GL_RGB8";
+    case GL_RGBA8: return "GL_RGBA8";
+    case GL_R8I: return "GL_R8I";
+    case GL_RG8I: return "GL_RG8I";
+    case GL_RGB8I: return "GL_RGB8I";
+    case GL_RGBA8I: return "GL_RGBA8I";
+    case GL_R8UI: return "GL_R8UI";
+    case GL_RG8UI: return "GL_RG8UI";
+    case GL_RGB8UI: return "GL_RGB8UI";
+    case GL_RGBA8UI: return "GL_RGBA8UI";
+    case GL_R16I: return "GL_R16I";
+    case GL_RG16I: return "GL_RG16I";
+    case GL_RGB16I: return "GL_RGB16I";
+    case GL_RGBA16I: return "GL_RGBA16I";
+    case GL_R16UI: return "GL_R16UI";
+    case GL_RG16UI: return "GL_RG16UI";
+    case GL_RGB16UI: return "GL_RGB16UI";
+    case GL_RGBA16UI: return "GL_RGBA16UI";
+    case GL_R32I: return "GL_R32I";
+    case GL_RG32I: return "GL_RG32I";
+    case GL_RGB32I: return "GL_RGB32I";
+    case GL_RGBA32I: return "GL_RGBA32I";
+    case GL_R32UI: return "GL_R32UI";
+    case GL_RG32UI: return "GL_RG32UI";
+    case GL_RGB32UI: return "GL_RGB32UI";
+    case GL_RGBA32UI: return "GL_RGBA32UI";
+    case GL_R16: return "GL_R16";
+    case GL_RG16: return "GL_RG16";
+    case GL_RGB16: return "GL_RGB16";
+    case GL_RGBA16: return "GL_RGBA16";
+    case GL_R32F: return "GL_R32F";
+    case GL_RG32F: return "GL_RG32F";
+    case GL_RGB32F: return "GL_RGB32F";
+    case GL_RGBA32F: return "GL_RGBA32F";
+    case GL_R16F: return "GL_R16F";
+    case GL_RG16F: return "GL_RG16F";
+    case GL_RGB16F: return "GL_RGB16F";
+    case GL_RGBA16F: return "GL_RGBA16F";
 
     case GL_UNSIGNED_BYTE: return "GL_UNSIGNED_BYTE";
     case GL_BYTE: return "GL_BYTE";
@@ -163,6 +203,28 @@ std::string to_string(GLenum e) {
     case GL_UNSIGNED_INT_10_10_10_2: return "GL_UNSIGNED_INT_10_10_10_2";
     case GL_UNSIGNED_INT_2_10_10_10_REV:
       return "GL_UNSIGNED_INT_2_10_10_10_REV";
+
+
+      // framebuffer attachements
+    case GL_COLOR_ATTACHMENT0: return "GL_COLOR_ATTACHEMENT0";
+    case GL_COLOR_ATTACHMENT1: return "GL_COLOR_ATTACHEMENT1";
+    case GL_COLOR_ATTACHMENT2: return "GL_COLOR_ATTACHEMENT2";
+    case GL_COLOR_ATTACHMENT3: return "GL_COLOR_ATTACHEMENT3";
+    case GL_COLOR_ATTACHMENT4: return "GL_COLOR_ATTACHEMENT4";
+    case GL_COLOR_ATTACHMENT5: return "GL_COLOR_ATTACHEMENT5";
+    case GL_COLOR_ATTACHMENT6: return "GL_COLOR_ATTACHEMENT6";
+    case GL_COLOR_ATTACHMENT7: return "GL_COLOR_ATTACHEMENT7";
+    case GL_COLOR_ATTACHMENT8: return "GL_COLOR_ATTACHEMENT8";
+    case GL_COLOR_ATTACHMENT9: return "GL_COLOR_ATTACHEMENT9";
+    case GL_COLOR_ATTACHMENT10: return "GL_COLOR_ATTACHEMENT10";
+    case GL_COLOR_ATTACHMENT11: return "GL_COLOR_ATTACHEMENT11";
+    case GL_COLOR_ATTACHMENT12: return "GL_COLOR_ATTACHEMENT12";
+    case GL_COLOR_ATTACHMENT13: return "GL_COLOR_ATTACHEMENT13";
+    case GL_COLOR_ATTACHMENT14: return "GL_COLOR_ATTACHEMENT14";
+    case GL_COLOR_ATTACHMENT15: return "GL_COLOR_ATTACHEMENT15";
+    case GL_DEPTH_ATTACHMENT: return "GL_DEPTH_ATTACHMENT";
+    case GL_STENCIL_ATTACHMENT: return "GL_STENCIL_ATTACHMENT";
+    case GL_DEPTH_STENCIL_ATTACHMENT: return "GL_DEPTH_STENCIL_ATTACHMENT";
     default: return "GLenum(" + std::to_string(e) + ")";
   }
 }

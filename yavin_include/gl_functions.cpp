@@ -53,7 +53,7 @@ GLenum gl::get_error() { return glGetError(); }
 
 void gl::clear(GLbitfield mask) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glClear\n";
+  if (verbose) *out << "glClear(" << mask << ")\n";
   glClear(mask);
   gl_error_check("glClear");
 }
@@ -167,7 +167,10 @@ void gl::vertex_attrib_pointer(GLuint index, GLint size, GLenum type,
                                GLboolean normalized, GLsizei stride,
                                const GLvoid* pointer) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glVertexAttribPointer\n";
+  if (verbose)
+    *out << "glVertexAttribPointer(" << index << ", " << size << ", "
+         << to_string(type) << ", " << (normalized ? "true" : "false") << ", "
+         << stride << ")\n";
   glVertexAttribPointer(index, size, type, normalized, stride, pointer);
   gl_error_check("glVertexAttribPointer");
 }
@@ -198,10 +201,9 @@ void gl::vertex_attrib_l_pointer(GLuint index, GLint size, GLenum type,
 
 void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateVertexArrays(" << n << ", " << arrays << ")";
   glCreateVertexArrays(n, arrays);
   if (verbose) {
-    *out << " = [ ";
+    *out << "glCreateVertexArrays(" << n << ", " << arrays << ") = [ ";
     for (GLsizei i = 0; i < n; ++i) *out << arrays[i] << ' ';
     *out << "]\n";
   }
@@ -210,14 +212,14 @@ void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
 
 //------------------------------------------------------------------------------
 
-void gl::delete_vertex_arrays(GLsizei n, GLuint* arrays) {
+void gl::delete_vertex_arrays(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
-    *out << "glDeleteVertexArrays(" << n << ", " << arrays << ") = [ ";
-    for (GLsizei i = 0; i < n; ++i) *out << arrays[i] << ' ';
+    *out << "glDeleteVertexArrays[ ";
+    for (GLsizei i = 0; i < n; ++i) *out << ids[i] << ' ';
     *out << "]\n";
   }
-  glDeleteVertexArrays(n, arrays);
+  glDeleteVertexArrays(n, ids);
   gl_error_check("glDeleteVertexArrays");
 }
 
@@ -235,7 +237,9 @@ void gl::bind_vertex_array(GLuint array) {
 void gl::draw_elements(GLenum mode, GLsizei count, GLenum type,
                        const GLvoid* indices) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDrawElements\n";
+  if (verbose)
+    *out << "glDrawElements(" << to_string(mode) << ", " << count << ", "
+         << to_string(type) << ", " << indices << ")\n";
   glDrawElements(mode, count, type, indices);
   gl_error_check("glDrawElements");
 }
@@ -265,13 +269,12 @@ void gl::bind_buffer_base(GLenum target, GLuint index, GLuint buffer) {
 
 //------------------------------------------------------------------------------
 
-void gl::create_buffers(GLsizei n, GLuint* buffers) {
+void gl::create_buffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateBuffers(" << n << ", " << buffers << ")";
-  glCreateBuffers(1, buffers);
+  glCreateBuffers(n, ids);
   if (verbose) {
-    *out << " = [ ";
-    for (GLsizei i = 0; i < n; ++i) *out << buffers[i] << ' ';
+    *out << "glCreateBuffers(" << n << ", " << ids << ") = [ ";
+    for (GLsizei i = 0; i < n; ++i) *out << ids[i] << ' ';
     *out << "]\n";
   }
   gl_error_check("glCreateBuffers");
@@ -279,15 +282,15 @@ void gl::create_buffers(GLsizei n, GLuint* buffers) {
 
 //------------------------------------------------------------------------------
 
-void gl::delete_buffers(GLsizei n, GLuint* buffers) {
+void gl::delete_buffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
-    *out << "glDeleteBuffers(" << n << ", " << buffers << ") = [ ";
-    for (GLsizei i = 0; i < n; ++i) *out << buffers[i] << ' ';
+    *out << "glDeleteBuffers[ ";
+    for (GLsizei i = 0; i < n; ++i) *out << ids[i] << ' ';
     *out << "]\n";
   }
-  glDeleteBuffers(1, buffers);
-  gl_error_check("glCreateBuffers");
+  glDeleteBuffers(n, ids);
+  gl_error_check("glDeleteBuffers");
 }
 
 //------------------------------------------------------------------------------
@@ -366,8 +369,8 @@ void gl::named_buffer_sub_data(GLuint buffer, GLintptr offset, GLsizei size,
 
 GLuint gl::create_program() {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateProgram\n";
-  auto result = glCreateProgram();
+  auto            result = glCreateProgram();
+  if (verbose) *out << "glCreateProgram() = " << result << "\n";
   gl_error_check("glCreateProgram");
   return result;
 }
@@ -385,7 +388,7 @@ void gl::attach_shader(GLuint program, GLuint shader) {
 
 void gl::link_program(GLuint program) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glLinkProgram\n";
+  if (verbose) *out << "glLinkProgram(" << program << ")\n";
   glLinkProgram(program);
   gl_error_check("glLinkProgram");
 }
@@ -394,7 +397,7 @@ void gl::link_program(GLuint program) {
 
 void gl::delete_program(GLuint program) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDeleteProgram\n";
+  if (verbose) *out << "glDeleteProgram(" << program << ")\n";
   glDeleteProgram(program);
   gl_error_check("glDeleteProgram");
 }
@@ -412,8 +415,8 @@ void gl::use_program(GLuint program) {
 
 GLuint gl::create_shader(GLenum shaderType) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateShader\n";
-  auto result = glCreateShader(shaderType);
+  auto            result = glCreateShader(shaderType);
+  if (verbose) *out << "glCreateShader() = " << result << "\n";
   gl_error_check("glCreateShader");
   return result;
 }
@@ -441,7 +444,7 @@ void gl::compile_shader(GLuint shader) {
 
 void gl::delete_shader(GLuint shader) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDeleteShader\n";
+  if (verbose) *out << "glDeleteShader(" << shader << ")\n";
   glDeleteShader(shader);
   gl_error_check("glDeleteShader");
 }
@@ -493,7 +496,9 @@ std::string gl::get_shader_info_log(GLuint shader) {
 
 void gl::program_uniform_1f(GLuint program, GLint location, GLfloat v0) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform1f\n";
+  if (verbose)
+    *out << "glProgramUniform1f(" << program << ", " << location << ", " << v0
+         << ")\n";
   glProgramUniform1f(program, location, v0);
   gl_error_check("glProgramUniform1f");
 }
@@ -503,7 +508,9 @@ void gl::program_uniform_1f(GLuint program, GLint location, GLfloat v0) {
 void gl::program_uniform_2f(GLuint program, GLint location, GLfloat v0,
                             GLfloat v1) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform2f\n";
+  if (verbose)
+    *out << "glProgramUniform2f(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ")\n";
   glProgramUniform2f(program, location, v0, v1);
   gl_error_check("glProgramUniform2f");
 }
@@ -513,7 +520,9 @@ void gl::program_uniform_2f(GLuint program, GLint location, GLfloat v0,
 void gl::program_uniform_3f(GLuint program, GLint location, GLfloat v0,
                             GLfloat v1, GLfloat v2) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform3f\n";
+  if (verbose)
+    *out << "glProgramUniform3f(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ", " << v2 << ")\n";
   glProgramUniform3f(program, location, v0, v1, v2);
   gl_error_check("glProgramUniform3f");
 }
@@ -523,7 +532,9 @@ void gl::program_uniform_3f(GLuint program, GLint location, GLfloat v0,
 void gl::program_uniform_4f(GLuint program, GLint location, GLfloat v0,
                             GLfloat v1, GLfloat v2, GLfloat v3) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform4f\n";
+  if (verbose)
+    *out << "glProgramUniform4f(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ", " << v2 << ", " << v3 << ")\n";
   glProgramUniform4f(program, location, v0, v1, v2, v3);
   gl_error_check("glProgramUniform4f");
 }
@@ -532,7 +543,9 @@ void gl::program_uniform_4f(GLuint program, GLint location, GLfloat v0,
 
 void gl::program_uniform_1i(GLuint program, GLint location, GLint v0) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform1i\n";
+  if (verbose)
+    *out << "glProgramUniform1i(" << program << ", " << location << ", " << v0
+         << ")\n";
   glProgramUniform1i(program, location, v0);
   gl_error_check("glProgramUniform1i");
 }
@@ -542,7 +555,9 @@ void gl::program_uniform_1i(GLuint program, GLint location, GLint v0) {
 void gl::program_uniform_2i(GLuint program, GLint location, GLint v0,
                             GLint v1) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform2i\n";
+  if (verbose)
+    *out << "glProgramUniform2i(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ")\n";
   glProgramUniform2i(program, location, v0, v1);
   gl_error_check("glProgramUniform2i");
 }
@@ -552,7 +567,9 @@ void gl::program_uniform_2i(GLuint program, GLint location, GLint v0,
 void gl::program_uniform_3i(GLuint program, GLint location, GLint v0, GLint v1,
                             GLint v2) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform3i\n";
+  if (verbose)
+    *out << "glProgramUniform3i(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ", " << v2 << ")\n";
   glProgramUniform3i(program, location, v0, v1, v2);
   gl_error_check("glProgramUniform3i");
 }
@@ -562,7 +579,9 @@ void gl::program_uniform_3i(GLuint program, GLint location, GLint v0, GLint v1,
 void gl::program_uniform_4i(GLuint program, GLint location, GLint v0, GLint v1,
                             GLint v2, GLint v3) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform4i\n";
+  if (verbose)
+    *out << "glProgramUniform4i(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ", " << v2 << ", " << v3 << ")\n";
   glProgramUniform4i(program, location, v0, v1, v2, v3);
   gl_error_check("glProgramUniform4i");
 }
@@ -848,8 +867,10 @@ void gl::get_program_info_log(GLuint program, GLsizei maxLength,
 
 GLint gl::get_uniform_location(GLuint program, const GLchar* name) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glGetUniformLocation\n";
-  auto result = glGetUniformLocation(program, name);
+  auto            result = glGetUniformLocation(program, name);
+  if (verbose)
+    *out << "glGetUniformLocation(" << program << ", " << name
+         << ") = " << result << '\n';
   gl_error_check("glGetUniformLocation");
   return result;
 }
@@ -874,7 +895,11 @@ void gl::create_textures(GLenum target, GLsizei n, GLuint* textures) {
 
 void gl::delete_textures(GLsizei n, GLuint* textures) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateTextures\n";
+  if (verbose) {
+    *out << "glDeleteTextures[ ";
+    for (GLsizei i = 0; i < n; ++i) *out << textures[i] << ' ';
+    *out << "]\n";
+  }
   glDeleteTextures(n, textures);
   gl_error_check("glDeleteTextures");
 }
@@ -920,8 +945,9 @@ void gl::tex_image_2d(GLenum target, GLint level, GLint internalFormat,
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
     *out << "glTexImage2D(" << to_string(target) << ", " << level << ", "
-         << to_string(internalFormat) << ", " << width << ", " << height << ", " << border
-         << ", " << to_string(format) << ", " << to_string(type) << ", " << data << ")\n";
+         << to_string(internalFormat) << ", " << width << ", " << height << ", "
+         << border << ", " << to_string(format) << ", " << to_string(type)
+         << ", " << data << ")\n";
   glTexImage2D(target, level, internalFormat, width, height, border, format,
                type, data);
   gl_error_check("glTexImage2D");
@@ -976,7 +1002,9 @@ void gl::get_n_tex_image(GLenum target, GLint level, GLenum format, GLenum type,
 void gl::get_texture_image(GLuint texture, GLint level, GLenum format,
                            GLenum type, GLsizei bufSize, void* pixels) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glGetTextureImage\n";
+  if (verbose)
+    *out << "glGetTextureImage(" << texture << ", " << level << ", " << format
+         << ", " << type << ", " << bufSize << ", " << pixels << ")\n";
   glGetTextureImage(texture, level, format, type, bufSize, pixels);
   gl_error_check("glGetTextureImage");
 }
@@ -1003,7 +1031,9 @@ void gl::tex_parameter_i(GLenum target, GLenum pname, GLint param) {
 
 void gl::texture_parameter_f(GLuint texture, GLenum pname, GLfloat param) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTextureParameterf\n";
+  if (verbose)
+    *out << "glTextureParameterf(" << texture << ", " << to_string(pname)
+         << ", " << param << ")\n";
   glTextureParameterf(texture, pname, param);
   gl_error_check("glTexParameterf");
 }
@@ -1012,7 +1042,9 @@ void gl::texture_parameter_f(GLuint texture, GLenum pname, GLfloat param) {
 
 void gl::texture_parameter_i(GLuint texture, GLenum pname, GLint param) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTextureParameteri\n";
+  if (verbose)
+    *out << "glTextureParameteri(" << texture << ", " << to_string(pname)
+         << ", " << param << ")\n";
   glTextureParameteri(texture, pname, param);
   gl_error_check("glTexParameteri");
 }
@@ -1021,7 +1053,9 @@ void gl::texture_parameter_i(GLuint texture, GLenum pname, GLint param) {
 
 void gl::tex_parameter_fv(GLenum target, GLenum pname, const GLfloat* params) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTexParameterfv\n";
+  if (verbose)
+    *out << "glTextureParameterfv(" << to_string(target) << ", "
+         << to_string(pname) << ", " << params << ")\n";
   glTexParameterfv(target, pname, params);
   gl_error_check("glTexParameterfv");
 }
@@ -1030,7 +1064,9 @@ void gl::tex_parameter_fv(GLenum target, GLenum pname, const GLfloat* params) {
 
 void gl::tex_parameter_iv(GLenum target, GLenum pname, const GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTexParameteriv\n";
+  if (verbose)
+    *out << "glTextureParameteriv(" << to_string(target) << ", "
+         << to_string(pname) << ", " << params << ")\n";
   glTexParameteriv(target, pname, params);
   gl_error_check("glTexParameteriv");
 }
@@ -1039,7 +1075,9 @@ void gl::tex_parameter_iv(GLenum target, GLenum pname, const GLint* params) {
 
 void gl::tex_parameter_Iiv(GLenum target, GLenum pname, const GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTexParameterIiv\n";
+  if (verbose)
+    *out << "glTextureParameterIiv(" << to_string(target) << ", "
+         << to_string(pname) << ", " << params << ")\n";
   glTexParameterIiv(target, pname, params);
   gl_error_check("glTexParameterIiv");
 }
@@ -1048,7 +1086,9 @@ void gl::tex_parameter_Iiv(GLenum target, GLenum pname, const GLint* params) {
 
 void gl::tex_parameter_Iuiv(GLenum target, GLenum pname, const GLuint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTexParameterIuiv\n";
+  if (verbose)
+    *out << "glTextureParameterIuiv(" << to_string(target) << ", "
+         << to_string(pname) << ", " << params << ")\n";
   glTexParameterIuiv(target, pname, params);
   gl_error_check("glTexParameterIuiv");
 }
@@ -1058,7 +1098,9 @@ void gl::tex_parameter_Iuiv(GLenum target, GLenum pname, const GLuint* params) {
 void gl::texture_parameter_fv(GLuint texture, GLenum pname,
                               const GLfloat* paramtexture) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTextureParameterfv\n";
+  if (verbose)
+    *out << "glTextureParameterfv(" << texture << ", " << to_string(pname)
+         << ", " << paramtexture << ")\n";
   glTextureParameterfv(texture, pname, paramtexture);
   gl_error_check("glTextureParameterfv");
 }
@@ -1068,7 +1110,9 @@ void gl::texture_parameter_fv(GLuint texture, GLenum pname,
 void gl::texture_parameter_iv(GLuint texture, GLenum pname,
                               const GLint* param) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTextureParameteriv\n";
+  if (verbose)
+    *out << "glTextureParameterfv(" << texture << ", " << to_string(pname)
+         << ", " << param << ")\n";
   glTextureParameteriv(texture, pname, param);
   gl_error_check("glTextureParameteriv");
 }
@@ -1078,7 +1122,9 @@ void gl::texture_parameter_iv(GLuint texture, GLenum pname,
 void gl::texture_parameter_Iiv(GLuint texture, GLenum pname,
                                const GLint* param) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTextureParameterIiv\n";
+  if (verbose)
+    *out << "glTextureParameterIiv(" << texture << ", " << to_string(pname)
+         << ", " << param << ")\n";
   glTextureParameterIiv(texture, pname, param);
   gl_error_check("glTextureParameterIiv");
 }
@@ -1088,7 +1134,9 @@ void gl::texture_parameter_Iiv(GLuint texture, GLenum pname,
 void gl::texture_parameter_Iuiv(GLuint texture, GLenum pname,
                                 const GLuint* param) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glTextureParameterIuiv\n";
+  if (verbose)
+    *out << "glTextureParameterIuiv(" << texture << ", " << to_string(pname)
+         << ", " << param << ")\n";
   glTextureParameterIuiv(texture, pname, param);
   gl_error_check("glTextureParameterIuiv");
 }
@@ -1099,8 +1147,12 @@ void gl::texture_parameter_Iuiv(GLuint texture, GLenum pname,
 
 void gl::create_framebuffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCreateFramebuffers\n";
   glCreateFramebuffers(n, ids);
+  if (verbose) {
+    *out << "glCreateFramebuffers(" << n << ", " << ids << ") = [ ";
+    for (GLsizei i = 0; i < n; ++i) *out << ids[i] << ' ';
+    *out << "]\n";
+  }
   gl_error_check("glCreateFramebuffers");
 }
 
@@ -1108,7 +1160,11 @@ void gl::create_framebuffers(GLsizei n, GLuint* ids) {
 
 void gl::delete_framebuffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glDeleteFramebuffers\n";
+  if (verbose) {
+    *out << "glDeleteFramebuffers[ ";
+    for (GLsizei i = 0; i < n; ++i) *out << ids[i] << ' ';
+    *out << "]\n";
+  }
   glDeleteFramebuffers(n, ids);
   gl_error_check("glDeleteFramebuffers");
 }
@@ -1117,7 +1173,9 @@ void gl::delete_framebuffers(GLsizei n, GLuint* ids) {
 
 void gl::bind_framebuffer(GLenum target, GLuint framebuffer) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glBindFramebuffer\n";
+  if (verbose)
+    *out << "glBindFramebuffer(" << to_string(target) << ", " << framebuffer
+         << ")\n";
   glBindFramebuffer(target, framebuffer);
   gl_error_check("glBindFramebuffer");
 }
@@ -1168,7 +1226,9 @@ void gl::framebuffer_texture_3d(GLenum target, GLenum attachment,
 void gl::named_framebuffer_texture(GLuint framebuffer, GLenum attachment,
                                    GLuint texture, GLint level) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glNamedFramebufferTexture\n";
+  if (verbose)
+    *out << "glNamedFramebufferTexture(" << framebuffer << ", "
+         << to_string(attachment) << ", " << texture << ", " << level << ")\n";
   glNamedFramebufferTexture(framebuffer, attachment, texture, level);
   gl_error_check("glNamedFramebufferTexture");
 }
@@ -1177,7 +1237,9 @@ void gl::named_framebuffer_texture(GLuint framebuffer, GLenum attachment,
 
 GLenum gl::check_named_framebuffer_status(GLuint framebuffer, GLenum target) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glCheckNamedFramebufferStatus\n";
+  if (verbose)
+    *out << "glCheckNamedFramebufferStatus(" << framebuffer << ", "
+         << to_string(target) << ")\n";
   auto result = glCheckNamedFramebufferStatus(framebuffer, target);
   gl_error_check("glCheckNamedFramebufferStatus");
   return result;
