@@ -26,6 +26,8 @@ class Texture2D : public Yavin::Texture {
       std::is_same_v<C, R> || std::is_same_v<C, RGB> ||
       std::is_same_v<C, RGBA> || std::is_same_v<C, BGR> ||
       std::is_same_v<C, BGRA>;
+
+  Texture2D(const Texture2D& other);
   Texture2D(Texture2D&& other);
 
   template <typename c = Components,
@@ -332,6 +334,13 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
   set_interpolation_mode_mag(interp_mode_mag);
   set_wrap_mode_s(wrap_mode_s);
   set_wrap_mode_t(wrap_mode_t);
+}
+
+template <typename T, typename Components>
+Texture2D<T, Components>::Texture2D(const Texture2D& other)
+    : Texture2D(other.m_width, other.m_height) {
+  gl::copy_image_sub_data(other.m_id, GL_TEXTURE_2D, 0, 0, 0, 0, this->m_id,
+                          GL_TEXTURE_2D, 0, 0, 0, 0, m_width, m_height, 1);
 }
 
 template <typename T, typename Components>

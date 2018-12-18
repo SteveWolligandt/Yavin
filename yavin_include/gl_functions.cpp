@@ -1017,6 +1017,26 @@ void gl::texture_sub_image_2d(GLuint texture, GLint level, GLint xoffset,
 
 //------------------------------------------------------------------------------
 
+void gl::copy_image_sub_data(GLuint srcName, GLenum srcTarget, GLint srcLevel,
+                             GLint srcX, GLint srcY, GLint srcZ, GLuint dstName,
+                             GLenum dstTarget, GLint dstLevel, GLint dstX,
+                             GLint dstY, GLint dstZ, GLsizei srcWidth,
+                             GLsizei srcHeight, GLsizei srcDepth) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glCopyImageSubData(" << srcName << ", " << to_string(srcTarget) << ", "
+         << srcLevel << ", " << srcX << ", " << srcY << ", " << srcZ << ", "
+         << dstName << ", " << to_string(dstTarget) << ", " << dstLevel << ", " << dstX
+         << ", " << dstY << ", " << dstZ << ", " << srcWidth << ", "
+         << srcHeight << ", " << srcDepth << ")\n";
+  glCopyImageSubData(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName,
+                     dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight,
+                     srcDepth);
+  gl_error_check("glCopyImageSubData");
+}
+
+//------------------------------------------------------------------------------
+
 void gl::get_tex_image(GLenum target, GLint level, GLenum format, GLenum type,
                        GLvoid* pixels) {
   std::lock_guard lock(detail::mutex::gl_call);

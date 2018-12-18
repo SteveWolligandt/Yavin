@@ -8,7 +8,7 @@
 namespace Yavin {
 //==============================================================================
 
-std::string to_string(GLenum e) {
+inline std::string to_string(GLenum e) {
   switch (e) {
     // buffers
     case GL_ARRAY_BUFFER: return "GL_ARRAY_BUFFER";
@@ -246,7 +246,7 @@ std::string to_string(GLenum e) {
 
 //------------------------------------------------------------------------------
 
-std::string map_access_to_string(GLbitfield b) {
+inline std::string map_access_to_string(GLbitfield b) {
   std::string flags;
   auto        pipe = [&flags]() {
     if (!flags.empty()) flags += std::string(" | ");
@@ -266,7 +266,7 @@ std::string map_access_to_string(GLbitfield b) {
   if (GL_MAP_COHERENT_BIT & b) {
     pipe();
     flags += "GL_MAP_COHERENT_BIT";
-  }  // namespace Yavin
+  }
   if (GL_MAP_INVALIDATE_RANGE_BIT & b) {
     pipe();
     flags += "GL_MAP_INVALIDATE_RANGE_BIT";

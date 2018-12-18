@@ -518,6 +518,14 @@ struct gl {
 
   //------------------------------------------------------------------------------
 
+  DLL_API static void copy_image_sub_data(
+      GLuint srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srcY,
+      GLint srcZ, GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint dstX,
+      GLint dstY, GLint dstZ, GLsizei srcWidth, GLsizei srcHeight,
+      GLsizei srcDepth);
+
+  //------------------------------------------------------------------------------
+
   DLL_API static void get_tex_image(GLenum target, GLint level, GLenum format,
                                     GLenum type, GLvoid* pixels);
 
