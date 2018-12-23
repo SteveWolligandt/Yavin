@@ -1,3 +1,5 @@
+include(CodeCoverage)
+
 configure_file(rgb.png rgb.png COPYONLY)
 configure_file(rgb2.png rgb2.png COPYONLY)
 configure_file(bunny.obj bunny.obj COPYONLY)
@@ -5,11 +7,22 @@ configure_file(quad.obj quad.obj COPYONLY)
 configure_file(oit_test.frag oit_test.frag COPYONLY)
 configure_file(oit_test.vert oit_test.vert COPYONLY)
 
-add_executable (buffer_test main.cpp buffer_test.cpp)
-target_link_libraries(buffer_test yavin Catch2)
+set(MAIN main.cpp)
 
-add_executable (tuple main.cpp tuple.cpp)
-target_link_libraries(tuple yavin Catch2)
+function(test name)
+  add_executable (${name} ${MAIN} ${ARGN})
+  target_link_libraries(${name} yavin Catch2)
+endfunction(test)
 
-add_executable (oit_test oit_test.cpp)
-target_link_libraries(oit_test yavin Catch2)
+set(BUFFER_TEST_FILES buffer_test.cpp)
+set(TUPLE_TEST_FILES tuple.cpp)
+set(OIT_TEST_FILES oit_test.cpp)
+
+test(buffer.test ${BUFFER_TEST_FILES})
+test(tuple.test  ${TUPLE_TEST_FILES})
+# test(oit.test    ${OIT_TEST_FILES})
+test(all.test    ${MAIN} ${BUFFER_TEST_FILES} ${TUPLE_TEST_FILES} )
+
+APPEND_COVERAGE_COMPILER_FLAGS()
+set(COVERAGE_GCOVR_EXCLUDES  "${CMAKE_SOURCE_DIR}/test" "${CMAKE_SOURCE_DIR}/external")
+SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME coverage EXECUTABLE all.test DEPENDENCIES yavin Catch2)

@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 project(yavin)
 set(CMAKE_CXX_STANDARD 17)
@@ -103,5 +104,5 @@ if (DOXYGEN_FOUND AND BUILD_DOC)
         VERBATIM)
 
     else (DOXYGEN_FOUND AND BUILD_DOC)
-  message("Doxygen need to be installed to generate the doxygen documentation")
+  # message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND AND BUILD_DOC)
