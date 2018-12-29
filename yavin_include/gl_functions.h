@@ -2,13 +2,13 @@
 #define __YAVIN_GL_FUNCTIONS_WRAPPER_H__
 
 #include <vector>
-#include "Camera.h"
+#include "camera.h"
 #include "error_check.h"
 #include "gl_includes.h"
 #include "mutex_handler.h"
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 struct gl {
   static bool verbose;
@@ -649,7 +649,7 @@ struct gl {
                                                        GLenum target);
 };
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================
 
 #endif

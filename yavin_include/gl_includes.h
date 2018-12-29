@@ -1,5 +1,5 @@
-#ifndef __GL_INCLUDES_H__
-#define __GL_INCLUDES_H__
+#ifndef __YAVIN_GL_INCLUDES_H__
+#define __YAVIN_GL_INCLUDES_H__
 
 #include <GL/glew.h>
 #ifdef _WIN32

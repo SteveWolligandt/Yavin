@@ -2,7 +2,7 @@
 #define __YAVIN_COMPILATION_H__
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 
 enum class Compilation { Debug, Release };
@@ -13,7 +13,7 @@ static constexpr Compilation compilation = Compilation::Debug;
 #endif
 
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================
 
 #endif

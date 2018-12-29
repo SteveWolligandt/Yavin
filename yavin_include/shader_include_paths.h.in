@@ -5,14 +5,14 @@
 #include <vector>
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 
 static const std::string        shader_dir = "@CMAKE_SOURCE_DIR@/shaders/";
 static std::vector<std::string> shader_include_paths{shader_dir};
 
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================
 
 #endif

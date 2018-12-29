@@ -149,7 +149,6 @@ function(SETUP_TARGET_FOR_COVERAGE_LCOV)
 
     # Setup target
     add_custom_target(${Coverage_NAME}
-
         # Cleanup lcov
         COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} -directory . --zerocounters
         # Create baseline to make sure untouched files show up in the report
@@ -225,7 +224,7 @@ function(SETUP_TARGET_FOR_COVERAGE_GCOVR_XML)
         COMMAND ${GCOVR_PATH} --xml
             -r ${PROJECT_SOURCE_DIR} ${GCOVR_EXCLUDES}
             --object-directory=${PROJECT_BINARY_DIR}
-            -o ${Coverage_NAME}.xml
+            -o ${Coverage_NAME}
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         DEPENDS ${Coverage_DEPENDENCIES}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
@@ -234,7 +233,7 @@ function(SETUP_TARGET_FOR_COVERAGE_GCOVR_XML)
     # Show info where to find the report
     add_custom_command(TARGET ${Coverage_NAME} POST_BUILD
         COMMAND ;
-        COMMENT "Cobertura code coverage report saved in ${Coverage_NAME}.xml."
+        COMMENT "Cobertura code coverage report saved in ${Coverage_NAME}."
     )
 
 endfunction() # SETUP_TARGET_FOR_COVERAGE_GCOVR_XML

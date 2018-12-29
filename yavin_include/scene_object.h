@@ -8,10 +8,13 @@
 #include <string>
 #include <vector>
 #include <yavin>
-#include "Camera.h"
-#include "Movable.h"
+#include "camera.h"
+#include "movable.h"
 #include "behaviour.h"
-namespace Yavin {
+
+//==============================================================================
+namespace yavin {
+//==============================================================================
 
 template <typename T>
 class scene_t;
@@ -26,12 +29,17 @@ template <typename T>
 struct is_collider;
 
 template <typename T>
-class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, public Movable {
+class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>,
+                       public Movable {
   friend class scene_t<T>;
 
  public:
-  scene_object_t() : m_collider(nullptr), m_parent_object(nullptr), m_name("unnamed") {}
-  scene_object_t(std::string&& name) : m_collider(nullptr), m_parent_object(nullptr), m_name(std::move(name)) {}
+  scene_object_t()
+      : m_collider(nullptr), m_parent_object(nullptr), m_name("unnamed") {}
+  scene_object_t(std::string&& name)
+      : m_collider(nullptr),
+        m_parent_object(nullptr),
+        m_name(std::move(name)) {}
 
   scene_object_t(scene_object_t<T>&& other)
       : std::vector<std::unique_ptr<behaviour_t<T>>>(std::move(other)),
@@ -44,7 +52,8 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
   auto& add_behaviour(Args&&... args) {
     if constexpr (is_collider<behaviour_t>::value) {
       if (!m_collider) {
-        m_collider = std::make_unique<behaviour_t>(this, std::forward<Args>(args)...);
+        m_collider =
+            std::make_unique<behaviour_t>(this, std::forward<Args>(args)...);
         return *dynamic_cast<behaviour_t*>(m_collider.get());
       } else
         throw std::runtime_error("scene object already has collider");
@@ -55,7 +64,7 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
     }
   }
 
-  std::optional<collision_t<T>> check_collision(const Yavin::ray_t<T>& r) const {
+  std::optional<collision_t<T>> check_collision(const ray_t<T>& r) const {
     if (m_collider)
       return m_collider->check_collision(r);
     else
@@ -78,7 +87,7 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
     for (const auto& b : *this) b->on_collision(c);
   }
 
-  void on_render(const Yavin::Camera& cam) {
+  void on_render(const Camera& cam) {
     for (auto& b : *this) b->on_render(cam);
   }
 
@@ -113,7 +122,8 @@ class scene_object_t : public std::vector<std::unique_ptr<behaviour_t<T>>>, publ
   std::unique_ptr<collider_t<T>> m_collider;
   scene_object_t<T>*             m_parent_object;
   std::string                    m_name;
-  std::vector<scene_t<T>*>       m_appropriate_scenes;  // friend class scene_t adds itself on push_back
+  std::vector<scene_t<T>*>
+      m_appropriate_scenes;  // friend class scene_t adds itself on push_back
 };
 
 using scene_object_d = scene_object_t<double>;
@@ -121,5 +131,7 @@ using scene_object_f = scene_object_t<float>;
 
 using scene_object = scene_object_t<double>;
 
-}  // namespace Yavin
+//==============================================================================
+}  // namespace yavin
+//==============================================================================
 #endif

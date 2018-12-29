@@ -2,12 +2,12 @@
 #include "@CMAKE_SOURCE_DIR@/yavin_include/gl_functions.h"
 
 //=============================================================================
-namespace Yavin {
+namespace yavin {
 //=============================================================================
 
-bool gl::verbose = @VERBOSE_GL@;
-std::ostream* gl::out = &std::cout;
+bool          gl::verbose = @VERBOSE_GL@;
+std::ostream* gl::out     = &std::cout;
 
 //=============================================================================
-} // namespace Yavin
+}  // namespace yavin
 //=============================================================================

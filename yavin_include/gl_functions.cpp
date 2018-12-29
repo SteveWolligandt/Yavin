@@ -2,7 +2,7 @@
 #include "to_string.h"
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 // MISC
 //==============================================================================
@@ -41,7 +41,7 @@ const GLubyte* gl::get_string(GLenum name) {
   auto result = glGetString(name);
   gl_error_check("glGetString");
   return result;
-}  // namespace Yavin
+}
 
 //------------------------------------------------------------------------------
 
@@ -1024,11 +1024,11 @@ void gl::copy_image_sub_data(GLuint srcName, GLenum srcTarget, GLint srcLevel,
                              GLsizei srcHeight, GLsizei srcDepth) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
-    *out << "glCopyImageSubData(" << srcName << ", " << to_string(srcTarget) << ", "
-         << srcLevel << ", " << srcX << ", " << srcY << ", " << srcZ << ", "
-         << dstName << ", " << to_string(dstTarget) << ", " << dstLevel << ", " << dstX
-         << ", " << dstY << ", " << dstZ << ", " << srcWidth << ", "
-         << srcHeight << ", " << srcDepth << ")\n";
+    *out << "glCopyImageSubData(" << srcName << ", " << to_string(srcTarget)
+         << ", " << srcLevel << ", " << srcX << ", " << srcY << ", " << srcZ
+         << ", " << dstName << ", " << to_string(dstTarget) << ", " << dstLevel
+         << ", " << dstX << ", " << dstY << ", " << dstZ << ", " << srcWidth
+         << ", " << srcHeight << ", " << srcDepth << ")\n";
   glCopyImageSubData(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName,
                      dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight,
                      srcDepth);
@@ -1303,5 +1303,5 @@ GLenum gl::check_named_framebuffer_status(GLuint framebuffer, GLenum target) {
   return result;
 }
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================

@@ -6,14 +6,10 @@
 #include "gl_type.h"
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 
-/**
- * @brief      Base Attribute
- *
- * @tparam     Ts    Data in attribute
- */
+//!  Base Attribute
 template <unsigned int n, typename T>
 struct attrib {
   static constexpr GLenum       type     = gl_type<T>::type;
@@ -106,6 +102,6 @@ using ui8vec3   = attrib<3, uint8_t>;
 using ui8vec4   = attrib<4, uint8_t>;
 
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================
 #endif

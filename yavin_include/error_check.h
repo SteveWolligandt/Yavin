@@ -7,7 +7,7 @@
 #include "dll_export.h"
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 
 class gl_error : public std::runtime_error {
@@ -24,13 +24,13 @@ class gl_framebuffer_not_complete_error : public std::runtime_error {
 DLL_API const std::string gl_error_to_string(int err);
 DLL_API const std::string gl_framebuffer_error_to_string(int status);
 
-DLL_API void _gl_error_check(const std::string& function,
-                             const char* file, size_t line);
+DLL_API void _gl_error_check(const std::string& function, const char* file,
+                             size_t line);
 DLL_API void gl_framebuffer_not_complete_check(const unsigned int fbo_id);
 
 #define gl_error_check(fun) _gl_error_check(fun, __FILE__, __LINE__);
 
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================
 #endif

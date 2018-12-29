@@ -5,7 +5,7 @@
 #include "gl_functions.h"
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 
 gl_error::gl_error(const std::string& function_name, const std::string& message,
@@ -75,5 +75,5 @@ void gl_framebuffer_not_complete_check(const GLuint fbo_id) {
 }
 
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================

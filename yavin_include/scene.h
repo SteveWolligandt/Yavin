@@ -4,12 +4,14 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-#include "Camera.h"
+#include "camera.h"
 #include "collision.h"
 #include "ray.h"
 #include "scene_object.h"
 
-namespace Yavin {
+//==============================================================================
+namespace yavin {
+//==============================================================================
 
 template <typename T = double>
 class scene_t : public std::vector<scene_object_t<T>> {
@@ -22,7 +24,7 @@ class scene_t : public std::vector<scene_object_t<T>> {
     return *dynamic_cast<shader_t*>(m_shader_pool.back().get());
   }
 
-  std::optional<collision_t<T>> cast_ray(const Yavin::ray_t<T>& r) const {
+  std::optional<collision_t<T>> cast_ray(const ray_t<T>& r) const {
     T                             shortest_dist = 1e10;
     std::optional<collision_t<T>> closest_collision;
     for (const auto& obj : *this)
@@ -59,8 +61,7 @@ class scene_t : public std::vector<scene_object_t<T>> {
     return this->back();
   }
 
-  std::optional<collision_t<T>> cast_ray(const Yavin::ray_t<T>& r, T x,
-                                         T y) const {
+  std::optional<collision_t<T>> cast_ray(const ray_t<T>& r, T x, T y) const {
     auto c = cast_ray(r);
     if (c) c->object().on_mouse_down(x, y);
     return c;
@@ -82,7 +83,7 @@ class scene_t : public std::vector<scene_object_t<T>> {
     for (auto& obj : *this) obj.on_collision(c);
   }
 
-  void on_render(const Yavin::Camera& cam) {
+  void on_render(const Camera& cam) {
     gl::viewport(cam.viewport());
     for (auto& obj : *this) obj.on_render(cam);
   }
@@ -101,5 +102,7 @@ using scene_f = scene_t<float>;
 
 using scene = scene_t<double>;
 
-}  // namespace Yavin
+//==============================================================================
+}  // namespace yavin
+//==============================================================================
 #endif

@@ -3,7 +3,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace Yavin {
+namespace yavin {
 enum Keys {
   KEY_0             = GLFW_KEY_0,
   KEY_1             = GLFW_KEY_1,
@@ -128,6 +128,6 @@ enum Keys {
   KEY_Y             = GLFW_KEY_Y,
   KEY_Z             = GLFW_KEY_Z
 }
-}  // Yavin
+}  // namespace yavin
 
 #endif

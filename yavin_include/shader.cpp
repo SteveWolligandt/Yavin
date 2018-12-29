@@ -1,9 +1,9 @@
-#include "Shader.h"
+#include "shader.h"
 
 #include "gl_functions.h"
 
 //==============================================================================
-namespace Yavin {
+namespace yavin {
 //==============================================================================
 
 template void Shader::add_shader_stage<VertexShader, char const*>(char const*);
@@ -320,5 +320,5 @@ void Shader::info_log() {
 }
 
 //==============================================================================
-}  // namespace Yavin
+}  // namespace yavin
 //==============================================================================
