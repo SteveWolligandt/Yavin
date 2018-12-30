@@ -13,6 +13,15 @@ class IndexBufferFixture : public IndexBuffer {
 
 //------------------------------------------------------------------------------
 
+TEST_CASE("IBO default construction") {
+  IndexBuffer ibo;
+  REQUIRE(ibo.gl_handle() != 0);
+  REQUIRE(ibo.size() == 0);
+  REQUIRE(ibo.capacity() == 0);
+}
+
+//------------------------------------------------------------------------------
+
 TEST_CASE_METHOD(IndexBufferFixture, "IBO Download") {
   auto down = download_data();
   for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == at(i));
@@ -69,7 +78,7 @@ TEST_CASE_METHOD(IndexBufferFixture, "IBO copy constructor") {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE_METHOD(IndexBufferFixture, "IBO move assignment") {
+TEST_CASE_METHOD(IndexBufferFixture, "IBO move constructor") {
   auto ibo_handle = gl_handle();
 
   REQUIRE(size() == 4);
@@ -93,6 +102,57 @@ TEST_CASE_METHOD(IndexBufferFixture, "IBO move assignment") {
 
 //------------------------------------------------------------------------------
 
+TEST_CASE_METHOD(IndexBufferFixture, "IBO move assignement") {
+  auto ibo_handle = gl_handle();
+
+  IndexBuffer moved{0, 1, 3, 4, 6, 7};  // some initializer data
+  moved = std::move(*this);
+
+  REQUIRE(size() == 6);
+  REQUIRE(capacity() == 6);
+
+  REQUIRE(moved.size() == 4);
+  REQUIRE(moved.capacity() == 4);
+
+  for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == moved[i]);
+
+  REQUIRE(at(0) == 0);
+  REQUIRE(at(1) == 1);
+  REQUIRE(at(2) == 3);
+  REQUIRE(at(3) == 4);
+  REQUIRE(at(4) == 6);
+  REQUIRE(at(5) == 7);
+}
+
+//------------------------------------------------------------------------------
+
+TEST_CASE("IBO size construction") {
+  SECTION("default initial") {
+    IndexBuffer ibo(10);
+    REQUIRE(ibo.size() == 10);
+    REQUIRE(ibo.capacity() == 10);
+  }
+  SECTION("specified initial") {
+    IndexBuffer ibo(10, 1);
+    REQUIRE(ibo.size() == 10);
+    REQUIRE(ibo.capacity() == 10);
+    auto data = ibo.download_data();
+    for (const auto& d : data) REQUIRE(d == 1);
+  }
+}
+
+//------------------------------------------------------------------------------
+
+TEST_CASE("IBO std::vector construction") {
+  std::vector<unsigned int> data{1, 2, 3, 4};
+  IndexBuffer               ibo(data);
+  REQUIRE(data.size() == ibo.size());
+  REQUIRE(data.size() == ibo.capacity());
+  for (size_t i = 0; i < data.size(); ++i) REQUIRE(ibo[i] == data[i]);
+}
+
+//------------------------------------------------------------------------------
+
 TEST_CASE_METHOD(IndexBufferFixture, "IBO push pop") {
   REQUIRE(size() == 4);
   REQUIRE(capacity() == 4);
@@ -110,6 +170,10 @@ TEST_CASE_METHOD(IndexBufferFixture, "IBO push pop") {
   for (size_t i = 0; i < 4; ++i) REQUIRE(correct_ibo_data[i] == at(i));
   REQUIRE(at(4) == 3);
   REQUIRE(at(5) == 8);
+
+  pop_back();
+  REQUIRE(size() == 5);
+  REQUIRE(capacity() == 8);
 }
 
 //==============================================================================

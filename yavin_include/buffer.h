@@ -474,7 +474,8 @@ class Buffer {
 //==============================================================================
 
 template <GLsizei array_type, typename T>
-Buffer<array_type, T>::Buffer(usage_t usage) : m_usage(usage) {
+Buffer<array_type, T>::Buffer(usage_t usage)
+    : m_usage(usage), m_size(0), m_capacity(0) {
   create_handle();
 }
 
