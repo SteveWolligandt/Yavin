@@ -1199,6 +1199,19 @@ void gl::texture_parameter_Iuiv(GLuint texture, GLenum pname,
   gl_error_check("glTextureParameterIuiv");
 }
 
+//------------------------------------------------------------------------------
+
+void gl::clear_tex_image(GLuint texture, GLint level, GLenum format,
+                         GLenum type, const void* data) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glClearTexImage(" << texture << ", " << level << ", "
+         << to_string(format) << ", " << to_string(type) << ", " << data
+         << ")\n";
+  glClearTexImage(texture, level, format, type, data);
+  gl_error_check("glClearTexImage");
+}
+
 //==============================================================================
 // FRAMEBUFFER RELATED
 //==============================================================================

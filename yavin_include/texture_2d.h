@@ -27,6 +27,13 @@ class Texture2D : public Texture {
       std::is_same_v<C, RGBA> || std::is_same_v<C, BGR> ||
       std::is_same_v<C, BGRA>;
 
+  static constexpr unsigned int n =
+      TexHelper::comb<T, Components>::num_components;
+  static constexpr GLint internal_format =
+      TexHelper::comb<T, Components>::internal_format;
+  static constexpr GLenum format = TexHelper::comb<T, Components>::format;
+  static constexpr GLenum type   = TexHelper::comb<T, Components>::type;
+
   Texture2D(const Texture2D& other);
   Texture2D(Texture2D&& other);
 
@@ -117,6 +124,14 @@ class Texture2D : public Texture {
   auto width() const;
   auto height() const;
 
+  void clear(const std::array<T, n>& col);
+
+  template <typename... Ts>
+  void clear(Ts&&... ts) {
+    static_assert(sizeof...(Ts) == n);
+    clear({std::forward<Ts>(ts)...});
+  }
+
   template <typename c = Components,
             typename   = std::enable_if_t<is_loadable<c>>>
   void load_png(const std::string& filepath);
@@ -134,13 +149,6 @@ class Texture2D : public Texture {
   void           set_data(const PixelUnpackBuffer<T>& pbo);
 
   void resize(unsigned int w, unsigned int h);
-
-  static constexpr unsigned int n =
-      TexHelper::comb<T, Components>::num_components;
-  static constexpr GLint internal_format =
-      TexHelper::comb<T, Components>::internal_format;
-  static constexpr GLenum format = TexHelper::comb<T, Components>::format;
-  static constexpr GLenum type   = TexHelper::comb<T, Components>::type;
 
  protected:
   unsigned int m_width, m_height;
@@ -451,6 +459,12 @@ auto Texture2D<T, Components>::width() const {
 template <typename T, typename Components>
 auto Texture2D<T, Components>::height() const {
   return m_height;
+}
+
+template <typename T, typename Components>
+void Texture2D<T, Components>::clear(
+    const std::array<T, Texture2D<T, Components>::n>& col) {
+  gl::clear_tex_image(this->m_id, 0, format, type, col.data());
 }
 
 template <typename T, typename Components>

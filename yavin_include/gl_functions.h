@@ -600,6 +600,12 @@ struct gl {
   DLL_API static void texture_parameter_Iuiv(GLuint texture, GLenum pname,
                                              const GLuint* param);
 
+  //------------------------------------------------------------------------------
+
+  DLL_API static void clear_tex_image(GLuint texture, GLint level,
+                                      GLenum format, GLenum type,
+                                      const void* data);
+
   //==============================================================================
   // FRAMEBUFFER RELATED
   //==============================================================================
