@@ -74,10 +74,9 @@ class Texture2D : public Texture {
       : Texture2D(width, height, data, interp_mode, interp_mode, wrap_mode,
                   wrap_mode) {}
   Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
-            InterpolationMode interp_mode_min = default_interpolation,
-            InterpolationMode interp_mode_mag = default_interpolation,
-            WrapMode          wrap_mode_s     = default_wrap_mode,
-            WrapMode          wrap_mode_t     = default_wrap_mode);
+            InterpolationMode interp_mode_min,
+            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
+            WrapMode wrap_mode_t);
 
   template <typename S>
   Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data)
