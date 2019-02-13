@@ -114,6 +114,9 @@ struct gl {
   DLL_API static void vertex_attrib_l_pointer(GLuint index, GLint size,
                                               GLenum type, GLsizei stride,
                                               const GLvoid* pointer);
+  //------------------------------------------------------------------------------
+
+  DLL_API static void draw_arrays(GLenum mode, GLint first, GLsizei count);
 
   //==============================================================================
   // VERTEXARRAY RELATED
@@ -194,6 +197,11 @@ struct gl {
 
   DLL_API static void named_buffer_sub_data(GLuint buffer, GLintptr offset,
                                             GLsizei size, const void* data);
+
+  //------------------------------------------------------------------------------
+
+  DLL_API static void get_buffer_parameter_iv(GLenum target, GLenum value,
+                                              GLint* data);
 
   //==============================================================================
   // SHADER RELATED

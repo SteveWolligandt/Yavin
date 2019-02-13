@@ -62,7 +62,8 @@ void _gl_error_check(const std::string& function, const char* file,
                      size_t line) {
   auto err     = gl::get_error();
   auto err_str = gl_error_to_string(err);
-  if (err != GL_NO_ERROR) throw gl_error(function, err_str, file, line);
+  if (err != GL_NO_ERROR)
+    throw gl_error(function, err_str, file, line);
 }
 
 //------------------------------------------------------------------------------

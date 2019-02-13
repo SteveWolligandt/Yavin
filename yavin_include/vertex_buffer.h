@@ -6,10 +6,10 @@
 #include <tuple>
 #include <vector>
 #include "buffer.h"
-#include "vbo_helpers.h"
 #include "error_check.h"
 #include "gl_includes.h"
 #include "tuple.h"
+#include "vbo_helpers.h"
 
 //==============================================================================
 namespace yavin {
@@ -57,11 +57,6 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
   VertexBuffer(std::initializer_list<data_t>&& list)
       : parent_t(std::move(list), default_usage) {}
 
-  void bind() const {
-    parent_t::bind();
-    activate_attributes();
-  }
-
   void push_back(Ts&&... ts) {
     parent_t::push_back(make_tuple(std::forward<Ts>(ts)...));
   }
@@ -72,6 +67,11 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
       gl::vertex_attrib_pointer(i, num_dims[i], types[i], GL_FALSE,
                                 this_t::data_size, (void*)offsets[i]);
     }
+  }
+
+  static constexpr void deactivate_attributes() {
+    for (unsigned int i = 0; i < num_attributes; i++)
+      gl::disable_vertex_attrib_array(i);
   }
 };
 

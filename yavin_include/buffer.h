@@ -15,19 +15,20 @@ class Buffer;
 
 //==============================================================================
 
-template <GLsizei array_type, typename T>
+template <GLsizei ArrayType, typename T, GLbitfield Access>
 class BufferMap {
  public:
-  using buffer_t                    = Buffer<array_type, T>;
-  constexpr static size_t data_size = buffer_t::data_size;
+  static constexpr auto access     = Access;
+  static constexpr auto array_type = ArrayType;
+  using buffer_t                   = Buffer<array_type, T>;
+  static constexpr auto data_size  = buffer_t::data_size;
 
   //! constructor gets a mapping to gpu_buffer
-  BufferMap(const buffer_t* buffer, size_t offset, size_t length,
-            GLbitfield access)
-      : m_buffer(buffer), m_offset(offset), m_length(length), m_access(access) {
+  BufferMap(const buffer_t* buffer, size_t offset, size_t length)
+      : m_buffer(buffer), m_offset(offset), m_length(length) {
     m_gpu_mapping = (T*)gl::map_named_buffer_range(
-        m_buffer->m_gl_handle, data_size * offset, data_size * m_length,
-        m_access);
+        m_buffer->gl_handle(), data_size * offset, data_size * m_length,
+        access);
     detail::mutex::gl_call.lock();
   }
 
@@ -37,7 +38,7 @@ class BufferMap {
   void unmap() {
     detail::mutex::gl_call.unlock();
     if (!m_unmapped) {
-      gl::unmap_named_buffer(m_buffer->m_gl_handle);
+      gl::unmap_named_buffer(m_buffer->gl_handle());
       m_unmapped = true;
     }
   }
@@ -61,38 +62,24 @@ class BufferMap {
 
   auto offset() const { return m_offset; }
   auto length() const { return m_length; }
-  auto access() const { return m_access; }
 
  protected:
   const buffer_t* m_buffer;
   size_t          m_offset;
   size_t          m_length;
-  GLbitfield      m_access;
   T*              m_gpu_mapping;
   bool            m_unmapped = false;
 };
 
 template <GLsizei array_type, typename T>
-class RBufferMap : public BufferMap<array_type, T> {
- public:
-  RBufferMap(const Buffer<array_type, T>* buffer, size_t offset, size_t length)
-      : BufferMap<array_type, T>(buffer, offset, length, GL_MAP_READ_BIT) {}
-};
+using RBufferMap = BufferMap<array_type, T, GL_MAP_READ_BIT>;
 
 template <GLsizei array_type, typename T>
-class WBufferMap : public BufferMap<array_type, T> {
- public:
-  WBufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length)
-      : BufferMap<array_type, T>(buffer, offset, length, GL_MAP_WRITE_BIT) {}
-};
+using WBufferMap = BufferMap<array_type, T, GL_MAP_WRITE_BIT>;
 
 template <GLsizei array_type, typename T>
-class RWBufferMap : public BufferMap<array_type, T> {
- public:
-  RWBufferMap(Buffer<array_type, T>* buffer, size_t offset, size_t length)
-      : BufferMap<array_type, T>(buffer, offset, length,
-                                 GL_MAP_WRITE_BIT | GL_MAP_READ_BIT) {}
-};
+using RWBufferMap =
+    BufferMap<array_type, T, GL_MAP_READ_BIT | GL_MAP_WRITE_BIT>;
 
 //==============================================================================
 //! Returned by Buffer::operator[] const for reading single elements
@@ -100,7 +87,7 @@ template <GLsizei array_type, typename T>
 class ReadableBufferElement {
  public:
   using buffer_t = Buffer<array_type, T>;
-  using r_map_t  = RBufferMap<array_type, T>;
+  using rmap_t   = RBufferMap<array_type, T>;
 
   ReadableBufferElement(const buffer_t* buffer, size_t idx)
       : m_buffer(buffer), m_idx(idx) {}
@@ -113,7 +100,7 @@ class ReadableBufferElement {
   operator T() const { return download(); }
 
   auto download() const {
-    r_map_t map(m_buffer, m_idx, 1);
+    rmap_t map(m_buffer, m_idx, 1);
     return map.front();
   }
 
@@ -134,9 +121,9 @@ inline auto& operator<<(std::ostream&                         out,
 template <GLsizei array_type, typename T>
 class WriteableBufferElement : public ReadableBufferElement<array_type, T> {
  public:
-  using parent_t = ReadableBufferElement<array_type, T>;
-  using buffer_t = typename parent_t::buffer_t;
-  using w_map_t  = WBufferMap<array_type, T>;
+  using parent_t    = ReadableBufferElement<array_type, T>;
+  using buffer_t    = typename parent_t::buffer_t;
+  using wmap_wmap_t = WBufferMap<array_type, T>;
 
   WriteableBufferElement(buffer_t* buffer, size_t idx)
       : parent_t(buffer, idx) {}
@@ -366,7 +353,6 @@ template <GLsizei _array_type, typename T>
 class Buffer {
   friend class ReadableBufferElement<_array_type, T>;
   friend class WriteableBufferElement<_array_type, T>;
-  friend class BufferMap<_array_type, T>;
 
  public:
   enum usage_t {
@@ -393,10 +379,9 @@ class Buffer {
   using iterator_t       = BufferIterator<array_type, T>;
   using const_iterator_t = ConstBufferIterator<array_type, T>;
 
-  using map_t    = BufferMap<array_type, T>;
-  using r_map_t  = RBufferMap<array_type, T>;
-  using w_map_t  = WBufferMap<array_type, T>;
-  using rw_map_t = RWBufferMap<array_type, T>;
+  using rmap_t  = RBufferMap<array_type, T>;
+  using wmap_t  = WBufferMap<array_type, T>;
+  using rwmap_t = RWBufferMap<array_type, T>;
 
   Buffer(usage_t usage);
   Buffer(const Buffer& other);
@@ -411,9 +396,10 @@ class Buffer {
 
   void create_handle();
   void destroy_handle();
+  auto gl_handle() const { return m_gl_handle; }
 
   void           upload_data(const std::vector<T>& data);
-  std::vector<T> download_data();
+  std::vector<T> download_data() const;
 
   void        bind() const;
   static void unbind();
@@ -454,14 +440,14 @@ class Buffer {
 
   auto gl_handle() { return m_gl_handle; }
 
-  auto map() { return rw_map_t(this, 0, m_size); }
-  auto map() const { return r_map_t(this, 0, m_size); }
+  auto map() { return rwmap_t(this, 0, m_size); }
+  auto map() const { return rmap_t(this, 0, m_size); }
 
   auto map(size_t offset, size_t length) {
-    return rw_map_t(this, offset, length);
+    return rwmap_t(this, offset, length);
   }
   auto map(size_t offset, size_t length) const {
-    return r_map_t(this, offset, length);
+    return rmap_t(this, offset, length);
   }
 
  protected:
@@ -603,10 +589,10 @@ void Buffer<array_type, T>::resize(size_t size) {
 //------------------------------------------------------------------------------
 
 template <GLsizei array_type, typename T>
-std::vector<T> Buffer<array_type, T>::download_data() {
-  r_map_t        map(this, 0, size());
+std::vector<T> Buffer<array_type, T>::download_data() const {
+  rmap_t         map(this, 0, size());
   std::vector<T> data(size());
-  for (size_t i = 0; i < size(); ++i) data[i] = map[i];
+  std::copy(map.begin(), map.end(), data.begin());
   return data;
 }
 

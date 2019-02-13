@@ -22,6 +22,7 @@
 #include "yavin_include/vbo_helpers.h"
 #include "yavin_include/vertex_array.h"
 #include "yavin_include/vertex_buffer.h"
+#include "yavin_include/indexed_data.h"
 #include "yavin_include/vertex_shader.h"
 #include "yavin_include/window.h"
 #include "yavin_include/oit_window.h"

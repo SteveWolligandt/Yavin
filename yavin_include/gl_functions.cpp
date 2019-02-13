@@ -192,7 +192,7 @@ void gl::vertex_attrib_pointer(GLuint index, GLint size, GLenum type,
   if (verbose)
     *out << "glVertexAttribPointer(" << index << ", " << size << ", "
          << to_string(type) << ", " << (normalized ? "true" : "false") << ", "
-         << stride << ")\n";
+         << stride << ", " << pointer << ")\n";
   glVertexAttribPointer(index, size, type, normalized, stride, pointer);
   gl_error_check("glVertexAttribPointer");
 }
@@ -215,6 +215,17 @@ void gl::vertex_attrib_l_pointer(GLuint index, GLint size, GLenum type,
   if (verbose) *out << "glVertexAttribLPointer\n";
   glVertexAttribLPointer(index, size, type, stride, pointer);
   gl_error_check("glVertexAttribLPointer");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::draw_arrays(GLenum mode, GLint first, GLsizei count) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glDrawArrays(" << to_string(mode) << ", " << first << ", " << count
+         << ")\n";
+  glDrawArrays(mode, first, count);
+  gl_error_check("glDrawArrays");
 }
 
 //==============================================================================
@@ -383,6 +394,19 @@ void gl::named_buffer_sub_data(GLuint buffer, GLintptr offset, GLsizei size,
          << ", " << data << ")\n";
   glNamedBufferSubData(buffer, offset, size, data);
   gl_error_check("glNamedBufferSubData");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::get_buffer_parameter_iv(GLenum target, GLenum value, GLint* data) {
+  assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER);
+  assert(value == GL_BUFFER_SIZE || value == GL_BUFFER_USAGE);
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glGetBufferParameteriv(" << to_string(target) << ", "
+         << to_string(value) << ", " << data << ", " << data << ")\n";
+  glGetBufferParameteriv(target, value, data);
+  gl_error_check("glGetBufferParameteriv");
 }
 
 //==============================================================================

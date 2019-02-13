@@ -27,7 +27,7 @@ VertexArray& VertexArray::operator=(VertexArray&& other) {
 VertexArray::~VertexArray() { destroy_handle(); }
 
 void VertexArray::destroy_handle() {
-  if (m_gl_handle != 0) gl::delete_buffers(1, &m_gl_handle);
+  if (m_gl_handle != 0) gl::delete_vertex_arrays(1, &m_gl_handle);
   m_gl_handle = 0;
 }
 
