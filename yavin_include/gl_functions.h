@@ -24,6 +24,22 @@ struct gl {
   // MISC
   //==============================================================================
 
+  DLL_API static void get_boolean_v(GLenum pname, GLboolean* params);
+
+  //------------------------------------------------------------------------------
+
+  DLL_API static void get_double_v(GLenum pname, GLdouble* params);
+
+  //------------------------------------------------------------------------------
+
+  DLL_API static void get_float_v(GLenum pname, GLfloat* params);
+
+  //------------------------------------------------------------------------------
+
+  DLL_API static void get_integer_v(GLenum pname, GLint* params);
+
+  //------------------------------------------------------------------------------
+
   DLL_API static void enable(GLenum cap);
 
   //------------------------------------------------------------------------------

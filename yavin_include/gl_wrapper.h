@@ -29,6 +29,9 @@ DLL_API void blend_func_multiplicative();
 DLL_API void blend_func_subtractive();
 DLL_API void blend_func_alpha();
 
+DLL_API GLint get_total_available_memory();
+DLL_API GLint get_current_available_memory();
+
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

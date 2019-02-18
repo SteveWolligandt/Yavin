@@ -26,6 +26,18 @@ void blend_func_alpha() {
   gl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+GLint get_total_available_memory() {
+  constexpr auto GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX = 0x9048;
+  GLint          tam;
+  gl::get_integer_v(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &tam);
+  return tam;
+}
+GLint get_current_available_memory() {
+  constexpr auto GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX = 0x9049;
+  GLint          tam;
+  gl::get_integer_v(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &tam);
+  return tam;
+}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

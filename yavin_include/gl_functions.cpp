@@ -7,6 +7,46 @@ namespace yavin {
 // MISC
 //==============================================================================
 
+void gl::get_boolean_v(GLenum pname, GLboolean* params) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glGetBooleanv(" << to_string(pname) << ", " << params << ")\n";
+  glGetBooleanv(pname, params);
+  gl_error_check("glGetBooleanv");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::get_double_v(GLenum pname, GLdouble* params) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glGetDoublev(" << to_string(pname) << ", " << params << ")\n";
+  glGetDoublev(pname, params);
+  gl_error_check("glGetDoublev");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::get_float_v(GLenum pname, GLfloat* params) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glGetFloatv(" << to_string(pname) << ", " << params << ")\n";
+  glGetFloatv(pname, params);
+  gl_error_check("glGetFloatv");
+}
+
+//------------------------------------------------------------------------------
+
+void gl::get_integer_v(GLenum pname, GLint* params) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glGetIntegerv(" << to_string(pname) << ", " << params << ")\n";
+  glGetIntegerv(pname, params);
+  gl_error_check("glGetIntergerv");
+}
+
+//------------------------------------------------------------------------------
+
 void gl::enable(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glEnable(" << to_string(cap) << ")\n";
