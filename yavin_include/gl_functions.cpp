@@ -657,7 +657,9 @@ void gl::program_uniform_2i(GLuint program, GLint location, GLint v0,
     *out << "glProgramUniform2i(" << program << ", " << location << ", " << v0
          << ", " << v1 << ")\n";
   glProgramUniform2i(program, location, v0, v1);
-  gl_error_check("glProgramUniform2i");
+  gl_error_check("glProgramUniform2i(" + std::to_string(program) + ", " +
+                 std::to_string(location) + ", " + std::to_string(v0) + ", " +
+                 std::to_string(v1) + ")");
 }
 
 //------------------------------------------------------------------------------

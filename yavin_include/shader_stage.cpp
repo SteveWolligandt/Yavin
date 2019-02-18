@@ -66,7 +66,7 @@ void ShaderStage::compile(bool use_ansi_color) {
   m_id           = gl::create_shader(m_shader_type);
   auto  source   = ShaderStageParser::parse(m_filename_or_source, m_glsl_vars,
                                          m_include_tree, m_string_type);
-  auto *source_c = source.c_str();
+  auto source_c = source.c_str();
   gl::shader_source(m_id, 1, &source_c, nullptr);
   gl::compile_shader(m_id);
   info_log(use_ansi_color);

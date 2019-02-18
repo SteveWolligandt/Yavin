@@ -14,7 +14,7 @@ namespace yavin {
  * <any>                                       <- variable name
  */
 const std::regex ShaderStageParser::regex_var(
-    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|int|uint|sampler\dD|mat\d|vec\d)\s(.*)[;])");
+    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|int|uint|sampler\dD|mat\d|vec\d|ivec\d|uivec\d)\s(.*)[;])");
 
 //------------------------------------------------------------------------------
 

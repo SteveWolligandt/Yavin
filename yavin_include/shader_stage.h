@@ -42,7 +42,7 @@ class ShaderStage {
 
   //----------------------------------------------------------------------------
 
-  const std::vector<GLSLVar>& glsl_vars() const { return m_glsl_vars; }
+  const auto& glsl_vars() const { return m_glsl_vars; }
 
   //----------------------------------------------------------------------------
 
