@@ -16,11 +16,13 @@ namespace yavin {
 //==============================================================================
 
 template <typename T, typename Components>
-class Texture2D : public Texture {
+class Texture2D : public BaseTexture<GL_TEXTURE_2D> {
  public:
-  static constexpr bool              is_float = std::is_same<float, T>::value;
-  static constexpr InterpolationMode default_interpolation = LINEAR;
-  static constexpr WrapMode          default_wrap_mode     = REPEAT;
+  using this_t                   = Texture2D<T, Components>;
+  using parent_t                 = BaseTexture<GL_TEXTURE_2D>;
+  static constexpr bool is_float = std::is_same<float, T>::value;
+  static constexpr tex::InterpolationMode default_interpolation = tex::LINEAR;
+  static constexpr tex::WrapMode          default_wrap_mode     = tex::REPEAT;
   template <typename C>
   static constexpr bool is_loadable =
       std::is_same_v<C, R> || std::is_same_v<C, RGB> ||
@@ -44,39 +46,39 @@ class Texture2D : public Texture {
                   default_wrap_mode, default_wrap_mode) {}
   template <typename c = Components,
             typename   = std::enable_if_t<is_loadable<c>>>
-  Texture2D(const std::string& filepath, InterpolationMode interp_mode,
-            WrapMode wrap_mode)
+  Texture2D(const std::string& filepath, tex::InterpolationMode interp_mode,
+            tex::WrapMode wrap_mode)
       : Texture2D(filepath, interp_mode, interp_mode, wrap_mode, wrap_mode) {}
   template <typename c = Components,
             typename   = std::enable_if_t<is_loadable<c>>>
-  Texture2D(const std::string& filepath, InterpolationMode interp_mode_min,
-            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
-            WrapMode wrap_mode_t);
+  Texture2D(const std::string& filepath, tex::InterpolationMode interp_mode_min,
+            tex::InterpolationMode interp_mode_mag, tex::WrapMode wrap_mode_s,
+            tex::WrapMode wrap_mode_t);
 
   Texture2D(unsigned int width, unsigned int height)
       : Texture2D(width, height, default_interpolation, default_interpolation,
                   default_wrap_mode, default_wrap_mode) {}
   Texture2D(unsigned int width, unsigned int height,
-            InterpolationMode interp_mode, WrapMode wrap_mode)
+            tex::InterpolationMode interp_mode, tex::WrapMode wrap_mode)
       : Texture2D(width, height, interp_mode, interp_mode, wrap_mode,
                   wrap_mode) {}
   Texture2D(unsigned int width, unsigned int height,
-            InterpolationMode interp_mode_min,
-            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
-            WrapMode wrap_mode_t);
+            tex::InterpolationMode interp_mode_min,
+            tex::InterpolationMode interp_mode_mag, tex::WrapMode wrap_mode_s,
+            tex::WrapMode wrap_mode_t);
 
   Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data)
       : Texture2D(width, height, data, default_interpolation,
                   default_interpolation, default_wrap_mode, default_wrap_mode) {
   }
   Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
-            InterpolationMode interp_mode, WrapMode wrap_mode)
+            tex::InterpolationMode interp_mode, tex::WrapMode wrap_mode)
       : Texture2D(width, height, data, interp_mode, interp_mode, wrap_mode,
                   wrap_mode) {}
   Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
-            InterpolationMode interp_mode_min,
-            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
-            WrapMode wrap_mode_t);
+            tex::InterpolationMode interp_mode_min,
+            tex::InterpolationMode interp_mode_mag, tex::WrapMode wrap_mode_s,
+            tex::WrapMode wrap_mode_t);
 
   template <typename S>
   Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data)
@@ -85,39 +87,39 @@ class Texture2D : public Texture {
   }
   template <typename S>
   Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
-            InterpolationMode interp_mode, WrapMode wrap_mode)
+            tex::InterpolationMode interp_mode, tex::WrapMode wrap_mode)
       : Texture2D(width, height, data, interp_mode, interp_mode, wrap_mode,
                   wrap_mode) {}
 
   template <typename S>
   Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data,
-            InterpolationMode interp_mode_min,
-            InterpolationMode interp_mode_mag, WrapMode wrap_mode_s,
-            WrapMode wrap_mode_t);
+            tex::InterpolationMode interp_mode_min,
+            tex::InterpolationMode interp_mode_mag, tex::WrapMode wrap_mode_s,
+            tex::WrapMode wrap_mode_t);
 
   void        bind(unsigned int i = 0) const;
   static void unbind(unsigned int i = 0);
   void        bind_image_texture(unsigned int i = 0) const;
   static void unbind_image_texture(unsigned int i = 0);
 
-  void set_interpolation_mode(InterpolationMode mode);
-  void set_interpolation_mode_min(InterpolationMode mode);
-  void set_interpolation_mode_mag(InterpolationMode mode);
+  void set_interpolation_mode(tex::InterpolationMode mode);
+  void set_interpolation_mode_min(tex::InterpolationMode mode);
+  void set_interpolation_mode_mag(tex::InterpolationMode mode);
 
-  void set_wrap_mode(WrapMode mode);
-  void set_wrap_mode_s(WrapMode mode);
-  void set_wrap_mode_t(WrapMode mode);
+  void set_wrap_mode(tex::WrapMode mode);
+  void set_wrap_mode_s(tex::WrapMode mode);
+  void set_wrap_mode_t(tex::WrapMode mode);
 
   template <typename _Components = Components,
             typename = std::enable_if<std::is_same_v<_Components, Depth>>>
-  void set_compare_func(CompareFunc f) {
-    gl::texture_parameter_i(m_id, GL_TEXTURE_COMPARE_FUNC, f);
+  void set_compare_func(tex::CompareFunc f) {
+    gl::texture_parameter_i(this->m_id, GL_TEXTURE_COMPARE_FUNC, f);
   }
 
   template <typename _Components = Components,
             typename = std::enable_if<std::is_same_v<_Components, Depth>>>
-  void set_compare_mode(CompareMode m) {
-    gl::texture_parameter_i(m_id, GL_TEXTURE_COMPARE_MODE, m);
+  void set_compare_mode(tex::CompareMode m) {
+    gl::texture_parameter_i(this->m_id, GL_TEXTURE_COMPARE_MODE, m);
   }
 
   auto width() const;
@@ -148,10 +150,14 @@ class Texture2D : public Texture {
   void           set_data(const PixelUnpackBuffer<T>& pbo);
 
   void resize(unsigned int w, unsigned int h);
+  void swap(Texture2D& other) {
+    parent_t::swap(other);
+    std::swap(m_width, other.m_width);
+    std::swap(m_height, other.m_height);
+  }
 
  protected:
   unsigned int m_width, m_height;
-  bool         m_is_consistent = false;
 };
 
 template <typename T, typename tex_t>
@@ -312,12 +318,11 @@ struct tex_png<T, BGRA> {
 
 template <typename T, typename Components>
 template <typename, typename>
-Texture2D<T, Components>::Texture2D(const std::string& filepath,
-                                    InterpolationMode  interp_mode_min,
-                                    InterpolationMode  interp_mode_mag,
-                                    WrapMode           wrap_mode_s,
-                                    WrapMode           wrap_mode_t) {
-  gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
+Texture2D<T, Components>::Texture2D(const std::string&     filepath,
+                                    tex::InterpolationMode interp_mode_min,
+                                    tex::InterpolationMode interp_mode_mag,
+                                    tex::WrapMode          wrap_mode_s,
+                                    tex::WrapMode          wrap_mode_t) {
   assert(filepath.substr(filepath.size() - 3, 3) == "png");
   bind();
   load_png(filepath);
@@ -329,14 +334,13 @@ Texture2D<T, Components>::Texture2D(const std::string& filepath,
 
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    InterpolationMode interp_mode_min,
-                                    InterpolationMode interp_mode_mag,
-                                    WrapMode wrap_mode_s, WrapMode wrap_mode_t)
-    : Texture(), m_width(0), m_height(0) {
-  gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
+                                    tex::InterpolationMode interp_mode_min,
+                                    tex::InterpolationMode interp_mode_mag,
+                                    tex::WrapMode          wrap_mode_s,
+                                    tex::WrapMode          wrap_mode_t)
+    : m_width(0), m_height(0) {
   bind();
   resize(width, height);
-  m_is_consistent = false;
   set_interpolation_mode_min(interp_mode_min);
   set_interpolation_mode_mag(interp_mode_mag);
   set_wrap_mode_s(wrap_mode_s);
@@ -352,18 +356,18 @@ Texture2D<T, Components>::Texture2D(const Texture2D& other)
 
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(Texture2D&& other)
-    : Texture(std::move(other)),
-      m_width(other.m_width),
-      m_height(other.m_height) {}
+    : parent_t(std::move(other)),
+      m_width(std::exchange(other.m_width, 0)),
+      m_height(std::exchange(other.m_height, 0)) {}
 
 template <typename T, typename Components>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<T>& data,
-                                    InterpolationMode     interp_mode_min,
-                                    InterpolationMode     interp_mode_mag,
-                                    WrapMode wrap_mode_s, WrapMode wrap_mode_t)
-    : Texture(), m_width(width), m_height(height) {
-  gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
+                                    const std::vector<T>&  data,
+                                    tex::InterpolationMode interp_mode_min,
+                                    tex::InterpolationMode interp_mode_mag,
+                                    tex::WrapMode          wrap_mode_s,
+                                    tex::WrapMode          wrap_mode_t)
+    : m_width(width), m_height(height) {
   bind();
   upload_data(data);
   set_interpolation_mode_min(interp_mode_min);
@@ -375,15 +379,15 @@ Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
 template <typename T, typename Components>
 template <typename S>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<S>& _data,
-                                    InterpolationMode     interp_mode_min,
-                                    InterpolationMode     interp_mode_mag,
-                                    WrapMode wrap_mode_s, WrapMode wrap_mode_t)
-    : Texture(), m_width(width), m_height(height) {
+                                    const std::vector<S>&  _data,
+                                    tex::InterpolationMode interp_mode_min,
+                                    tex::InterpolationMode interp_mode_mag,
+                                    tex::WrapMode          wrap_mode_s,
+                                    tex::WrapMode          wrap_mode_t)
+    : m_width(width), m_height(height) {
   std::vector<T> data;
   data.reserve(_data.size());
   for (const auto& date : _data) data.push_back(static_cast<T>(date));
-  gl::create_textures(GL_TEXTURE_2D, 1, &m_id);
   bind();
   upload_data(data);
   set_interpolation_mode_min(interp_mode_min);
@@ -396,7 +400,7 @@ template <typename T, typename Components>
 void Texture2D<T, Components>::bind(unsigned int i) const {
   assert(i < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
   gl::active_texture(GL_TEXTURE0 + i);
-  gl::bind_texture(GL_TEXTURE_2D, m_id);
+  gl::bind_texture(GL_TEXTURE_2D, this->m_id);
 }
 
 template <typename T, typename Components>
@@ -417,37 +421,38 @@ void Texture2D<T, Components>::unbind_image_texture(unsigned int i) {
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::set_interpolation_mode(InterpolationMode mode) {
+void Texture2D<T, Components>::set_interpolation_mode(
+    tex::InterpolationMode mode) {
   set_interpolation_mode_min(mode);
   set_interpolation_mode_mag(mode);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::set_interpolation_mode_min(
-    InterpolationMode mode) {
-  gl::texture_parameter_i(m_id, GL_TEXTURE_MIN_FILTER, mode);
+    tex::InterpolationMode mode) {
+  gl::texture_parameter_i(this->m_id, GL_TEXTURE_MIN_FILTER, mode);
 }
 
 template <typename T, typename Components>
 void Texture2D<T, Components>::set_interpolation_mode_mag(
-    InterpolationMode mode) {
-  gl::texture_parameter_i(m_id, GL_TEXTURE_MAG_FILTER, mode);
+    tex::InterpolationMode mode) {
+  gl::texture_parameter_i(this->m_id, GL_TEXTURE_MAG_FILTER, mode);
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::set_wrap_mode(WrapMode mode) {
+void Texture2D<T, Components>::set_wrap_mode(tex::WrapMode mode) {
   set_wrap_mode_s(mode);
   set_wrap_mode_t(mode);
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::set_wrap_mode_s(WrapMode mode) {
-  gl::texture_parameter_i(m_id, GL_TEXTURE_WRAP_S, mode);
+void Texture2D<T, Components>::set_wrap_mode_s(tex::WrapMode mode) {
+  gl::texture_parameter_i(this->m_id, GL_TEXTURE_WRAP_S, mode);
 }
 
 template <typename T, typename Components>
-void Texture2D<T, Components>::set_wrap_mode_t(WrapMode mode) {
-  gl::texture_parameter_i(m_id, GL_TEXTURE_WRAP_T, mode);
+void Texture2D<T, Components>::set_wrap_mode_t(tex::WrapMode mode) {
+  gl::texture_parameter_i(this->m_id, GL_TEXTURE_WRAP_T, mode);
 }
 
 template <typename T, typename Components>
@@ -533,16 +538,20 @@ void Texture2D<T, Components>::resize(unsigned int width, unsigned int height) {
     m_height = height;
     gl::tex_image_2d(GL_TEXTURE_2D, 0, internal_format, m_width, m_height, 0,
                      format, type, nullptr);
-    m_is_consistent = false;
   }
 }
 
 template <typename T, typename Components>
 std::vector<T> Texture2D<T, Components>::download_data() const {
   std::vector<T> data(n * m_width * m_height);
-  gl::get_texture_image(m_id, 0, format, type,
+  gl::get_texture_image(this->m_id, 0, format, type,
                         m_width * m_height * n * sizeof(T), data.data());
   return data;
+}
+
+template <typename T, typename Components>
+void swap(Texture2D<T, Components>& t0, Texture2D<T, Components>& t1) {
+  t0.swap(t1);
 }
 
 //==============================================================================

@@ -50,8 +50,8 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
   m_linked_list.bind(9);
 
   m_head_indices_tex.bind();
-  m_head_indices_tex.set_interpolation_mode(Texture::NEAREST);
-  m_head_indices_tex.set_wrap_mode(Texture::REPEAT);
+  m_head_indices_tex.set_interpolation_mode(tex::NEAREST);
+  m_head_indices_tex.set_wrap_mode(tex::REPEAT);
   m_head_indices_tex.unbind();
   m_head_indices_tex.bind_image_texture(7);
 

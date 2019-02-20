@@ -700,9 +700,13 @@ void gl::program_uniform_1ui(GLuint program, GLint location, GLuint v0) {
 void gl::program_uniform_2ui(GLuint program, GLint location, GLuint v0,
                              GLuint v1) {
   std::lock_guard lock(detail::mutex::gl_call);
-  if (verbose) *out << "glProgramUniform2ui\n";
+  if (verbose)
+    *out << "glProgramUniform2ui(" << program << ", " << location << ", " << v0
+         << ", " << v1 << ")\n";
   glProgramUniform2ui(program, location, v0, v1);
-  gl_error_check("glProgramUniform2ui");
+  gl_error_check("glProgramUniform2ui(" + std::to_string(program) + ", " +
+                 std::to_string(location) + ", " + std::to_string(v0) + ", " +
+                 std::to_string(v1) + ")");
 }
 
 //------------------------------------------------------------------------------

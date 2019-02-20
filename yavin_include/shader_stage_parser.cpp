@@ -7,23 +7,11 @@
 namespace yavin {
 //==============================================================================
 
-/**
- * layout (location=<digit>)                   <- optional layout position
- * {in|out|uniform}                            <- modifier
- * {float | int | sampler<digit>D | mat<digit> | vec<digit>} <- datatype
- * <any>                                       <- variable name
- */
 const std::regex ShaderStageParser::regex_var(
-    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|int|uint|sampler\dD|mat\d|vec\d|ivec\d|uivec\d)\s(.*)[;])");
+    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|double|int|uint|bool|sampler\dD|mat\d|vec\d|ivec\d|uvec\d|bvec\d|dvec\d)\s(.*)[;])");
 
 //------------------------------------------------------------------------------
 
-/**
- * #include <- keyword
- * "        <- string start
- * <any>    <- path
- * "        <- string end
- */
 const std::regex ShaderStageParser::regex_include(R"(#include\s+\"(.*)\")");
 
 //==============================================================================
@@ -74,7 +62,7 @@ std::optional<GLSLVar> ShaderStageParser::parse_varname(
 
   std::regex_match(line, match, regex_var);
 
-  if (match.str(4).size() > 0) {
+  if (!match.str(4).empty()) {
     return GLSLVar{[](const std::string& mod_name) {
                      if (mod_name == "uniform")
                        return GLSLVar::UNIFORM;
