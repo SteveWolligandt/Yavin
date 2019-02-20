@@ -13,7 +13,8 @@ namespace yavin {
 
 class Window {
  public:
-  DLL_API Window(const std::string& name, const int width, const unsigned int height, const unsigned int major = 4,
+  DLL_API Window(const std::string& name, const int width,
+                 const unsigned int height, const unsigned int major = 4,
                  const unsigned int minor = 5);
   DLL_API ~Window();
 
@@ -41,11 +42,6 @@ class Window {
   DLL_API void        print_versions();
 
   DLL_API void make_context_current();
-  DLL_API void enable_multisampling();
-  DLL_API void disable_multisampling();
-  DLL_API bool multisampling_enabled();
-  DLL_API void enable_depth_test();
-  DLL_API void disable_depth_test();
 
  private:
   GLFWwindow*  m_window;

@@ -19,6 +19,10 @@ void disable_depth_write() { gl::depth_mask(GL_FALSE); }
 void enable_blending() { gl::enable(GL_BLEND); }
 void disable_blending() { gl::disable(GL_BLEND); }
 
+void enable_multisampling() { gl::enable(GL_MULTISAMPLE); }
+void disable_multisampling() { gl::disable(GL_MULTISAMPLE); }
+bool multisampling_enabled() { return gl::is_enabled(GL_MULTISAMPLE); }
+
 void blend_func_additive() { gl::blend_func(GL_ONE, GL_ONE); }
 void blend_func_multiplicative() { gl::blend_func(GL_ONE, GL_ONE); }
 void blend_func_subtractive() { gl::blend_func(GL_ONE, GL_ONE); }

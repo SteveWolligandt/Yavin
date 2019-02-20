@@ -164,14 +164,6 @@ void Window::print_versions() {
 void Window::should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
 
-void Window::enable_multisampling() { gl::enable(GL_MULTISAMPLE); }
-void Window::disable_multisampling() { gl::disable(GL_MULTISAMPLE); }
-
-bool Window::multisampling_enabled() { return gl::is_enabled(GL_MULTISAMPLE); }
-
-void Window::enable_depth_test() { gl::enable(GL_DEPTH_TEST); }
-void Window::disable_depth_test() { gl::disable(GL_DEPTH_TEST); }
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
