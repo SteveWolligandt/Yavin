@@ -67,19 +67,6 @@ class Texture2D : public BaseTexture<GL_TEXTURE_2D> {
             tex::InterpolationMode interp_mode_mag, tex::WrapMode wrap_mode_s,
             tex::WrapMode wrap_mode_t);
 
-  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data)
-      : Texture2D(width, height, data, default_interpolation,
-                  default_interpolation, default_wrap_mode, default_wrap_mode) {
-  }
-  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
-            tex::InterpolationMode interp_mode, tex::WrapMode wrap_mode)
-      : Texture2D(width, height, data, interp_mode, interp_mode, wrap_mode,
-                  wrap_mode) {}
-  Texture2D(unsigned int width, unsigned int height, const std::vector<T>& data,
-            tex::InterpolationMode interp_mode_min,
-            tex::InterpolationMode interp_mode_mag, tex::WrapMode wrap_mode_s,
-            tex::WrapMode wrap_mode_t);
-
   template <typename S>
   Texture2D(unsigned int width, unsigned int height, const std::vector<S>& data)
       : Texture2D(width, height, data, default_interpolation,
@@ -144,8 +131,9 @@ class Texture2D : public BaseTexture<GL_TEXTURE_2D> {
   void upload_data(const std::vector<T>& data);
 
  public:
+  template <typename S>
   void           upload_data(unsigned int width, unsigned int height,
-                             const std::vector<T>& data);
+                             const std::vector<S>& data);
   std::vector<T> download_data() const;
   void           set_data(const PixelUnpackBuffer<T>& pbo);
 
@@ -361,35 +349,16 @@ Texture2D<T, Components>::Texture2D(Texture2D&& other)
       m_height(std::exchange(other.m_height, 0)) {}
 
 template <typename T, typename Components>
-Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<T>&  data,
-                                    tex::InterpolationMode interp_mode_min,
-                                    tex::InterpolationMode interp_mode_mag,
-                                    tex::WrapMode          wrap_mode_s,
-                                    tex::WrapMode          wrap_mode_t)
-    : m_width(width), m_height(height) {
-  bind();
-  upload_data(data);
-  set_interpolation_mode_min(interp_mode_min);
-  set_interpolation_mode_mag(interp_mode_mag);
-  set_wrap_mode_s(wrap_mode_s);
-  set_wrap_mode_t(wrap_mode_t);
-}
-
-template <typename T, typename Components>
 template <typename S>
 Texture2D<T, Components>::Texture2D(unsigned int width, unsigned int height,
-                                    const std::vector<S>&  _data,
+                                    const std::vector<S>&  data,
                                     tex::InterpolationMode interp_mode_min,
                                     tex::InterpolationMode interp_mode_mag,
                                     tex::WrapMode          wrap_mode_s,
                                     tex::WrapMode          wrap_mode_t)
     : m_width(width), m_height(height) {
-  std::vector<T> data;
-  data.reserve(_data.size());
-  for (const auto& date : _data) data.push_back(static_cast<T>(date));
   bind();
-  upload_data(data);
+  upload_data(width, height, data);
   set_interpolation_mode_min(interp_mode_min);
   set_interpolation_mode_mag(interp_mode_mag);
   set_wrap_mode_s(wrap_mode_s);
@@ -514,12 +483,19 @@ void Texture2D<T, Components>::upload_data(const std::vector<T>& data) {
 }
 
 template <typename T, typename Components>
+template <typename S>
 void Texture2D<T, Components>::upload_data(unsigned int          width,
                                            unsigned int          height,
-                                           const std::vector<T>& data) {
+                                           const std::vector<S>& data) {
   m_width  = width;
   m_height = height;
-  upload_data(data);
+  if constexpr (std::is_same_v<S, T>)
+    upload_data(data);
+  else {
+    std::vector<T> converted_data(data.size());
+    std::copy(begin(data), end(data), begin(converted_data));
+    upload_data(converted_data);
+  }
 }
 
 template <typename T, typename Components>
