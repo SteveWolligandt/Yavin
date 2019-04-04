@@ -6,7 +6,6 @@ namespace yavin {
 //==============================================================================
 // MISC
 //==============================================================================
-
 void gl::get_boolean_v(GLenum pname, GLboolean* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -16,7 +15,6 @@ void gl::get_boolean_v(GLenum pname, GLboolean* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_double_v(GLenum pname, GLdouble* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -26,7 +24,6 @@ void gl::get_double_v(GLenum pname, GLdouble* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_float_v(GLenum pname, GLfloat* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -36,7 +33,6 @@ void gl::get_float_v(GLenum pname, GLfloat* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_integer_v(GLenum pname, GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -46,7 +42,6 @@ void gl::get_integer_v(GLenum pname, GLint* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::enable(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glEnable(" << to_string(cap) << ")\n";
@@ -55,7 +50,6 @@ void gl::enable(GLenum cap) {
 }
 
 //------------------------------------------------------------------------------
-
 GLboolean gl::is_enabled(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glIsEnabled(" << to_string(cap) << ")\n";
@@ -65,7 +59,6 @@ GLboolean gl::is_enabled(GLenum cap) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::disable(GLenum cap) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glDisable(" << to_string(cap) << ")\n";
@@ -74,7 +67,6 @@ void gl::disable(GLenum cap) {
 }
 
 //------------------------------------------------------------------------------
-
 const GLubyte* gl::get_string(GLenum name) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glGetString\n";
@@ -84,13 +76,13 @@ const GLubyte* gl::get_string(GLenum name) {
 }
 
 //------------------------------------------------------------------------------
-
-GLenum gl::get_error() { return glGetError(); }
+GLenum gl::get_error() {
+  return glGetError();
+}
 
 //==============================================================================
 // BACKBUFFER RELATED
 //==============================================================================
-
 void gl::clear(GLbitfield mask) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
@@ -121,7 +113,6 @@ void gl::clear(GLbitfield mask) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -132,7 +123,6 @@ void gl::clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -143,11 +133,11 @@ void gl::viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
 }
 
 //------------------------------------------------------------------------------
-
-void gl::viewport(const glm::vec4& vp) { viewport(vp[1], vp[1], vp[2], vp[3]); }
+void gl::viewport(const glm::vec4& vp) {
+  viewport(vp[1], vp[1], vp[2], vp[3]);
+}
 
 //------------------------------------------------------------------------------
-
 void gl::flush() {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glFlush\n";
@@ -156,7 +146,6 @@ void gl::flush() {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::depth_mask(GLboolean flag) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glDepthMask(" << (flag ? "true" : "false") << ")\n";
@@ -165,7 +154,6 @@ void gl::depth_mask(GLboolean flag) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::blend_func(GLenum sfactor, GLenum dfactor) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glBlendFunc(" << sfactor << ", " << dfactor << ")\n";
@@ -174,7 +162,6 @@ void gl::blend_func(GLenum sfactor, GLenum dfactor) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::blend_funci(GLuint buf, GLenum sfactor, GLenum dfactor) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -187,7 +174,6 @@ void gl::blend_funci(GLuint buf, GLenum sfactor, GLenum dfactor) {
 //==============================================================================
 // VERTEXBUFFER RELATED
 //==============================================================================
-
 void gl::enable_vertex_attrib_array(GLuint index) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glEnableVertexAttribArray(" << index << ")\n";
@@ -196,7 +182,6 @@ void gl::enable_vertex_attrib_array(GLuint index) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::disable_vertex_attrib_array(GLuint index) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glDisableVertexAttribArray(" << index << ")\n";
@@ -205,7 +190,6 @@ void gl::disable_vertex_attrib_array(GLuint index) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::enable_vertex_attrib_array(GLuint vaobj, GLuint index) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -215,7 +199,6 @@ void gl::enable_vertex_attrib_array(GLuint vaobj, GLuint index) {
 }
 
 //------------------------------------------------------------------------------
-
 // gl::void disable_vertex_attrib_array(GLuint vaobj, GLuint index) {
 //  std::lock_guard lock(detail::mutex::gl_call);
 //  if(verbose)*out<<"glDisableVertexArrayAttrib\n";
@@ -224,7 +207,6 @@ void gl::enable_vertex_attrib_array(GLuint vaobj, GLuint index) {
 //}
 
 //------------------------------------------------------------------------------
-
 void gl::vertex_attrib_pointer(GLuint index, GLint size, GLenum type,
                                GLboolean normalized, GLsizei stride,
                                const GLvoid* pointer) {
@@ -238,7 +220,6 @@ void gl::vertex_attrib_pointer(GLuint index, GLint size, GLenum type,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::vertex_attrib_i_pointer(GLuint index, GLint size, GLenum type,
                                  GLsizei stride, const GLvoid* pointer) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -248,7 +229,6 @@ void gl::vertex_attrib_i_pointer(GLuint index, GLint size, GLenum type,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::vertex_attrib_l_pointer(GLuint index, GLint size, GLenum type,
                                  GLsizei stride, const GLvoid* pointer) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -258,7 +238,6 @@ void gl::vertex_attrib_l_pointer(GLuint index, GLint size, GLenum type,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::draw_arrays(GLenum mode, GLint first, GLsizei count) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -271,7 +250,6 @@ void gl::draw_arrays(GLenum mode, GLint first, GLsizei count) {
 //==============================================================================
 // VERTEXARRAY RELATED
 //==============================================================================
-
 void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
   std::lock_guard lock(detail::mutex::gl_call);
   glCreateVertexArrays(n, arrays);
@@ -284,7 +262,6 @@ void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::delete_vertex_arrays(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
@@ -297,7 +274,6 @@ void gl::delete_vertex_arrays(GLsizei n, GLuint* ids) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::bind_vertex_array(GLuint array) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glBindVertexArray(" << array << ")\n";
@@ -306,7 +282,6 @@ void gl::bind_vertex_array(GLuint array) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::draw_elements(GLenum mode, GLsizei count, GLenum type,
                        const GLvoid* indices) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -320,7 +295,6 @@ void gl::draw_elements(GLenum mode, GLsizei count, GLenum type,
 //==============================================================================
 // BUFFER RELATED
 //==============================================================================
-
 void gl::bind_buffer(GLenum target, GLuint buffer) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -330,7 +304,6 @@ void gl::bind_buffer(GLenum target, GLuint buffer) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::bind_buffer_base(GLenum target, GLuint index, GLuint buffer) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -341,7 +314,6 @@ void gl::bind_buffer_base(GLenum target, GLuint index, GLuint buffer) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::create_buffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   glCreateBuffers(n, ids);
@@ -354,7 +326,6 @@ void gl::create_buffers(GLsizei n, GLuint* ids) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::delete_buffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
@@ -367,7 +338,6 @@ void gl::delete_buffers(GLsizei n, GLuint* ids) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::copy_named_buffer_sub_data(GLuint readBuffer, GLuint writeBuffer,
                                     GLintptr readOffset, GLintptr writeOffset,
                                     GLsizei size) {
@@ -379,7 +349,6 @@ void gl::copy_named_buffer_sub_data(GLuint readBuffer, GLuint writeBuffer,
 }
 
 //------------------------------------------------------------------------------
-
 void* gl::map_named_buffer(GLuint buffer, GLenum access) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -390,7 +359,6 @@ void* gl::map_named_buffer(GLuint buffer, GLenum access) {
 }
 
 //------------------------------------------------------------------------------
-
 void* gl::map_named_buffer_range(GLuint buffer, GLintptr offset, GLsizei length,
                                  GLbitfield access) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -403,7 +371,6 @@ void* gl::map_named_buffer_range(GLuint buffer, GLintptr offset, GLsizei length,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::named_buffer_data(GLuint buffer, GLsizei size, const void* data,
                            GLenum usage) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -415,7 +382,6 @@ void gl::named_buffer_data(GLuint buffer, GLsizei size, const void* data,
 }
 
 //------------------------------------------------------------------------------
-
 GLboolean gl::unmap_named_buffer(GLuint buffer) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glUnmapNamedBuffer(" << buffer << ")\n";
@@ -425,7 +391,6 @@ GLboolean gl::unmap_named_buffer(GLuint buffer) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::named_buffer_sub_data(GLuint buffer, GLintptr offset, GLsizei size,
                                const void* data) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -437,7 +402,6 @@ void gl::named_buffer_sub_data(GLuint buffer, GLintptr offset, GLsizei size,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_buffer_parameter_iv(GLenum target, GLenum value, GLint* data) {
   assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER);
   assert(value == GL_BUFFER_SIZE || value == GL_BUFFER_USAGE);
@@ -452,7 +416,6 @@ void gl::get_buffer_parameter_iv(GLenum target, GLenum value, GLint* data) {
 //==============================================================================
 // SHADER RELATED
 //==============================================================================
-
 GLuint gl::create_program() {
   std::lock_guard lock(detail::mutex::gl_call);
   auto            result = glCreateProgram();
@@ -462,7 +425,6 @@ GLuint gl::create_program() {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::attach_shader(GLuint program, GLuint shader) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glAttachShader\n";
@@ -471,7 +433,6 @@ void gl::attach_shader(GLuint program, GLuint shader) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::link_program(GLuint program) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glLinkProgram(" << program << ")\n";
@@ -480,7 +441,6 @@ void gl::link_program(GLuint program) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::delete_program(GLuint program) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glDeleteProgram(" << program << ")\n";
@@ -489,7 +449,6 @@ void gl::delete_program(GLuint program) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::use_program(GLuint program) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glUseProgram(" << program << ")\n";
@@ -498,7 +457,6 @@ void gl::use_program(GLuint program) {
 }
 
 //------------------------------------------------------------------------------
-
 GLuint gl::create_shader(GLenum shaderType) {
   std::lock_guard lock(detail::mutex::gl_call);
   auto            result = glCreateShader(shaderType);
@@ -508,7 +466,6 @@ GLuint gl::create_shader(GLenum shaderType) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::shader_source(GLuint shader, GLsizei count, const GLchar** string,
                        const GLint* length) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -518,7 +475,6 @@ void gl::shader_source(GLuint shader, GLsizei count, const GLchar** string,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::compile_shader(GLuint shader) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glCompileShader\n";
@@ -527,7 +483,6 @@ void gl::compile_shader(GLuint shader) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::delete_shader(GLuint shader) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glDeleteShader(" << shader << ")\n";
@@ -536,7 +491,6 @@ void gl::delete_shader(GLuint shader) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::dispatch_compute(GLuint num_groups_x, GLuint num_groups_y,
                           GLuint num_groups_z) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -548,7 +502,6 @@ void gl::dispatch_compute(GLuint num_groups_x, GLuint num_groups_y,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_shader_iv(GLuint shader, GLenum pname, GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glGetShaderiv\n";
@@ -557,7 +510,6 @@ void gl::get_shader_iv(GLuint shader, GLenum pname, GLint* params) {
 }
 
 //------------------------------------------------------------------------------
-
 GLint gl::get_shader_info_log_length(GLuint shader) {
   GLint info_log_length;
   get_shader_iv(shader, GL_INFO_LOG_LENGTH, &info_log_length);
@@ -565,7 +517,6 @@ GLint gl::get_shader_info_log_length(GLuint shader) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_shader_info_log(GLuint shader, GLsizei maxLength, GLsizei* length,
                              GLchar* infoLog) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -575,7 +526,6 @@ void gl::get_shader_info_log(GLuint shader, GLsizei maxLength, GLsizei* length,
 }
 
 //------------------------------------------------------------------------------
-
 std::string gl::get_shader_info_log(GLuint shader, GLsizei maxLength) {
   std::vector<char> buffer(maxLength);
   if (verbose) *out << "data\n";
@@ -585,13 +535,11 @@ std::string gl::get_shader_info_log(GLuint shader, GLsizei maxLength) {
 }
 
 //------------------------------------------------------------------------------
-
 std::string gl::get_shader_info_log(GLuint shader) {
   return get_shader_info_log(shader, get_shader_info_log_length(shader));
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_1f(GLuint program, GLint location, GLfloat v0) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -602,7 +550,6 @@ void gl::program_uniform_1f(GLuint program, GLint location, GLfloat v0) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_2f(GLuint program, GLint location, GLfloat v0,
                             GLfloat v1) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -614,7 +561,6 @@ void gl::program_uniform_2f(GLuint program, GLint location, GLfloat v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_3f(GLuint program, GLint location, GLfloat v0,
                             GLfloat v1, GLfloat v2) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -626,7 +572,6 @@ void gl::program_uniform_3f(GLuint program, GLint location, GLfloat v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_4f(GLuint program, GLint location, GLfloat v0,
                             GLfloat v1, GLfloat v2, GLfloat v3) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -638,7 +583,6 @@ void gl::program_uniform_4f(GLuint program, GLint location, GLfloat v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_1i(GLuint program, GLint location, GLint v0) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -649,7 +593,6 @@ void gl::program_uniform_1i(GLuint program, GLint location, GLint v0) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_2i(GLuint program, GLint location, GLint v0,
                             GLint v1) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -663,7 +606,6 @@ void gl::program_uniform_2i(GLuint program, GLint location, GLint v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_3i(GLuint program, GLint location, GLint v0, GLint v1,
                             GLint v2) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -675,7 +617,6 @@ void gl::program_uniform_3i(GLuint program, GLint location, GLint v0, GLint v1,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_4i(GLuint program, GLint location, GLint v0, GLint v1,
                             GLint v2, GLint v3) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -687,7 +628,6 @@ void gl::program_uniform_4i(GLuint program, GLint location, GLint v0, GLint v1,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_1ui(GLuint program, GLint location, GLuint v0) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glProgramUniform1ui\n";
@@ -696,7 +636,6 @@ void gl::program_uniform_1ui(GLuint program, GLint location, GLuint v0) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_2ui(GLuint program, GLint location, GLuint v0,
                              GLuint v1) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -710,7 +649,6 @@ void gl::program_uniform_2ui(GLuint program, GLint location, GLuint v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_3ui(GLuint program, GLint location, GLuint v0,
                              GLuint v1, GLuint v2) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -720,7 +658,6 @@ void gl::program_uniform_3ui(GLuint program, GLint location, GLuint v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_4ui(GLuint program, GLint location, GLuint v0,
                              GLuint v1, GLuint v2, GLuint v3) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -730,7 +667,6 @@ void gl::program_uniform_4ui(GLuint program, GLint location, GLuint v0,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_1fv(GLuint program, GLint location, GLsizei count,
                              const GLfloat* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -740,7 +676,6 @@ void gl::program_uniform_1fv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_2fv(GLuint program, GLint location, GLsizei count,
                              const GLfloat* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -750,7 +685,6 @@ void gl::program_uniform_2fv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_3fv(GLuint program, GLint location, GLsizei count,
                              const GLfloat* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -760,7 +694,6 @@ void gl::program_uniform_3fv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_4fv(GLuint program, GLint location, GLsizei count,
                              const GLfloat* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -770,7 +703,6 @@ void gl::program_uniform_4fv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_1iv(GLuint program, GLint location, GLsizei count,
                              const GLint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -780,7 +712,6 @@ void gl::program_uniform_1iv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_2iv(GLuint program, GLint location, GLsizei count,
                              const GLint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -790,7 +721,6 @@ void gl::program_uniform_2iv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_3iv(GLuint program, GLint location, GLsizei count,
                              const GLint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -800,7 +730,6 @@ void gl::program_uniform_3iv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_4iv(GLuint program, GLint location, GLsizei count,
                              const GLint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -810,7 +739,6 @@ void gl::program_uniform_4iv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_1uiv(GLuint program, GLint location, GLsizei count,
                               const GLuint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -820,7 +748,6 @@ void gl::program_uniform_1uiv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_2uiv(GLuint program, GLint location, GLsizei count,
                               const GLuint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -830,7 +757,6 @@ void gl::program_uniform_2uiv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_3uiv(GLuint program, GLint location, GLsizei count,
                               const GLuint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -840,7 +766,6 @@ void gl::program_uniform_3uiv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_4uiv(GLuint program, GLint location, GLsizei count,
                               const GLuint* value) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -850,7 +775,6 @@ void gl::program_uniform_4uiv(GLuint program, GLint location, GLsizei count,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_2fv(GLuint program, GLint location,
                                     GLsizei count, GLboolean transpose,
                                     const GLfloat* value) {
@@ -861,7 +785,6 @@ void gl::program_uniform_matrix_2fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_3fv(GLuint program, GLint location,
                                     GLsizei count, GLboolean transpose,
                                     const GLfloat* value) {
@@ -872,7 +795,6 @@ void gl::program_uniform_matrix_3fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_4fv(GLuint program, GLint location,
                                     GLsizei count, GLboolean transpose,
                                     const GLfloat* value) {
@@ -883,7 +805,6 @@ void gl::program_uniform_matrix_4fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_2x3fv(GLuint program, GLint location,
                                       GLsizei count, GLboolean transpose,
                                       const GLfloat* value) {
@@ -894,7 +815,6 @@ void gl::program_uniform_matrix_2x3fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_3x2fv(GLuint program, GLint location,
                                       GLsizei count, GLboolean transpose,
                                       const GLfloat* value) {
@@ -905,7 +825,6 @@ void gl::program_uniform_matrix_3x2fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_2x4fv(GLuint program, GLint location,
                                       GLsizei count, GLboolean transpose,
                                       const GLfloat* value) {
@@ -916,7 +835,6 @@ void gl::program_uniform_matrix_2x4fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_4x2fv(GLuint program, GLint location,
                                       GLsizei count, GLboolean transpose,
                                       const GLfloat* value) {
@@ -927,7 +845,6 @@ void gl::program_uniform_matrix_4x2fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_3x4fv(GLuint program, GLint location,
                                       GLsizei count, GLboolean transpose,
                                       const GLfloat* value) {
@@ -938,7 +855,6 @@ void gl::program_uniform_matrix_3x4fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::program_uniform_matrix_4x3fv(GLuint program, GLint location,
                                       GLsizei count, GLboolean transpose,
                                       const GLfloat* value) {
@@ -949,7 +865,6 @@ void gl::program_uniform_matrix_4x3fv(GLuint program, GLint location,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_program_iv(GLuint program, GLenum pname, GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glGetProgramiv\n";
@@ -958,7 +873,6 @@ void gl::get_program_iv(GLuint program, GLenum pname, GLint* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_program_info_log(GLuint program, GLsizei maxLength,
                               GLsizei* length, GLchar* infoLog) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -968,7 +882,6 @@ void gl::get_program_info_log(GLuint program, GLsizei maxLength,
 }
 
 //------------------------------------------------------------------------------
-
 GLint gl::get_uniform_location(GLuint program, const GLchar* name) {
   std::lock_guard lock(detail::mutex::gl_call);
   auto            result = glGetUniformLocation(program, name);
@@ -982,7 +895,6 @@ GLint gl::get_uniform_location(GLuint program, const GLchar* name) {
 //==============================================================================
 // TEXTURE RELATED
 //==============================================================================
-
 void gl::create_textures(GLenum target, GLsizei n, GLuint* textures) {
   std::lock_guard lock(detail::mutex::gl_call);
   glCreateTextures(target, n, textures);
@@ -996,7 +908,6 @@ void gl::create_textures(GLenum target, GLsizei n, GLuint* textures) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::delete_textures(GLsizei n, GLuint* textures) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
@@ -1009,7 +920,6 @@ void gl::delete_textures(GLsizei n, GLuint* textures) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::active_texture(GLenum texture) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glActiveTexture(" << texture - GL_TEXTURE0 << ")\n";
@@ -1018,7 +928,6 @@ void gl::active_texture(GLenum texture) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::bind_texture(GLenum target, GLuint texture) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1028,7 +937,6 @@ void gl::bind_texture(GLenum target, GLuint texture) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::bind_image_texture(GLuint unit, GLuint texture, GLint level,
                             GLboolean layered, GLint layer, GLenum access,
                             GLenum format) {
@@ -1042,7 +950,6 @@ void gl::bind_image_texture(GLuint unit, GLuint texture, GLint level,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_image_2d(GLenum target, GLint level, GLint internalFormat,
                       GLsizei width, GLsizei height, GLint border,
                       GLenum format, GLenum type, const GLvoid* data) {
@@ -1058,7 +965,6 @@ void gl::tex_image_2d(GLenum target, GLint level, GLint internalFormat,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_sub_image_2d(GLenum target, GLint level, GLint xoffset,
                           GLint yoffset, GLsizei width, GLsizei height,
                           GLenum format, GLenum type, const GLvoid* pixels) {
@@ -1074,7 +980,6 @@ void gl::tex_sub_image_2d(GLenum target, GLint level, GLint xoffset,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_sub_image_2d(GLuint texture, GLint level, GLint xoffset,
                               GLint yoffset, GLsizei width, GLsizei height,
                               GLenum format, GLenum type, const void* pixels) {
@@ -1086,7 +991,22 @@ void gl::texture_sub_image_2d(GLuint texture, GLint level, GLint xoffset,
 }
 
 //------------------------------------------------------------------------------
+void gl::tex_image_3d(GLenum target, GLint level, GLint internalformat,
+                      GLsizei width, GLsizei height, GLsizei depth,
+                      GLint border, GLenum format, GLenum type,
+                      const GLvoid* data) {
+  std::lock_guard lock(detail::mutex::gl_call);
+  if (verbose)
+    *out << "glTexImage3D(" << to_string(target) << ", " << level << ", "
+         << to_string(internalformat) << ", " << width << ", " << height << ", "
+         << depth << ", " << border << ", " << to_string(format) << ", "
+         << to_string(type) << ", " << data << ")\n";
+  glTexImage3D(target, level, internalformat, width, height, depth, border,
+               format, type, data);
+  gl_error_check("glTexImage3D");
+}
 
+//------------------------------------------------------------------------------
 void gl::copy_image_sub_data(GLuint srcName, GLenum srcTarget, GLint srcLevel,
                              GLint srcX, GLint srcY, GLint srcZ, GLuint dstName,
                              GLenum dstTarget, GLint dstLevel, GLint dstX,
@@ -1106,7 +1026,6 @@ void gl::copy_image_sub_data(GLuint srcName, GLenum srcTarget, GLint srcLevel,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_tex_image(GLenum target, GLint level, GLenum format, GLenum type,
                        GLvoid* pixels) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1116,7 +1035,6 @@ void gl::get_tex_image(GLenum target, GLint level, GLenum format, GLenum type,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_n_tex_image(GLenum target, GLint level, GLenum format, GLenum type,
                          GLsizei bufSize, void* pixels) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1126,7 +1044,6 @@ void gl::get_n_tex_image(GLenum target, GLint level, GLenum format, GLenum type,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::get_texture_image(GLuint texture, GLint level, GLenum format,
                            GLenum type, GLsizei bufSize, void* pixels) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1138,7 +1055,6 @@ void gl::get_texture_image(GLuint texture, GLint level, GLenum format,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_parameter_f(GLenum target, GLenum pname, GLfloat param) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glTexParameterf\n";
@@ -1147,7 +1063,6 @@ void gl::tex_parameter_f(GLenum target, GLenum pname, GLfloat param) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_parameter_i(GLenum target, GLenum pname, GLint param) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) *out << "glTexParameteri\n";
@@ -1156,7 +1071,6 @@ void gl::tex_parameter_i(GLenum target, GLenum pname, GLint param) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_parameter_f(GLuint texture, GLenum pname, GLfloat param) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1167,7 +1081,6 @@ void gl::texture_parameter_f(GLuint texture, GLenum pname, GLfloat param) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_parameter_i(GLuint texture, GLenum pname, GLint param) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1178,7 +1091,6 @@ void gl::texture_parameter_i(GLuint texture, GLenum pname, GLint param) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_parameter_fv(GLenum target, GLenum pname, const GLfloat* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1189,7 +1101,6 @@ void gl::tex_parameter_fv(GLenum target, GLenum pname, const GLfloat* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_parameter_iv(GLenum target, GLenum pname, const GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1200,7 +1111,6 @@ void gl::tex_parameter_iv(GLenum target, GLenum pname, const GLint* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_parameter_Iiv(GLenum target, GLenum pname, const GLint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1211,7 +1121,6 @@ void gl::tex_parameter_Iiv(GLenum target, GLenum pname, const GLint* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::tex_parameter_Iuiv(GLenum target, GLenum pname, const GLuint* params) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1222,7 +1131,6 @@ void gl::tex_parameter_Iuiv(GLenum target, GLenum pname, const GLuint* params) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_parameter_fv(GLuint texture, GLenum pname,
                               const GLfloat* paramtexture) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1234,7 +1142,6 @@ void gl::texture_parameter_fv(GLuint texture, GLenum pname,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_parameter_iv(GLuint texture, GLenum pname,
                               const GLint* param) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1246,7 +1153,6 @@ void gl::texture_parameter_iv(GLuint texture, GLenum pname,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_parameter_Iiv(GLuint texture, GLenum pname,
                                const GLint* param) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1258,7 +1164,6 @@ void gl::texture_parameter_Iiv(GLuint texture, GLenum pname,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::texture_parameter_Iuiv(GLuint texture, GLenum pname,
                                 const GLuint* param) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1270,7 +1175,6 @@ void gl::texture_parameter_Iuiv(GLuint texture, GLenum pname,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::clear_tex_image(GLuint texture, GLint level, GLenum format,
                          GLenum type, const void* data) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1285,7 +1189,6 @@ void gl::clear_tex_image(GLuint texture, GLint level, GLenum format,
 //==============================================================================
 // FRAMEBUFFER RELATED
 //==============================================================================
-
 void gl::create_framebuffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   glCreateFramebuffers(n, ids);
@@ -1298,7 +1201,6 @@ void gl::create_framebuffers(GLsizei n, GLuint* ids) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::delete_framebuffers(GLsizei n, GLuint* ids) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose) {
@@ -1311,7 +1213,6 @@ void gl::delete_framebuffers(GLsizei n, GLuint* ids) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::bind_framebuffer(GLenum target, GLuint framebuffer) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)
@@ -1322,7 +1223,6 @@ void gl::bind_framebuffer(GLenum target, GLuint framebuffer) {
 }
 
 //------------------------------------------------------------------------------
-
 void gl::framebuffer_texture(GLenum target, GLenum attachment, GLuint texture,
                              GLint level) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1332,7 +1232,6 @@ void gl::framebuffer_texture(GLenum target, GLenum attachment, GLuint texture,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::framebuffer_texture_1d(GLenum target, GLenum attachment,
                                 GLenum textarget, GLuint texture, GLint level) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1342,7 +1241,6 @@ void gl::framebuffer_texture_1d(GLenum target, GLenum attachment,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::framebuffer_texture_2d(GLenum target, GLenum attachment,
                                 GLenum textarget, GLuint texture, GLint level) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1352,7 +1250,6 @@ void gl::framebuffer_texture_2d(GLenum target, GLenum attachment,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::framebuffer_texture_3d(GLenum target, GLenum attachment,
                                 GLenum textarget, GLuint texture, GLint level,
                                 GLint layer) {
@@ -1363,7 +1260,6 @@ void gl::framebuffer_texture_3d(GLenum target, GLenum attachment,
 }
 
 //------------------------------------------------------------------------------
-
 void gl::named_framebuffer_texture(GLuint framebuffer, GLenum attachment,
                                    GLuint texture, GLint level) {
   std::lock_guard lock(detail::mutex::gl_call);
@@ -1375,7 +1271,6 @@ void gl::named_framebuffer_texture(GLuint framebuffer, GLenum attachment,
 }
 
 //------------------------------------------------------------------------------
-
 GLenum gl::check_named_framebuffer_status(GLuint framebuffer, GLenum target) {
   std::lock_guard lock(detail::mutex::gl_call);
   if (verbose)

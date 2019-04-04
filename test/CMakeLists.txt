@@ -24,6 +24,7 @@ add_executable (unittests
   indexbuffer.cpp
   vertexbuffer.cpp
   texture2d.cpp
+  texture3d.cpp
   ${CMAKE_BINARY_DIR}/yavin_include/gl_verbose.cpp
   ${YAVIN_SOURCES}
   ${ARGN})
