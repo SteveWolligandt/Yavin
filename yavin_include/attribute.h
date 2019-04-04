@@ -19,8 +19,8 @@ struct attrib {
   auto&       operator[](size_t i) { return data[i]; }
   const auto& operator[](size_t i) const { return data[i]; }
 
-  const auto begin() const { return data; }
-  const auto end() const { return data + n; }
+  auto begin() const { return data; }
+  auto end() const { return data + n; }
 
   auto begin() { return data; }
   auto end() { return data + n; }

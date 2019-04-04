@@ -24,8 +24,7 @@ class ShaderStage {
   //----------------------------------------------------------------------------
 
   DLL_API ShaderStage(GLenum shader_type, const std::string& shaderfilepath,
-                      StringType string_type    = StringType::FILE,
-                      bool       use_ansi_color = true);
+                      StringType string_type    = StringType::FILE);
 
   //----------------------------------------------------------------------------
 

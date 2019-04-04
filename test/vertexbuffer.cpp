@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <yavin>
 
 //==============================================================================
@@ -7,9 +7,8 @@ namespace yavin::test {
 
 extern Window window;
 
-//------------------------------------------------------------------------------
-
-TEST_CASE("VBO download") {
+//==============================================================================
+TEST_CASE("[VBO] download") {
   using vbo_t = VertexBuffer<vec2, vec2>;
   vbo_t vbo{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}};
 
@@ -24,9 +23,8 @@ TEST_CASE("VBO download") {
   REQUIRE(get<1>(down[1])[1] == 8);
 }
 
-//------------------------------------------------------------------------------
-
-TEST_CASE("VBO element access") {
+//==============================================================================
+TEST_CASE("[VBO] element access") {
   using vbo_t = VertexBuffer<vec3>;
   REQUIRE(vbo_t::data_size == 3 * sizeof(float));
 
@@ -46,6 +44,7 @@ TEST_CASE("VBO element access") {
   REQUIRE(v_back[1] == 5);
   REQUIRE(v_back[2] == 6);
 }
+
 //==============================================================================
 }  // namespace yavin::test
 //==============================================================================

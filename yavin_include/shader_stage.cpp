@@ -21,7 +21,7 @@ const std::regex ShaderStage::regex_mesa_compiler_error(
 
 ShaderStage::ShaderStage(GLenum             shader_type,
                          const std::string &filename_or_source,
-                         StringType string_type, bool use_ansi_color)
+                         StringType string_type)
     : m_shader_type(shader_type),
       m_string_type(string_type),
       m_filename_or_source(filename_or_source),

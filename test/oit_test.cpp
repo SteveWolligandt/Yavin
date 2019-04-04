@@ -1,13 +1,12 @@
 #include <yavin>
+#include <catch2/catch.hpp>
 #include "TriangleStrip.h"
-
-using namespace Yavin;
 
 const unsigned int screen_width  = 800;
 const unsigned int screen_height = 600;
 
 //==============================================================================
-namespace Yavin::Test {
+namespace yavin::test {
 //==============================================================================
 
 class ColorLinkedListShader : public Shader {
@@ -59,7 +58,7 @@ class OITTestWindow : public OITWindow {
       cam.set_projection(30, (float)w / (float)h, 0.01, 100, w, h);
     });
 
-    set_key_callback([this](int key, int scancode, int action, int mods) {
+    set_key_callback([this](int key, int, int action, int) {
       if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) { shader.create(); }
     });
   }
@@ -71,10 +70,10 @@ class OITTestWindow : public OITWindow {
   std::vector<glm::vec4>     colors;
 };
 //==============================================================================
-}  // namespace Yavin::Test
+}  // namespace yavin::test
 //==============================================================================
 
-int main() {
-  Yavin::Test::OITTestWindow w("OIT Test", 20);
+TEST_CASE("[OIT Test] #1", "[oit]") {
+  yavin::test::OITTestWindow w("OIT Test", 20);
   w.start_rendering();
 }
