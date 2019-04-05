@@ -359,9 +359,11 @@ template <typename type, typename components>
 template <typename, typename>
 void Texture2D<type, components>::save_png(const std::string& filepath,
                                            type               scale_factor) {
-  using tex_png_t               = tex_png<type, components>;
+  using tex_png_t = tex_png<type, components>;
+
+  typename tex_png_t::png_t image(m_width, m_height);
   auto                     data = download_data();
-  typename tex_png_t::type image(m_width, m_height);
+
   for (unsigned int y = 0; y < image.get_height(); ++y)
     for (png::uint_32 x = 0; x < image.get_width(); ++x) {
       unsigned int idx = x + m_width * y;

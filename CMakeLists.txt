@@ -13,6 +13,7 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomic_counter_buffer.cpp
   ${CMAKE_SOURCE_DIR}/src/attribute.cpp
   ${CMAKE_SOURCE_DIR}/src/compute_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/context.cpp
   ${CMAKE_SOURCE_DIR}/src/error_check.cpp
   ${CMAKE_SOURCE_DIR}/src/fragment_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/frame_buffer.cpp
@@ -55,6 +56,7 @@ find_package(glm REQUIRED)
 find_package(PNG REQUIRED)
 find_package(PNG++ REQUIRED)
 find_package(Boost REQUIRED)
+find_package(X11 REQUIRED)
 
 
 option(VERBOSE "verbose OpenGL calls" OFF)
@@ -75,6 +77,7 @@ target_include_directories(yavin
     ${GLM_INCLUDE_DIRS} 
     ${GLFW3_INCLUDE_DIRECTORIES}
     ${GLEW_INCLUDE_DIR}
+    ${X11_INCLUDE_DIR}
 )
 
 target_link_libraries(yavin 
@@ -83,6 +86,7 @@ target_link_libraries(yavin
   ${GLFW_LIBRARIES} 
   ${PNG_LIBRARIES} 
   ${PNG+_LIBRARIES}
+  ${X11_LIBRARIES}
 )
 
 export(TARGETS yavin FILE yavinConfig.cmake)

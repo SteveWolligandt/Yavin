@@ -28,7 +28,7 @@ Window::Window(const std::string& name, const int width,
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
   glfwWindowHint(GLFW_SAMPLES, 8);
   m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
-  make_context_current();
+  make_current();
   if (!m_window) {
     glfwTerminate();
     throw std::runtime_error("cannot create GLFW window");
@@ -162,7 +162,7 @@ void Window::print_versions() {
             << "\n";
 }
 void Window::should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
-void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
+void Window::make_current() { glfwMakeContextCurrent(m_window); }
 
 //==============================================================================
 }  // namespace yavin

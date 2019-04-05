@@ -41,7 +41,7 @@ class Window {
   DLL_API std::string get_glsl_version();
   DLL_API void        print_versions();
 
-  DLL_API void make_context_current();
+  DLL_API void make_current();
 
  private:
   GLFWwindow*  m_window;

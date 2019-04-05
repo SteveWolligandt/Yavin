@@ -26,6 +26,7 @@
 #include "yavin/vertex_buffer.h"
 #include "yavin/indexed_data.h"
 #include "yavin/vertex_shader.h"
+#include "yavin/context.h"
 #include "yavin/window.h"
 #include "yavin/oit_window.h"
 #include "yavin/error_check.h"

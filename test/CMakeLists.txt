@@ -17,9 +17,12 @@ configure_file(oit_test.vert oit_test.vert COPYONLY)
 
 set(MAIN main.cpp)
 
+add_executable (glxcontext glxcontext.cpp)
+target_compile_features(glxcontext PUBLIC cxx_std_17)
+target_link_libraries(glxcontext yavin)
+
 add_executable (unittests
   main.cpp
-  # oit_test.cpp
   tuple.cpp
   indexbuffer.cpp
   vertexbuffer.cpp
