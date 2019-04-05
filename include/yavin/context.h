@@ -6,13 +6,7 @@
 #include <list>
 #include <string>
 
-#include <GL/glew.h>
-#ifdef _WIN32
-#include <GL/wglew.h>
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <yavin/gl_includes.h>
 #include <GL/glx.h>
 
 //==============================================================================
@@ -49,4 +43,9 @@ class Context {
 }  // namespace yavin
 //==============================================================================
 
+#ifndef YAVIN_X11_CONTEXT_DONT_DELETE
+#undef Always
+#undef None
+#undef Success
+#endif
 #endif

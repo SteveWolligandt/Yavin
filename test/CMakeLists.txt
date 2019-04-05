@@ -23,19 +23,20 @@ target_link_libraries(glxcontext yavin)
 
 add_executable (unittests
   main.cpp
-  tuple.cpp
+  # tuple.cpp
   indexbuffer.cpp
-  vertexbuffer.cpp
-  texture1d.cpp
-  texture2d.cpp
-  texture3d.cpp
+  # vertexbuffer.cpp
+  # texture1d.cpp
+  # texture2d.cpp
+  # texture3d.cpp
   ${YAVIN_SOURCES}
   ${ARGN})
 target_compile_features(unittests PUBLIC cxx_std_17)
 target_link_libraries(unittests
   ${OPENGL_LIBRARIES}
-  ${GLFW_LIBRARIES}
   ${GLEW_LIBRARY}
+  ${GLFW_LIBRARIES}
+  ${X11_LIBRARIES}
   Catch2::Catch2)
 
 target_include_directories(unittests
@@ -45,12 +46,12 @@ target_include_directories(unittests
     ${CMAKE_BINARY_DIR}/include
     ${OPENGL_INCLUDE_DIR}
     ${GLM_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIR}
     ${GLFW3_INCLUDE_DIRECTORIES}
     ${GLEW_INCLUDE_DIR})
 target_compile_options(unittests
   PRIVATE
-    -Wall -Wextra -pedantic
-    -Wno-missing-braces -Wno-unused-lambda-capture)
+    -Wall -Wextra -pedantic)
 catch_discover_tests(unittests)
 
 if (COVERAGE)

@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cstring>
+
+#define YAVIN_X11_CONTEXT_DONT_DELETE
 #include <yavin/context.h>
+#include <yavin/gl_includes.h>
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
@@ -226,3 +229,4 @@ int Context::ctxErrorHandler(XErrorEvent * /*ev*/) {
 //==============================================================================
 } // namespace yavin
 //==============================================================================
+
