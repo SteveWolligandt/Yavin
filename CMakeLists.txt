@@ -2,20 +2,48 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(yavin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-# create library target
-add_library(yavin SHARED ${YAVIN_SOURCES} ${CMAKE_BINARY_DIR}/yavin_include/gl_verbose.cpp ${YAVIN_HEADERS})
-target_compile_features(yavin PUBLIC cxx_std_17)
-target_compile_definitions(yavin PRIVATE DLL_EXPORT)
-target_include_directories(yavin PRIVATE 
-  ${CMAKE_BINARY_DIR}/yavin_include
-)
-
 # for color with ninja
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "-fcolor-diagnostics")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "-fdiagnostics-color=always")
 endif()
+
+set(YAVIN_SOURCES
+  ${CMAKE_SOURCE_DIR}/src/atomic_counter_buffer.cpp
+  ${CMAKE_SOURCE_DIR}/src/attribute.cpp
+  ${CMAKE_SOURCE_DIR}/src/compute_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/error_check.cpp
+  ${CMAKE_SOURCE_DIR}/src/fragment_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/frame_buffer.cpp
+  ${CMAKE_SOURCE_DIR}/src/geometry_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/gl_functions.cpp
+  ${CMAKE_SOURCE_DIR}/src/glsl_var.cpp
+  ${CMAKE_SOURCE_DIR}/src/gl_wrapper.cpp
+  ${CMAKE_SOURCE_DIR}/src/index_buffer.cpp
+  ${CMAKE_SOURCE_DIR}/src/mutex_handler.cpp
+  ${CMAKE_SOURCE_DIR}/src/oit_window.cpp
+  ${CMAKE_SOURCE_DIR}/src/orthographic_camera.cpp
+  ${CMAKE_SOURCE_DIR}/src/perspective_camera.cpp
+  ${CMAKE_SOURCE_DIR}/src/shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/shader_stage.cpp
+  ${CMAKE_SOURCE_DIR}/src/shader_stage_parser.cpp
+  ${CMAKE_SOURCE_DIR}/src/tesselation_control_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/tesselation_evaluation_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/texture.cpp
+  ${CMAKE_SOURCE_DIR}/src/vertex_array.cpp
+  ${CMAKE_SOURCE_DIR}/src/vertex_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/window.cpp
+  ${CMAKE_BINARY_DIR}/src/gl_verbose.cpp
+)
+
+# create library target
+add_library(yavin SHARED ${YAVIN_SOURCES})
+target_compile_features(yavin PUBLIC cxx_std_17)
+target_compile_definitions(yavin PRIVATE DLL_EXPORT)
+target_compile_options(yavin
+  PRIVATE
+    -Wall -Wextra -pedantic)
 
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
@@ -28,8 +56,6 @@ find_package(PNG REQUIRED)
 find_package(PNG++ REQUIRED)
 find_package(Boost REQUIRED)
 
-file(GLOB YAVIN_SOURCES yavin_include/*.cpp)
-file(GLOB YAVIN_HEADERS yavin_include/*.h)
 
 option(VERBOSE "verbose OpenGL calls" OFF)
 if (VERBOSE)
@@ -37,13 +63,14 @@ if (VERBOSE)
 else()
   set(VERBOSE_GL "false")
 endif()
-configure_file(yavin_include/gl_verbose.cpp.in yavin_include/gl_verbose.cpp)
-configure_file(yavin_include/shader_include_paths.h.in yavin_include/shader_include_paths.h)
+configure_file(src/gl_verbose.cpp.in src/gl_verbose.cpp)
+configure_file(include/yavin/shader_include_paths.h.in include/yavin/shader_include_paths.h)
 
 target_include_directories(yavin
   PUBLIC 
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/single_include
+    ${CMAKE_BINARY_DIR}/include
     ${OPENGL_INCLUDE_DIR} 
     ${GLM_INCLUDE_DIRS} 
     ${GLFW3_INCLUDE_DIRECTORIES}

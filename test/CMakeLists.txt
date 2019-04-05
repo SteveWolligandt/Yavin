@@ -23,9 +23,9 @@ add_executable (unittests
   tuple.cpp
   indexbuffer.cpp
   vertexbuffer.cpp
+  texture1d.cpp
   texture2d.cpp
   texture3d.cpp
-  ${CMAKE_BINARY_DIR}/yavin_include/gl_verbose.cpp
   ${YAVIN_SOURCES}
   ${ARGN})
 target_compile_features(unittests PUBLIC cxx_std_17)
@@ -34,18 +34,17 @@ target_link_libraries(unittests
   ${GLFW_LIBRARIES}
   ${GLEW_LIBRARY}
   Catch2::Catch2)
+
 target_include_directories(unittests
   PUBLIC
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/single_include
+    ${CMAKE_BINARY_DIR}/include
     ${OPENGL_INCLUDE_DIR}
     ${GLM_INCLUDE_DIRS}
     ${GLFW3_INCLUDE_DIRECTORIES}
     ${GLEW_INCLUDE_DIR})
-target_include_directories(unittests
-  PRIVATE
-    ${CMAKE_BINARY_DIR}/yavin_include)
-  target_compile_options(unittests
+target_compile_options(unittests
   PRIVATE
     -Wall -Wextra -pedantic
     -Wno-missing-braces -Wno-unused-lambda-capture)

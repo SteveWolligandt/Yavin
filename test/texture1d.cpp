@@ -10,14 +10,14 @@ namespace yavin::test {
 extern Window window;
 
 template <typename type, typename C>
-struct RandomTexture3D : Texture3D<type, C> {
-  using parent_t = Texture3D<type, C>;
+struct RandomTexture1D : Texture1D<type, C> {
+  using parent_t = Texture1D<type, C>;
   using dist_t   = std::conditional_t<std::is_floating_point_v<type>,
                                     std::uniform_real_distribution<type>,
                                     std::uniform_int_distribution<type>>;
 
   static constexpr auto   num_components = parent_t::num_components;
-  static constexpr size_t w = 20, h = 20, d = 20;
+  static constexpr size_t w = 100;
   // static constexpr type min = std::is_floating_point_v<type> ? -100 : 0;
   static constexpr type min = 0;
   static constexpr type max = 100;
@@ -26,19 +26,19 @@ struct RandomTexture3D : Texture3D<type, C> {
   std::vector<type> data;
 
   //----------------------------------------------------------------------------
-  RandomTexture3D()
-      : eng{std::random_device{}()}, data(w * h * d * num_components) {
+  RandomTexture1D()
+      : eng{std::random_device{}()}, data(w * num_components) {
     dist_t     rand{min, max};
     auto random_val = [&] { return rand(eng); };
     boost::generate(data, random_val);
-    this->upload_data(w, h, d, data);
+    this->upload_data(w, data);
   }
 };
 
 TEMPLATE_PRODUCT_TEST_CASE(
-    "[Texture3D] upload and download",
-    "[texture3d][texture]",
-    RandomTexture3D,
+    "[Texture1D] upload and download",
+    "[texture1d][texture]",
+    RandomTexture1D,
     (
      // (uint8_t , R)  , (uint8_t , RG)  , (uint8_t , RGB) ,
      // (uint8_t , BGR), (uint8_t , RGBA), (uint8_t , BGRA),
