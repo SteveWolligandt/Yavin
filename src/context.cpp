@@ -9,7 +9,8 @@
 namespace yavin {
 //==============================================================================
 
-bool Context::error_occured = false;
+std::list<Context *> Context::contexts;
+bool                 Context::error_occured      = false;
 const int Context::visual_attribs[23] = {
   GLX_X_RENDERABLE    , True,
   GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
@@ -26,7 +27,6 @@ const int Context::visual_attribs[23] = {
   //GLX_SAMPLES         , 4,
   None
 };
-std::list<Context*> Context::contexts;
 
 Context::Context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   contexts.push_back(this);
