@@ -3,7 +3,7 @@
 
 #include "error_check.h"
 
-#include "texture_2d.h"
+#include "texture.h"
 #include "dll_export.h"
 
 //==============================================================================

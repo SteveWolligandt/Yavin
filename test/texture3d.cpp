@@ -31,7 +31,7 @@ struct RandomTexture3D : Texture3D<type, C> {
     dist_t     rand{min, max};
     auto random_val = [&] { return rand(eng); };
     boost::generate(data, random_val);
-    this->upload_data(w, h, d, data);
+    this->upload_data(data, w, h, d);
   }
 };
 

@@ -2,12 +2,6 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(yavin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-# for color with ninja
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "-fcolor-diagnostics")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "-fdiagnostics-color=always")
-endif()
 
 set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomic_counter_buffer.cpp
@@ -41,23 +35,49 @@ set(YAVIN_SOURCES
 # create library target
 add_library(yavin SHARED ${YAVIN_SOURCES})
 target_compile_features(yavin PUBLIC cxx_std_17)
-target_compile_definitions(yavin PRIVATE DLL_EXPORT)
+
+# for color with ninja
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_compile_options(-fcolor-diagnostics)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_compile_options(-fdiagnostics-color=always)
+endif()
+
+target_compile_definitions(yavin
+  PRIVATE
+    DLL_EXPORT)
+
 target_compile_options(yavin
   PRIVATE
-    -Wall -Wextra -pedantic)
+    -Wall
+    -Wextra
+    -Wno-missing-braces
+    -pedantic
+)
 
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 find_path(GLEW_INCLUDE_DIR GL/glew.h)
 find_library(GLEW_LIBRARY NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
-find_package(GLFW3 REQUIRED)
+find_package(GLFW3)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
-find_package(PNG REQUIRED)
-find_package(PNG++ REQUIRED)
+find_package(PNG)
+find_package(PNG++)
 find_package(Boost REQUIRED)
 find_package(X11 REQUIRED)
 
+if(GLFW3_FOUND)
+  target_compile_definitions(yavin
+    PRIVATE
+      USE_GLFW3)
+endif()
+
+if(PNG++_FOUND)
+  target_compile_definitions(yavin
+    PRIVATE
+    USE_PNG)
+endif()
 
 option(VERBOSE "verbose OpenGL calls" OFF)
 if (VERBOSE)

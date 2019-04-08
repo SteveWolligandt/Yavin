@@ -37,12 +37,15 @@ struct id_holder {
   auto& operator=(const id_holder& other) = delete;
   id_holder(const id_holder& other)       = delete;
 
-  auto  id() const { return m_id; }
-  auto& id() { return m_id; }
-
-  void swap(id_holder& other) { std::swap(m_id, other.m_id); }
+  auto id() const { return m_id; }
 
  protected:
+  auto& id() { return m_id; }
+
+ public:
+  void swap(id_holder& other) { std::swap(m_id, other.m_id); }
+
+ private:
   id_t m_id;
 };
 

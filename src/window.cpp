@@ -1,3 +1,4 @@
+#ifdef USE_GLFW3
 #include <yavin/window.h>
 #include <chrono>
 #include <iostream>
@@ -11,9 +12,7 @@ namespace yavin {
 Window::Window(const std::string& name, const int width,
                const unsigned int height, const unsigned int major,
                const unsigned int minor)
-    : m_render_function([]() {}),
-      m_update_function([](double) {}),
-      m_key_callback_function([](int, int, int, int) {}),
+    : m_key_callback_function([](int, int, int, int) {}),
       m_resize_callback_function([](int, int) {}),
       m_cursor_pos_callback_function([](double, double) {}),
       m_mouse_button_callback_function([](int, int, int) {}),
@@ -77,12 +76,6 @@ Window::~Window() {
   glfwTerminate();
 }
 
-void Window::set_render_function(std::function<void()> render_function) {
-  m_render_function = render_function;
-}
-void Window::set_update_function(std::function<void(double)> update_function) {
-  m_update_function = update_function;
-}
 void Window::set_key_callback(
     std::function<void(int, int, int, int)> key_callback_function) {
   m_key_callback_function = key_callback_function;
@@ -104,52 +97,12 @@ void Window::set_scroll_callback(
   m_scroll_callback_function = scroll_callback_function;
 }
 
-void Window::start_rendering() {
-  // m_render_thread = new std::thread([&]() {
-  std::cout << "start\n";
-  std::chrono::high_resolution_clock timer;
-  double                             t = 0.0;
-  while (!glfwWindowShouldClose(m_window)) {
-    auto time_before = timer.now();
-
-    m_update_function(t);
-    m_render_function();
-    swap_buffers();
-    poll_events();
-
-    auto time_after      = timer.now();
-    auto render_duration = time_after - time_before;
-    auto render_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(render_duration);
-
-    auto to_wait = 1.0 / (m_fps / 1000.0 - render_time.count());
-    if (to_wait > 0)
-      std::this_thread::sleep_for(
-          std::chrono::milliseconds(static_cast<int>(to_wait)));
-
-    t = double(std::chrono::duration_cast<std::chrono::milliseconds>(
-                   timer.now() - time_before)
-                   .count());
-  }
-  // });
-}
-
 void Window::swap_buffers() { glfwSwapBuffers(m_window); }
 void Window::get_framebuffer_size(int& width, int& height) {
   glfwGetFramebufferSize(m_window, &width, &height);
 }
 
 void Window::poll_events() { glfwPollEvents(); }
-
-void Window::set_fps(const double fps) { m_fps = fps; }
-
-void Window::join_render_thread() {
-  if (m_render_thread) {
-    m_render_thread->join();
-    delete m_render_thread;
-    m_render_thread = nullptr;
-  }
-}
 
 std::string Window::get_gl_version() {
   return (char*)gl::get_string(GL_VERSION);
@@ -167,3 +120,4 @@ void Window::make_current() { glfwMakeContextCurrent(m_window); }
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
+#endif

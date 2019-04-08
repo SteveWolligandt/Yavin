@@ -1,3 +1,4 @@
+#ifdef USE_GLFW3
 #ifndef __YAVIN_OIT_WINDOW__
 #define __YAVIN_OIT_WINDOW__
 
@@ -89,4 +90,5 @@ class OITWindow : public Window {
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
+#endif
 #endif

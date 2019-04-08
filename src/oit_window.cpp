@@ -1,3 +1,4 @@
+#ifdef USE_GLFW3
 #include <yavin/oit_window.h>
 #include <yavin/gl_wrapper.h>
 #include <yavin/orthographic_camera.h>
@@ -99,3 +100,4 @@ OITWindow::OITWindow(const std::string& name, size_t width, size_t height,
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
+#endif
