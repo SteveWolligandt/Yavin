@@ -1,6 +1,7 @@
 #ifndef __YAVIN_TEXTURE_H__
 #define __YAVIN_TEXTURE_H__
 
+#include <yavin/settings.h>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <iostream>
@@ -9,6 +10,10 @@
 #include "gl_functions.h"
 #include "id_holder.h"
 #include "pixel_unpack_buffer.h"
+#include "tex_components.h"
+#include "tex_settings.h"
+#include "tex_target.h"
+#include "tex_png.h"
 #include "type.h"
 
 #ifdef USE_PNG
@@ -17,46 +22,8 @@
 
 //==============================================================================
 namespace yavin {
-
-struct R {
-  static constexpr size_t num_components = 1;
-};
-struct RG {
-  static constexpr size_t num_components = 2;
-};
-struct RGB {
-  static constexpr size_t num_components = 3;
-};
-struct RGBA {
-  static constexpr size_t num_components = 4;
-};
-struct BGR {
-  static constexpr size_t num_components = 3;
-};
-struct BGRA {
-  static constexpr size_t num_components = 4;
-};
-struct Depth {
-  static constexpr size_t num_components = 1;
-};
-
 //==============================================================================
-namespace tex {
-//==============================================================================
-template <unsigned int n>
-struct target;
 
-//------------------------------------------------------------------------------
-template <unsigned int n>
-static constexpr auto target_v = target<n>::value;
-
-//==============================================================================
-template <typename T, typename format>
-struct comb {};
-
-//==============================================================================
-}  // namespace tex
-//==============================================================================
 enum WrapMode {
   CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER,
   CLAMP_TO_EDGE   = GL_CLAMP_TO_EDGE,
@@ -93,7 +60,7 @@ enum CompareMode {
 
 //==============================================================================
 template <unsigned int D, typename T, typename C>
-class Texture : public id_holder<GLuint> {
+class texture : public id_holder<GLuint> {
   static_assert(D >= 1 && D <= 3,
                 "number of dimensions must be between 1 and 3");
 
@@ -106,9 +73,11 @@ class Texture : public id_holder<GLuint> {
   static constexpr auto default_wrap_mode     = REPEAT;
   static constexpr auto num_components        = components::num_components;
   static constexpr auto num_dimensions        = D;
-  static constexpr auto gl_internal_format = tex::comb<T, C>::internal_format;
-  static constexpr auto gl_format          = tex::comb<T, C>::format;
-  static constexpr auto gl_type            = tex::comb<T, C>::type;
+
+  static constexpr auto gl_internal_format =
+      tex::settings<T, C>::internal_format;
+  static constexpr auto gl_format = tex::settings<T, C>::format;
+  static constexpr auto gl_type   = tex::settings<T, C>::type;
   static constexpr std::array<GLenum, 3> wrapmode_indices{
       GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_R};
 
@@ -123,10 +92,10 @@ class Texture : public id_holder<GLuint> {
 
  public:
   //============================================================================
-  Texture() : Texture{std::make_index_sequence<D>{}} {}
+  texture() : texture{std::make_index_sequence<D>{}} {}
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   template <size_t... Is>
-  Texture(std::index_sequence<Is...>) : m_size{((void)Is, 0)...} {
+  texture(std::index_sequence<Is...>) : m_size{((void)Is, 0)...} {
     create_id();
     set_wrap_mode(default_wrap_mode);
     set_interpolation_mode(default_interpolation);
@@ -134,20 +103,33 @@ class Texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   //! TODO: copy wrap and interpolation modes
-  Texture(const Texture& other) : Texture{} { copy_data(other); }
+  texture(const texture& other) : texture{} { copy_data(other); }
 
   //----------------------------------------------------------------------------
-  Texture(Texture&& other)
+  texture(texture&& other)
       : id_holder{std::move(other)}, m_size{std::move(other.m_size)} {}
 
   //----------------------------------------------------------------------------
-  ~Texture() {
+  auto& operator=(const texture& other) {
+    copy_data(other);
+    return *this;
+  }
+
+  //----------------------------------------------------------------------------
+  auto& operator=(texture&& other) {
+    id_holder::operator=(std::move(other));
+    m_size             = std::move(other.m_size);
+    return *this;
+  }
+
+  //----------------------------------------------------------------------------
+  ~texture() {
     if (id()) { gl::delete_textures(1, &id()); }
   }
 
   //----------------------------------------------------------------------------
   template <typename... Sizes>
-  Texture(Sizes... sizes) : m_size{sizes...} {
+  texture(Sizes... sizes) : m_size{static_cast<size_t>(sizes)...} {
     static_assert(sizeof...(Sizes) == D,
                   "number of sizes does not match number of dimensions");
     static_assert((std::is_integral_v<Sizes> && ...),
@@ -160,7 +142,7 @@ class Texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   template <typename S, typename... Sizes>
-  Texture(const std::vector<S>& data, Sizes... sizes) : m_size{sizes...} {
+  texture(const std::vector<S>& data, Sizes... sizes) : m_size{sizes...} {
     static_assert(sizeof...(Sizes) == D,
                   "number of sizes does not match number of dimensions");
     static_assert((std::is_integral_v<Sizes> && ...),
@@ -173,7 +155,7 @@ class Texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   template <size_t... Is>
-  Texture(InterpolationMode interp_mode, WrapMode wrap_mode,
+  texture(InterpolationMode interp_mode, WrapMode wrap_mode,
           std::index_sequence<Is...>)
       : m_size{((void)Is, 0)...} {
     create_id();
@@ -181,12 +163,12 @@ class Texture : public id_holder<GLuint> {
     set_wrap_mode(wrap_mode);
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Texture(InterpolationMode interp_mode, WrapMode wrap_mode)
-      : Texture{interp_mode, wrap_mode, std::make_index_sequence<D>{}} {}
+  texture(InterpolationMode interp_mode, WrapMode wrap_mode)
+      : texture{interp_mode, wrap_mode, std::make_index_sequence<D>{}} {}
 
   //----------------------------------------------------------------------------
   template <typename... Sizes>
-  Texture(InterpolationMode interp_mode, WrapMode wrap_mode, Sizes... sizes)
+  texture(InterpolationMode interp_mode, WrapMode wrap_mode, Sizes... sizes)
       : m_size{sizes...} {
     static_assert(sizeof...(Sizes) == D,
                   "number of sizes does not match number of dimensions");
@@ -200,7 +182,7 @@ class Texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   template <typename S, typename... Sizes>
-  Texture(InterpolationMode interp_mode, WrapMode wrap_mode,
+  texture(InterpolationMode interp_mode, WrapMode wrap_mode,
           const std::vector<S>& data, Sizes... sizes)
       : m_size{sizes...} {
     static_assert(sizeof...(Sizes) == D,
@@ -211,6 +193,16 @@ class Texture : public id_holder<GLuint> {
     set_interpolation_mode(interp_mode);
     set_wrap_mode(wrap_mode);
     upload_data(data);
+  }
+
+  //----------------------------------------------------------------------------
+  texture(const std::string& filepath) : texture{} { read(filepath); }
+
+  //----------------------------------------------------------------------------
+  texture(InterpolationMode interp_mode, WrapMode wrap_mode,
+          const std::string& filepath)
+      : texture{interp_mode, wrap_mode} {
+    read(filepath);
   }
 
  private:
@@ -290,7 +282,7 @@ class Texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  void copy_data(const Texture& other) {
+  void copy_data(const texture& other) {
     m_size = other.m_size;
     if constexpr (D == 1)
       gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
@@ -312,16 +304,16 @@ class Texture : public id_holder<GLuint> {
     static_assert(sizeof...(Sizes) == D);
     static_assert((std::is_integral_v<Sizes> && ...));
     bind();
-    m_size = {sizes...};
+    m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
     if constexpr (D == 1)
-      gl::tex_image_1d(target, 0, gl_internal_format, m_size[0], 0, gl_format,
+      gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
                        gl_type, nullptr);
-    else if (D == 2)
-      gl::tex_image_2d(target, 0, gl_internal_format, m_size[0], m_size[1], 0,
+    else if constexpr (D == 2)
+      gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
                        gl_format, gl_type, nullptr);
-    else if (D == 3)
-      gl::tex_image_2d(target, 0, gl_internal_format, m_size[0], m_size[1],
-                       m_size[2], 0, gl_format, gl_type, nullptr);
+    else if constexpr (D == 3)
+      gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
+                       depth(), 0, gl_format, gl_type, nullptr);
   }
 
  private:
@@ -337,17 +329,35 @@ class Texture : public id_holder<GLuint> {
     assert(data.size() == num_texels() * num_components);
     bind();
     if constexpr (D == 1)
-      gl::tex_image_1d(target, 0, gl_internal_format, m_size[0], 0, gl_format,
+      gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
                        gl_type, data.data());
-    else if (D == 2)
-      gl::tex_image_2d(target, 0, gl_internal_format, m_size[0], m_size[1], 0,
+    else if constexpr (D == 2)
+      gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
                        gl_format, gl_type, data.data());
-    else
-      gl::tex_image_3d(target, 0, gl_internal_format, m_size[0], m_size[1],
-                       m_size[2], 0, gl_format, gl_type, data.data());
+    else if constexpr (D == 3)
+      gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
+                       depth(), 0, gl_format, gl_type, data.data());
   }
 
  public:
+  //------------------------------------------------------------------------------
+  template <typename S, typename... Sizes>
+  void upload_data(const std::vector<S>& data, Sizes... sizes) {
+    static_assert(sizeof...(Sizes) == D);
+    static_assert((std::is_integral_v<Sizes> && ...));
+    m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
+    upload_data(data);
+  }
+
+  //------------------------------------------------------------------------------
+  auto download_data() const {
+    std::vector<type> data(num_components * num_texels());
+    gl::get_texture_image(id(), 0, gl_format, gl_type,
+                          num_texels() * num_components * sizeof(type),
+                          data.data());
+    return data;
+  }
+
   //----------------------------------------------------------------------------
   auto width() const { return m_size[0]; }
 
@@ -361,24 +371,6 @@ class Texture : public id_holder<GLuint> {
   template <unsigned int D_ = D, typename = std::enable_if_t<(D_ > 2)>>
   auto depth() const {
     return m_size[2];
-  }
-
-  //------------------------------------------------------------------------------
-  template <typename S, typename... Sizes>
-  void upload_data(const std::vector<S>& data, Sizes... sizes) {
-    static_assert(sizeof...(Sizes) == D);
-    static_assert((std::is_integral_v<Sizes> && ...));
-    m_size = std::array<size_t, D>{sizes...};
-    upload_data(data);
-  }
-
-  //------------------------------------------------------------------------------
-  auto download_data() const {
-    std::vector<type> data(num_components * num_texels());
-    gl::get_texture_image(id(), 0, gl_format, gl_type,
-                          num_texels() * num_components * sizeof(type),
-                          data.data());
-    return data;
   }
 
   //----------------------------------------------------------------------------
@@ -486,12 +478,13 @@ class Texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   void read(const std::string filepath) {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
-#ifdef USE_PNG
-    if (D == 2 && ext == "png") {
-      read_png(filepath);
-      return;
+    if constexpr (D == 2 && is_readable) {
+      if constexpr (settings::use_png)
+        if (ext == "png") {
+          read_png(filepath);
+          return;
+        }
     }
-#endif
 
     throw std::runtime_error("could not read fileformat ." + ext);
   }
@@ -499,449 +492,71 @@ class Texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   void write(const std::string filepath) const {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
-#ifdef USE_PNG
-    if (D == 2 && ext == "png") {
-      write_png(filepath);
-      return;
+    if constexpr (D == 2 && is_readable) {
+      if constexpr (settings::use_png)
+        if (ext == "png") {
+          write_png(filepath);
+          return;
+        }
     }
-#endif
     throw std::runtime_error("could not write fileformat ." + ext);
   }
 
-#ifdef USE_PNG
   //------------------------------------------------------------------------------
   template <unsigned int D_ = D,
-            typename        = std::enable_if_t<D_ == 2 && is_readable>>
+            typename        = std::enable_if_t<D_ == 2 && is_readable>,
+            typename        = std::enable_if_t<settings::use_png>>
   void read_png(const std::string& filepath) {
-    using tex_png_t = tex_png<type, components>;
-    typename tex_png_t::type image;
-    image.read(filepath);
-    m_size[0] = image.get_width();
-    m_size[1] = image.get_height();
-    std::vector<type> data;
-    data.reserve(num_texels() * num_components);
-    for (png::uint_32 y = image.get_height(); y > 0; --y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x)
-        tex_png_t::load_pixel(data, image, x, y);
-    if constexpr (std::is_same_v<type, float>) {
-      auto normalize = [](auto d) { return d / 255.0f; };
-      boost::transform(data, begin(data), normalize);
-    }
+    if constexpr (settings::use_png) {
+      using tex_png_t = tex_png<type, components>;
+      typename tex_png_t::png_t image;
+      image.read(filepath);
+      m_size[0] = image.get_width();
+      m_size[1] = image.get_height();
+      std::vector<type> data;
+      data.reserve(num_texels() * num_components);
+      for (png::uint_32 y = image.get_height(); y > 0; --y)
+        for (png::uint_32 x = 0; x < image.get_width(); ++x)
+          tex_png_t::load_pixel(data, image, x, y);
+      if constexpr (std::is_same_v<type, float>) {
+        auto normalize = [](auto d) { return d / 255.0f; };
+        boost::transform(data, begin(data), normalize);
+      }
 
-    upload_data(data);
+      upload_data(data);
+    }
   }
 
   //------------------------------------------------------------------------------
   template <unsigned int D_ = D,
-            typename        = std::enable_if_t<D_ == 2 && is_readable>>
+            typename        = std::enable_if_t<D_ == 2 && is_readable>,
+            typename        = std::enable_if_t<settings::use_png>>
   void write_png(const std::string& filepath) const {
-    using tex_png_t = tex_png<type, components>;
-    typename tex_png_t::png_t image(m_size[0], m_height);
-    auto                      data = download_data();
+    if constexpr (settings::use_png) {
+      using tex_png_t = tex_png<type, components>;
+      typename tex_png_t::png_t image(width(), height());
+      auto                      data = download_data();
 
-    for (unsigned int y = 0; y < image.get_height(); ++y)
-      for (png::uint_32 x = 0; x < image.get_width(); ++x) {
-        unsigned int idx = x + m_size[0] * y;
-        tex_png_t::save_pixel(data, image, x, y, idx);
-      }
-    image.write(filepath);
+      for (unsigned int y = 0; y < image.get_height(); ++y)
+        for (png::uint_32 x = 0; x < image.get_width(); ++x) {
+          unsigned int idx = x + width() * y;
+          tex_png_t::save_pixel(data, image, x, y, idx);
+        }
+      image.write(filepath);
+    }
   }
-#endif
 };
 
 //==============================================================================
 template <typename T, typename C>
-using Texture1D = Texture<1, T, C>;
+using tex1D = texture<1, T, C>;
 
 template <typename T, typename C>
-using Texture2D = Texture<2, T, C>;
+using tex2D = texture<2, T, C>;
 
 template <typename T, typename C>
-using Texture3D = Texture<3, T, C>;
+using tex3D = texture<3, T, C>;
 
-//=============================================================================
-namespace tex {  // type specializations
-//=============================================================================
-
-template <>
-struct target<1> {
-  static constexpr GLenum value = GL_TEXTURE_1D;
-};
-
-//------------------------------------------------------------------------------
-template <>
-struct target<2> {
-  static constexpr GLenum value = GL_TEXTURE_2D;
-};
-
-//------------------------------------------------------------------------------
-template <>
-struct target<3> {
-  static constexpr GLenum value = GL_TEXTURE_3D;
-};
-
-//=============================================================================
-// int8
-template <>
-struct comb<int8_t, R> {
-  static constexpr GLint  internal_format = GL_R8;
-  static constexpr GLenum format          = GL_RED;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int8_t, RG> {
-  static constexpr GLint  internal_format = GL_RG8;
-  static constexpr GLenum format          = GL_RG;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int8_t, RGB> {
-  static constexpr GLint  internal_format = GL_RGB8;
-  static constexpr GLenum format          = GL_RGB;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int8_t, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA8;
-  static constexpr GLenum format          = GL_RGBA;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int8_t, BGR> {
-  static constexpr GLint  internal_format = GL_RGB8;
-  static constexpr GLenum format          = GL_BGR;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int8_t, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA8;
-  static constexpr GLenum format          = GL_BGRA;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//------------------------------------------------------------------------------
-// uint8
-template <>
-struct comb<uint8_t, R> {
-  static constexpr GLint  internal_format = GL_R8;
-  static constexpr GLenum format          = GL_RED;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint8_t, RG> {
-  static constexpr GLint  internal_format = GL_RG8;
-  static constexpr GLenum format          = GL_RG;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint8_t, RGB> {
-  static constexpr GLint  internal_format = GL_RGB8;
-  static constexpr GLenum format          = GL_RGB;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint8_t, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA8;
-  static constexpr GLenum format          = GL_RGBA;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint8_t, BGR> {
-  static constexpr GLint  internal_format = GL_RGB8;
-  static constexpr GLenum format          = GL_BGR;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint8_t, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA8;
-  static constexpr GLenum format          = GL_BGRA;
-  static constexpr GLenum type            = GL_UNSIGNED_BYTE;
-};
-
-//------------------------------------------------------------------------------
-// int16
-template <>
-struct comb<int16_t, R> {
-  static constexpr GLint  internal_format = GL_R16;
-  static constexpr GLenum format          = GL_RED;
-  static constexpr GLenum type            = GL_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int16_t, RG> {
-  static constexpr GLint  internal_format = GL_RG16;
-  static constexpr GLenum format          = GL_RG;
-  static constexpr GLenum type            = GL_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int16_t, RGB> {
-  static constexpr GLint  internal_format = GL_RGB16;
-  static constexpr GLenum format          = GL_RGB;
-  static constexpr GLenum type            = GL_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int16_t, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA16;
-  static constexpr GLenum format          = GL_RGBA;
-  static constexpr GLenum type            = GL_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int16_t, BGR> {
-  static constexpr GLint  internal_format = GL_RGB16;
-  static constexpr GLenum format          = GL_BGR;
-  static constexpr GLenum type            = GL_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int16_t, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA16;
-  static constexpr GLenum format          = GL_BGRA;
-  static constexpr GLenum type            = GL_SHORT;
-};
-
-//------------------------------------------------------------------------------
-// uint16
-template <>
-struct comb<uint16_t, R> {
-  static constexpr GLint  internal_format = GL_R16;
-  static constexpr GLenum format          = GL_RED;
-  static constexpr GLenum type            = GL_UNSIGNED_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint16_t, RG> {
-  static constexpr GLint  internal_format = GL_RG16;
-  static constexpr GLenum format          = GL_RG;
-  static constexpr GLenum type            = GL_UNSIGNED_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint16_t, RGB> {
-  static constexpr GLint  internal_format = GL_RGB16;
-  static constexpr GLenum format          = GL_RGB;
-  static constexpr GLenum type            = GL_UNSIGNED_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint16_t, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA16;
-  static constexpr GLenum format          = GL_RGBA;
-  static constexpr GLenum type            = GL_UNSIGNED_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint16_t, BGR> {
-  static constexpr GLint  internal_format = GL_RGB16;
-  static constexpr GLenum format          = GL_BGR;
-  static constexpr GLenum type            = GL_UNSIGNED_SHORT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint16_t, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA16;
-  static constexpr GLenum format          = GL_BGRA;
-  static constexpr GLenum type            = GL_UNSIGNED_SHORT;
-};
-
-//------------------------------------------------------------------------------
-// int32
-template <>
-struct comb<int32_t, R> {
-  static constexpr GLint  internal_format = GL_R32I;
-  static constexpr GLenum format          = GL_RED_INTEGER;
-  static constexpr GLenum type            = GL_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int32_t, RG> {
-  static constexpr GLint  internal_format = GL_RG32I;
-  static constexpr GLenum format          = GL_RG_INTEGER;
-  static constexpr GLenum type            = GL_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int32_t, RGB> {
-  static constexpr GLint  internal_format = GL_RGB32I;
-  static constexpr GLenum format          = GL_RGB_INTEGER;
-  static constexpr GLenum type            = GL_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int32_t, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA32I;
-  static constexpr GLenum format          = GL_RGBA_INTEGER;
-  static constexpr GLenum type            = GL_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int32_t, BGR> {
-  static constexpr GLint  internal_format = GL_RGB32I;
-  static constexpr GLenum format          = GL_BGR_INTEGER;
-  static constexpr GLenum type            = GL_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<int32_t, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA32I;
-  static constexpr GLenum format          = GL_BGRA_INTEGER;
-  static constexpr GLenum type            = GL_INT;
-};
-
-//------------------------------------------------------------------------------
-// uint32
-template <>
-struct comb<uint32_t, R> {
-  static constexpr GLint  internal_format = GL_R32UI;
-  static constexpr GLenum format          = GL_RED_INTEGER;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint32_t, RG> {
-  static constexpr GLint  internal_format = GL_RG32UI;
-  static constexpr GLenum format          = GL_RG_INTEGER;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint32_t, RGB> {
-  static constexpr GLint  internal_format = GL_RGB32UI;
-  static constexpr GLenum format          = GL_RGB_INTEGER;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint32_t, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA32UI;
-  static constexpr GLenum format          = GL_RGBA_INTEGER;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint32_t, BGR> {
-  static constexpr GLint  internal_format = GL_RGB32UI;
-  static constexpr GLenum format          = GL_BGR_INTEGER;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<uint32_t, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA32UI;
-  static constexpr GLenum format          = GL_BGRA_INTEGER;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//------------------------------------------------------------------------------
-// float
-template <>
-struct comb<float, R> {
-  static constexpr GLint  internal_format = GL_R32F;
-  static constexpr GLenum format          = GL_RED;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<float, RG> {
-  static constexpr GLint  internal_format = GL_RG32F;
-  static constexpr GLenum format          = GL_RG;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<float, RGB> {
-  static constexpr GLint  internal_format = GL_RGB32F;
-  static constexpr GLenum format          = GL_RGB;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<float, RGBA> {
-  static constexpr GLint  internal_format = GL_RGBA32F;
-  static constexpr GLenum format          = GL_RGBA;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<float, BGR> {
-  static constexpr GLint  internal_format = GL_RGB32F;
-  static constexpr GLenum format          = GL_BGR;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<float, BGRA> {
-  static constexpr GLint  internal_format = GL_RGBA32F;
-  static constexpr GLenum format          = GL_BGRA;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//------------------------------------------------------------------------------
-// Depth
-template <>
-struct comb<uint32_t, Depth> {
-  static constexpr GLint  internal_format = GL_DEPTH_COMPONENT32;
-  static constexpr GLenum format          = GL_DEPTH_COMPONENT;
-  static constexpr GLenum type            = GL_UNSIGNED_INT;
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-template <>
-struct comb<float, Depth> {
-  static constexpr GLint  internal_format = GL_DEPTH_COMPONENT32;
-  static constexpr GLenum format          = GL_DEPTH_COMPONENT;
-  static constexpr GLenum type            = GL_FLOAT;
-};
-
-//=============================================================================
-}  // namespace tex
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

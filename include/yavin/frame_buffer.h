@@ -3,35 +3,47 @@
 
 #include "error_check.h"
 
-#include "texture.h"
 #include "dll_export.h"
+#include "texture.h"
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
 
-class FrameBuffer {
+class framebuffer : public id_holder<GLuint> {
  public:
-  DLL_API FrameBuffer();
-  DLL_API FrameBuffer(FrameBuffer&& other);
-  DLL_API ~FrameBuffer();
+  DLL_API framebuffer();
+  DLL_API ~framebuffer();
+  template <typename... Textures>
+  DLL_API framebuffer(const Textures&... textures) : framebuffer{} {
+    unsigned int i = 0;
+    using discard = int[];
+    // attach textures one after another, incrementing i if texture is a color
+    // texture
+    (void)discard{((void)(std::is_same_v<typename Textures::components, Depth>
+                              ? attach(textures, i)
+                              : attach(textures, i++)),
+                   0)...};
+  }
 
   template <typename T, typename Components>
-  DLL_API void attachTex2D(const Texture2D<T, Components>& tex,
-                           unsigned int                    i = 0);
+  DLL_API void attach(const tex2D<T, Components>& tex, unsigned int i = 0);
   template <typename T>
-  DLL_API void attachDepth(const Texture2D<T, Depth>& depth_tex);
+  DLL_API void attach(const tex2D<T, Depth>& depth_tex);
+ private:
+  // this is necessary for constructor taking variadic parameters
+  template <typename T>
+  DLL_API void attach(const tex2D<T, Depth>& depth_tex, unsigned int) {
+    attach(depth_tex);
+  }
 
+ public:
   DLL_API void        bind();
   DLL_API static void unbind();
 
   DLL_API void clear();
 
-  DLL_API GLuint id() const;
-
  private:
-  GLuint m_id;
-  bool   m_dont_delete = false;
 };
 
 //==============================================================================

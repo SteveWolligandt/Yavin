@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(yavin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+# for color with ninja
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_compile_options(-fcolor-diagnostics)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_compile_options(-fdiagnostics-color=always)
+endif()
 
 set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomic_counter_buffer.cpp
@@ -17,7 +23,7 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/gl_wrapper.cpp
   ${CMAKE_SOURCE_DIR}/src/index_buffer.cpp
   ${CMAKE_SOURCE_DIR}/src/mutex_handler.cpp
-  ${CMAKE_SOURCE_DIR}/src/oit_window.cpp
+  # ${CMAKE_SOURCE_DIR}/src/oit_window.cpp
   ${CMAKE_SOURCE_DIR}/src/orthographic_camera.cpp
   ${CMAKE_SOURCE_DIR}/src/perspective_camera.cpp
   ${CMAKE_SOURCE_DIR}/src/shader.cpp
@@ -26,6 +32,7 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/tesselation_control_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/tesselation_evaluation_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
+  # ${CMAKE_SOURCE_DIR}/src/tex_png.cpp
   ${CMAKE_SOURCE_DIR}/src/vertex_array.cpp
   ${CMAKE_SOURCE_DIR}/src/vertex_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/window.cpp
@@ -35,13 +42,6 @@ set(YAVIN_SOURCES
 # create library target
 add_library(yavin SHARED ${YAVIN_SOURCES})
 target_compile_features(yavin PUBLIC cxx_std_17)
-
-# for color with ninja
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  add_compile_options(-fcolor-diagnostics)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  add_compile_options(-fdiagnostics-color=always)
-endif()
 
 target_compile_definitions(yavin
   PRIVATE
@@ -74,9 +74,12 @@ if(GLFW3_FOUND)
 endif()
 
 if(PNG++_FOUND)
+  set(USE_PNG "true")
   target_compile_definitions(yavin
     PRIVATE
-    USE_PNG)
+      USE_PNG)
+else()
+  set(USE_PNG "false")
 endif()
 
 option(VERBOSE "verbose OpenGL calls" OFF)
@@ -85,8 +88,14 @@ if (VERBOSE)
 else()
   set(VERBOSE_GL "false")
 endif()
+
 configure_file(src/gl_verbose.cpp.in src/gl_verbose.cpp)
-configure_file(include/yavin/shader_include_paths.h.in include/yavin/shader_include_paths.h)
+configure_file(
+  include/yavin/shader_include_paths.h.in
+  include/yavin/shader_include_paths.h)
+configure_file(
+  include/yavin/settings.h.in
+  include/yavin/settings.h)
 
 target_include_directories(yavin
   PUBLIC 

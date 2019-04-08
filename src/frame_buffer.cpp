@@ -4,103 +4,107 @@
 namespace yavin {
 //==============================================================================
 
-FrameBuffer::FrameBuffer() { gl::create_framebuffers(1, &m_id); }
-
-FrameBuffer::FrameBuffer(FrameBuffer&& other) {
-  other.m_dont_delete = true;
-  m_id                = other.m_id;
+framebuffer::framebuffer() {
+  gl::create_framebuffers(1, &id());
 }
 
-FrameBuffer::~FrameBuffer() {
-  if (!m_dont_delete) gl::delete_framebuffers(1, &m_id);
+//------------------------------------------------------------------------------
+framebuffer::~framebuffer() {
+  gl::delete_framebuffers(1, &id());
 }
 
+//------------------------------------------------------------------------------
 template <typename T, typename Components>
-void FrameBuffer::attachTex2D(const Texture2D<T, Components>& tex,
-                              unsigned int                    i) {
+void framebuffer::attach(const tex2D<T, Components>& tex, unsigned int i) {
   assert(i < GL_MAX_COLOR_ATTACHMENTS);
-  gl::named_framebuffer_texture(m_id, GL_COLOR_ATTACHMENT0 + i, tex.id(), 0);
-  gl_framebuffer_not_complete_check(m_id);
+  gl::named_framebuffer_texture(id(), GL_COLOR_ATTACHMENT0 + i, tex.id(), 0);
+  gl_framebuffer_not_complete_check(id());
 }
 
+//------------------------------------------------------------------------------
 template <typename T>
-void FrameBuffer::attachDepth(const Texture2D<T, Depth>& tex) {
-  gl::named_framebuffer_texture(m_id, GL_DEPTH_ATTACHMENT, tex.id(), 0);
-  gl_framebuffer_not_complete_check(m_id);
+void framebuffer::attach(const tex2D<T, Depth>& tex) {
+  gl::named_framebuffer_texture(id(), GL_DEPTH_ATTACHMENT, tex.id(), 0);
+  gl_framebuffer_not_complete_check(id());
 }
 
-template void FrameBuffer::attachTex2D<float, R>(const Texture2D<float, R>&,
-                                                 unsigned int);
-template void FrameBuffer::attachTex2D<int8_t, R>(const Texture2D<int8_t, R>&,
-                                                  unsigned int);
-template void FrameBuffer::attachTex2D<uint8_t, R>(const Texture2D<uint8_t, R>&,
-                                                   unsigned int);
-template void FrameBuffer::attachTex2D<int16_t, R>(const Texture2D<int16_t, R>&,
-                                                   unsigned int);
-template void FrameBuffer::attachTex2D<uint16_t, R>(
-    const Texture2D<uint16_t, R>&, unsigned int);
-template void FrameBuffer::attachTex2D<int32_t, R>(const Texture2D<int32_t, R>&,
-                                                   unsigned int);
-template void FrameBuffer::attachTex2D<uint32_t, R>(
-    const Texture2D<uint32_t, R>&, unsigned int);
+//------------------------------------------------------------------------------
+void framebuffer::bind() {
+  gl::bind_framebuffer(GL_FRAMEBUFFER, id());
+}
 
-template void FrameBuffer::attachTex2D<float, RGBA>(
-    const Texture2D<float, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<int8_t, RGBA>(
-    const Texture2D<int8_t, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint8_t, RGBA>(
-    const Texture2D<uint8_t, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<int16_t, RGBA>(
-    const Texture2D<int16_t, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint16_t, RGBA>(
-    const Texture2D<uint16_t, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<int32_t, RGBA>(
-    const Texture2D<int32_t, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint32_t, RGBA>(
-    const Texture2D<uint32_t, RGBA>&, unsigned int);
-template void FrameBuffer::attachTex2D<float, RGB>(const Texture2D<float, RGB>&,
-                                                   unsigned int);
-template void FrameBuffer::attachTex2D<int8_t, RGB>(
-    const Texture2D<int8_t, RGB>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint8_t, RGB>(
-    const Texture2D<uint8_t, RGB>&, unsigned int);
-template void FrameBuffer::attachTex2D<int16_t, RGB>(
-    const Texture2D<int16_t, RGB>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint16_t, RGB>(
-    const Texture2D<uint16_t, RGB>&, unsigned int);
-template void FrameBuffer::attachTex2D<int32_t, RGB>(
-    const Texture2D<int32_t, RGB>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint32_t, RGB>(
-    const Texture2D<uint32_t, RGB>&, unsigned int);
+//------------------------------------------------------------------------------
+void framebuffer::unbind() {
+  gl::bind_framebuffer(GL_FRAMEBUFFER, 0);
+}
 
-template void FrameBuffer::attachDepth<uint32_t>(
-    const Texture2D<uint32_t, Depth>&);
-template void FrameBuffer::attachDepth<float>(const Texture2D<float, Depth>&);
-
-template void FrameBuffer::attachTex2D<float, RG>(const Texture2D<float, RG>&,
-                                                  unsigned int);
-template void FrameBuffer::attachTex2D<int8_t, RG>(const Texture2D<int8_t, RG>&,
-                                                   unsigned int);
-template void FrameBuffer::attachTex2D<uint8_t, RG>(
-    const Texture2D<uint8_t, RG>&, unsigned int);
-template void FrameBuffer::attachTex2D<int16_t, RG>(
-    const Texture2D<int16_t, RG>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint16_t, RG>(
-    const Texture2D<uint16_t, RG>&, unsigned int);
-template void FrameBuffer::attachTex2D<int32_t, RG>(
-    const Texture2D<int32_t, RG>&, unsigned int);
-template void FrameBuffer::attachTex2D<uint32_t, RG>(
-    const Texture2D<uint32_t, RG>&, unsigned int);
-
-void FrameBuffer::bind() { gl::bind_framebuffer(GL_FRAMEBUFFER, m_id); }
-void FrameBuffer::unbind() { gl::bind_framebuffer(GL_FRAMEBUFFER, 0); }
-
-void FrameBuffer::clear() {
-  // glClearNamedFramebufferfi(m_id, GLenum buffer, GLint drawbuffer,
+//------------------------------------------------------------------------------
+void framebuffer::clear() {
+  // glClearNamedFramebufferfi(id(), GLenum buffer, GLint drawbuffer,
   //                           GLfloat depth, GLint stencil);
 }
 
-GLuint FrameBuffer::id() const { return m_id; }
+//==============================================================================
+template void framebuffer::attach<float, R>(const tex2D<float, R>&,
+                                            unsigned int);
+template void framebuffer::attach<int8_t, R>(const tex2D<int8_t, R>&,
+                                             unsigned int);
+template void framebuffer::attach<uint8_t, R>(const tex2D<uint8_t, R>&,
+                                              unsigned int);
+template void framebuffer::attach<int16_t, R>(const tex2D<int16_t, R>&,
+                                              unsigned int);
+template void framebuffer::attach<uint16_t, R>(const tex2D<uint16_t, R>&,
+                                               unsigned int);
+template void framebuffer::attach<int32_t, R>(const tex2D<int32_t, R>&,
+                                              unsigned int);
+template void framebuffer::attach<uint32_t, R>(const tex2D<uint32_t, R>&,
+                                               unsigned int);
+
+template void framebuffer::attach<float, RG>(const tex2D<float, RG>&,
+                                             unsigned int);
+template void framebuffer::attach<int8_t, RG>(const tex2D<int8_t, RG>&,
+                                              unsigned int);
+template void framebuffer::attach<uint8_t, RG>(const tex2D<uint8_t, RG>&,
+                                               unsigned int);
+template void framebuffer::attach<int16_t, RG>(const tex2D<int16_t, RG>&,
+                                               unsigned int);
+template void framebuffer::attach<uint16_t, RG>(const tex2D<uint16_t, RG>&,
+                                                unsigned int);
+template void framebuffer::attach<int32_t, RG>(const tex2D<int32_t, RG>&,
+                                               unsigned int);
+template void framebuffer::attach<uint32_t, RG>(const tex2D<uint32_t, RG>&,
+                                                unsigned int);
+template void framebuffer::attach<float, RGB>(const tex2D<float, RGB>&,
+                                              unsigned int);
+template void framebuffer::attach<int8_t, RGB>(const tex2D<int8_t, RGB>&,
+                                               unsigned int);
+template void framebuffer::attach<uint8_t, RGB>(const tex2D<uint8_t, RGB>&,
+                                                unsigned int);
+template void framebuffer::attach<int16_t, RGB>(const tex2D<int16_t, RGB>&,
+                                                unsigned int);
+template void framebuffer::attach<uint16_t, RGB>(const tex2D<uint16_t, RGB>&,
+                                                 unsigned int);
+template void framebuffer::attach<int32_t, RGB>(const tex2D<int32_t, RGB>&,
+                                                unsigned int);
+template void framebuffer::attach<uint32_t, RGB>(const tex2D<uint32_t, RGB>&,
+                                                 unsigned int);
+template void framebuffer::attach<float, RGBA>(const tex2D<float, RGBA>&,
+                                               unsigned int);
+template void framebuffer::attach<int8_t, RGBA>(const tex2D<int8_t, RGBA>&,
+                                                unsigned int);
+template void framebuffer::attach<uint8_t, RGBA>(const tex2D<uint8_t, RGBA>&,
+                                                 unsigned int);
+template void framebuffer::attach<int16_t, RGBA>(const tex2D<int16_t, RGBA>&,
+                                                 unsigned int);
+template void framebuffer::attach<uint16_t, RGBA>(const tex2D<uint16_t, RGBA>&,
+                                                  unsigned int);
+template void framebuffer::attach<int32_t, RGBA>(const tex2D<int32_t, RGBA>&,
+                                                 unsigned int);
+template void framebuffer::attach<uint32_t, RGBA>(const tex2D<uint32_t, RGBA>&,
+                                                  unsigned int);
+template void framebuffer::attach<uint32_t>(const tex2D<uint32_t, Depth>&);
+template void framebuffer::attach<float>(const tex2D<float, Depth>&);
+
 
 //==============================================================================
 }  // namespace yavin

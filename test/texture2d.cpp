@@ -10,8 +10,8 @@ namespace yavin::test {
 extern Window window;
 
 template <typename type, typename C>
-struct RandomTexture2D : Texture2D<type, C> {
-  using parent_t = Texture2D<type, C>;
+struct RandomTexture2D : tex2D<type, C> {
+  using parent_t = tex2D<type, C>;
   using dist_t   = std::conditional_t<std::is_floating_point_v<type>,
                                     std::uniform_real_distribution<type>,
                                     std::uniform_int_distribution<type>>;
@@ -28,19 +28,16 @@ struct RandomTexture2D : Texture2D<type, C> {
   //----------------------------------------------------------------------------
   RandomTexture2D()
       : eng{std::random_device{}()}, data(w * h * num_components) {
-    dist_t     rand{min, max};
-    auto random_val = [&] { return rand(eng); };
+    dist_t rand{min, max};
+    auto   random_val = [&] { return rand(eng); };
     boost::generate(data, random_val);
     this->upload_data(data, w, h);
   }
 };
 
 TEMPLATE_PRODUCT_TEST_CASE(
-    "[Texture2D] upload and download",
-    "[texture2d][texture]",
-    RandomTexture2D,
-    (
-     (uint8_t , R)  , (uint8_t , RG)  , (uint8_t , RGB) ,
+    "[tex2D] upload and download", "[texture2d][texture]", RandomTexture2D,
+    ((uint8_t , R)  , (uint8_t , RG)  , (uint8_t , RGB) ,
      (uint8_t , BGR), (uint8_t , RGBA), (uint8_t , BGRA),
      (int8_t  , R)  , (int8_t  , RG)  , (int8_t  , RGB) ,
      (int8_t  , BGR), (int8_t  , RGBA), (int8_t  , BGRA),
@@ -53,10 +50,9 @@ TEMPLATE_PRODUCT_TEST_CASE(
      (int32_t , R)  , (int32_t , RG)  , (int32_t , RGB) ,
      (int32_t , BGR), (int32_t , RGBA), (int32_t , BGRA),
      (float   , R)  , (float   , RG)  , (float   , RGB) ,
-     (float   , BGR), (float   , RGBA), (float   , BGRA)
-     )) {
+     (float   , BGR), (float   , RGBA), (float   , BGRA))) {
   TestType tex;
-  auto downloaded_data = tex.download_data();
+  auto     downloaded_data = tex.download_data();
   REQUIRE(tex.data.size() == downloaded_data.size());
   auto it      = begin(tex.data);
   auto it_down = begin(downloaded_data);

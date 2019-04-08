@@ -1,17 +1,6 @@
-#ifndef __YAVIN_TEX_PNG_H__
-#define __YAVIN_TEX_PNG_H__
+#include <yavin/tex_png.h>
 
-#ifdef USE_PNG
-#include <png++/png.hpp>
-#include "tex_components.h"
-
-//==============================================================================
-namespace yavin {
-//==============================================================================
-
-template <typename type, typename tex_t>
-struct tex_png;
-
+namespace yavin{
 //==============================================================================
 template <typename type>
 struct tex_png<type, R> {
@@ -167,9 +156,4 @@ struct tex_png<type, BGRA> {
     }
   };
 };
-//==============================================================================
 }  // namespace yavin
-//==============================================================================
-
-#endif
-#endif
