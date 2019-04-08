@@ -23,7 +23,6 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/gl_wrapper.cpp
   ${CMAKE_SOURCE_DIR}/src/index_buffer.cpp
   ${CMAKE_SOURCE_DIR}/src/mutex_handler.cpp
-  # ${CMAKE_SOURCE_DIR}/src/oit_window.cpp
   ${CMAKE_SOURCE_DIR}/src/orthographic_camera.cpp
   ${CMAKE_SOURCE_DIR}/src/perspective_camera.cpp
   ${CMAKE_SOURCE_DIR}/src/shader.cpp
@@ -32,7 +31,6 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/tesselation_control_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/tesselation_evaluation_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
-  # ${CMAKE_SOURCE_DIR}/src/tex_png.cpp
   ${CMAKE_SOURCE_DIR}/src/vertex_array.cpp
   ${CMAKE_SOURCE_DIR}/src/vertex_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/window.cpp
@@ -59,25 +57,45 @@ set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 find_path(GLEW_INCLUDE_DIR GL/glew.h)
 find_library(GLEW_LIBRARY NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
-find_package(GLFW3)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
-find_package(PNG)
-find_package(PNG++)
 find_package(Boost REQUIRED)
 find_package(X11 REQUIRED)
 
+target_include_directories(yavin
+  PUBLIC 
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/single_include
+    ${CMAKE_BINARY_DIR}/include
+    ${OPENGL_INCLUDE_DIR} 
+    ${GLM_INCLUDE_DIRS} 
+    ${GLEW_INCLUDE_DIR}
+    ${X11_INCLUDE_DIR}
+)
+
+target_link_libraries(yavin 
+  ${OPENGL_LIBRARIES}
+  ${GLEW_LIBRARY}
+  ${X11_LIBRARIES}
+)
+
+################################################################################
+find_package(GLFW3)
 if(GLFW3_FOUND)
-  target_compile_definitions(yavin
-    PRIVATE
-      USE_GLFW3)
+  target_include_directories(yavin PUBLIC ${GLFW3_INCLUDE_DIRECTORIES})
+  target_link_libraries(yavin ${GLFW_LIBRARIES} ${X11_LIBRARIES})
+  target_compile_definitions(yavin PRIVATE USE_GLFW3)
 endif()
 
-if(PNG++_FOUND)
+################################################################################
+find_package(PNG)
+find_package(PNG++)
+if(PNG_FOUND AND PNG++_FOUND)
+  target_include_directories(yavin PUBLIC
+                             ${PNG_INCLUDE_DIRS} ${PNG++_INCLUDE_DIRS})
+  target_link_libraries(yavin
+                        ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
   set(USE_PNG "true")
-  target_compile_definitions(yavin
-    PRIVATE
-      USE_PNG)
 else()
   set(USE_PNG "false")
 endif()
@@ -89,34 +107,15 @@ else()
   set(VERBOSE_GL "false")
 endif()
 
-configure_file(src/gl_verbose.cpp.in src/gl_verbose.cpp)
-configure_file(
-  include/yavin/shader_include_paths.h.in
-  include/yavin/shader_include_paths.h)
-configure_file(
-  include/yavin/settings.h.in
-  include/yavin/settings.h)
-
-target_include_directories(yavin
-  PUBLIC 
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/single_include
-    ${CMAKE_BINARY_DIR}/include
-    ${OPENGL_INCLUDE_DIR} 
-    ${GLM_INCLUDE_DIRS} 
-    ${GLFW3_INCLUDE_DIRECTORIES}
-    ${GLEW_INCLUDE_DIR}
-    ${X11_INCLUDE_DIR}
-)
-
-target_link_libraries(yavin 
-  ${OPENGL_LIBRARIES}
-  ${GLEW_LIBRARY}
-  ${GLFW_LIBRARIES} 
-  ${PNG_LIBRARIES} 
-  ${PNG+_LIBRARIES}
-  ${X11_LIBRARIES}
-)
+set(TEST_USE "#ifdef false")
+configure_file(src/gl_verbose.cpp.in
+               src/gl_verbose.cpp)
+configure_file(include/yavin/shader_include_paths.h.in
+               include/yavin/shader_include_paths.h)
+configure_file(include/yavin/texture.h.in
+               include/yavin/texture.h)
+configure_file(include/yavin/settings.h.in
+               include/yavin/settings.h)
 
 export(TARGETS yavin FILE yavinConfig.cmake)
 

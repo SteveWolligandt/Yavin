@@ -46,6 +46,12 @@ target_compile_options(unittests
     -Wno-missing-braces
     -pedantic
 )
+if(PNG_FOUND AND PNG++_FOUND)
+  target_include_directories(unittests PUBLIC
+                             ${PNG_INCLUDE_DIRS} ${PNG++_INCLUDE_DIRS})
+  target_link_libraries(unittests
+                        ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
+endif()
 catch_discover_tests(unittests)
 
 ################################################################################

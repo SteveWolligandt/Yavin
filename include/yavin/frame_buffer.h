@@ -4,7 +4,7 @@
 #include "error_check.h"
 
 #include "dll_export.h"
-#include "texture.h"
+#include <yavin/texture.h>
 
 //==============================================================================
 namespace yavin {

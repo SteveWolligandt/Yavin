@@ -1,23 +1,22 @@
 #ifndef __YAVIN_TEXTURE_H__
 #define __YAVIN_TEXTURE_H__
 
+#include <yavin/error_check.h>
+#include <yavin/gl_functions.h>
+#include <yavin/id_holder.h>
+#include <yavin/pixel_unpack_buffer.h>
 #include <yavin/settings.h>
+#include <yavin/tex_components.h>
+#include <yavin/tex_settings.h>
+#include <yavin/tex_target.h>
+#include <yavin/type.h>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <iostream>
 #include <utility>
-#include "error_check.h"
-#include "gl_functions.h"
-#include "id_holder.h"
-#include "pixel_unpack_buffer.h"
-#include "tex_components.h"
-#include "tex_settings.h"
-#include "tex_target.h"
-#include "tex_png.h"
-#include "type.h"
 
-#ifdef USE_PNG
-#include "tex_png.h"
+#if @USE_PNG@
+#include <yavin/tex_png.h>
 #endif
 
 //==============================================================================
@@ -479,11 +478,12 @@ class texture : public id_holder<GLuint> {
   void read(const std::string filepath) {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_readable) {
-      if constexpr (settings::use_png)
-        if (ext == "png") {
-          read_png(filepath);
-          return;
-        }
+#if @USE_PNG@
+      if (ext == "png") {
+        read_png(filepath);
+        return;
+      }
+#endif
     }
 
     throw std::runtime_error("could not read fileformat ." + ext);
@@ -493,15 +493,17 @@ class texture : public id_holder<GLuint> {
   void write(const std::string filepath) const {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_readable) {
-      if constexpr (settings::use_png)
-        if (ext == "png") {
-          write_png(filepath);
-          return;
-        }
+#if @USE_PNG@
+      if (ext == "png") {
+        write_png(filepath);
+        return;
+      }
+#endif
     }
     throw std::runtime_error("could not write fileformat ." + ext);
   }
 
+#if @USE_PNG@
   //------------------------------------------------------------------------------
   template <unsigned int D_ = D,
             typename        = std::enable_if_t<D_ == 2 && is_readable>,
@@ -545,6 +547,7 @@ class texture : public id_holder<GLuint> {
       image.write(filepath);
     }
   }
+#endif
 };
 
 //==============================================================================
