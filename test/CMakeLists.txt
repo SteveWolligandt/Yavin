@@ -64,21 +64,20 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       "code coverage can only be done with g++ compiler at the moment")
   endif()
 endif()
+
 if (COVERAGE)
   target_compile_options(unittests
-  PRIVATE
-    -fprofile-arcs -ftest-coverage)
+    PUBLIC -fprofile-arcs -ftest-coverage)
+
+  target_link_libraries(unittests -lgcov)
 
   set(EXCLUDES
-        "${CMAKE_SOURCE_DIR}/test"
-        "${CMAKE_SOURCE_DIR}/external"
-        "/usr/include")
+    "${CMAKE_SOURCE_DIR}/test"
+    "${CMAKE_SOURCE_DIR}/external"
+    "/usr/include")
 
-  set(COVERAGE_GCOVR_EXCLUDES
-    ${EXCLUDES})
-
-  set(COVERAGE_LCOV_EXCLUDES
-    ${EXCLUDES})
+  set(COVERAGE_GCOVR_EXCLUDES ${EXCLUDES})
+  set(COVERAGE_LCOV_EXCLUDES ${EXCLUDES})
 
   SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(
     NAME coverage.html

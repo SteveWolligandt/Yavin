@@ -107,7 +107,6 @@ else()
   set(VERBOSE_GL "false")
 endif()
 
-set(TEST_USE "#ifdef false")
 configure_file(src/gl_verbose.cpp.in
                src/gl_verbose.cpp)
 configure_file(include/yavin/shader_include_paths.h.in
