@@ -10,31 +10,31 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 set(YAVIN_SOURCES
-  ${CMAKE_SOURCE_DIR}/src/atomic_counter_buffer.cpp
+  ${CMAKE_SOURCE_DIR}/src/atomiccounterbuffer.cpp
   ${CMAKE_SOURCE_DIR}/src/attribute.cpp
-  ${CMAKE_SOURCE_DIR}/src/compute_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/computeshader.cpp
   ${CMAKE_SOURCE_DIR}/src/context.cpp
-  ${CMAKE_SOURCE_DIR}/src/error_check.cpp
-  ${CMAKE_SOURCE_DIR}/src/fragment_shader.cpp
-  ${CMAKE_SOURCE_DIR}/src/frame_buffer.cpp
-  ${CMAKE_SOURCE_DIR}/src/geometry_shader.cpp
-  ${CMAKE_SOURCE_DIR}/src/gl_functions.cpp
-  ${CMAKE_SOURCE_DIR}/src/glsl_var.cpp
-  ${CMAKE_SOURCE_DIR}/src/gl_wrapper.cpp
-  ${CMAKE_SOURCE_DIR}/src/index_buffer.cpp
-  ${CMAKE_SOURCE_DIR}/src/mutex_handler.cpp
-  ${CMAKE_SOURCE_DIR}/src/orthographic_camera.cpp
-  ${CMAKE_SOURCE_DIR}/src/perspective_camera.cpp
+  ${CMAKE_SOURCE_DIR}/src/errorcheck.cpp
+  ${CMAKE_SOURCE_DIR}/src/fragmentshader.cpp
+  ${CMAKE_SOURCE_DIR}/src/framebuffer.cpp
+  ${CMAKE_SOURCE_DIR}/src/geometryshader.cpp
+  ${CMAKE_SOURCE_DIR}/src/glfunctions.cpp
+  ${CMAKE_SOURCE_DIR}/src/glslvar.cpp
+  ${CMAKE_SOURCE_DIR}/src/glwrapper.cpp
+  ${CMAKE_SOURCE_DIR}/src/indexbuffer.cpp
+  ${CMAKE_SOURCE_DIR}/src/mutexhandler.cpp
+  ${CMAKE_SOURCE_DIR}/src/orthographiccamera.cpp
+  ${CMAKE_SOURCE_DIR}/src/perspectivecamera.cpp
   ${CMAKE_SOURCE_DIR}/src/shader.cpp
-  ${CMAKE_SOURCE_DIR}/src/shader_stage.cpp
-  ${CMAKE_SOURCE_DIR}/src/shader_stage_parser.cpp
-  ${CMAKE_SOURCE_DIR}/src/tesselation_control_shader.cpp
-  ${CMAKE_SOURCE_DIR}/src/tesselation_evaluation_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/shaderstage.cpp
+  ${CMAKE_SOURCE_DIR}/src/shaderstageparser.cpp
+  ${CMAKE_SOURCE_DIR}/src/tesselationcontrolshader.cpp
+  ${CMAKE_SOURCE_DIR}/src/tesselationevaluationshader.cpp
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
-  ${CMAKE_SOURCE_DIR}/src/vertex_array.cpp
-  ${CMAKE_SOURCE_DIR}/src/vertex_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/vertexarray.cpp
+  ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
   ${CMAKE_SOURCE_DIR}/src/window.cpp
-  ${CMAKE_BINARY_DIR}/src/gl_verbose.cpp
+  ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
 
 # create library target
@@ -107,10 +107,10 @@ else()
   set(VERBOSE_GL "false")
 endif()
 
-configure_file(src/gl_verbose.cpp.in
-               src/gl_verbose.cpp)
-configure_file(include/yavin/shader_include_paths.h.in
-               include/yavin/shader_include_paths.h)
+configure_file(src/glverbose.cpp.in
+               src/glverbose.cpp)
+configure_file(include/yavin/shaderincludepaths.h.in
+               include/yavin/shaderincludepaths.h)
 configure_file(include/yavin/texture.h.in
                include/yavin/texture.h)
 configure_file(include/yavin/settings.h.in

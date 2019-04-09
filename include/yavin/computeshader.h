@@ -1,22 +1,19 @@
-#ifndef __YAVIN_MOVABLE_H__
-#define __YAVIN_MOVABLE_H__
+#ifndef __YAVIN_COMPUTESHADER_H__
+#define __YAVIN_COMPUTESHADER_H__
 
+#include <string>
+
+#include "shaderstage.h"
 #include "dllexport.h"
-#include "transform.h"
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
 
-class Movable {
+class ComputeShader : public ShaderStage {
  public:
-  DLL_API Movable()          = default;
-  DLL_API virtual ~Movable() = default;
-  Transform&       transform() { return m_transform; }
-  const Transform& transform() const { return m_transform; }
-
- protected:
-  Transform m_transform;
+  DLL_API ComputeShader(const std::string& filename);
+  DLL_API ComputeShader(ComputeShader&& other);
 };
 
 //==============================================================================

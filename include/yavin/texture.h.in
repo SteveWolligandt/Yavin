@@ -1,14 +1,14 @@
 #ifndef __YAVIN_TEXTURE_H__
 #define __YAVIN_TEXTURE_H__
 
-#include <yavin/error_check.h>
-#include <yavin/gl_functions.h>
-#include <yavin/id_holder.h>
-#include <yavin/pixel_unpack_buffer.h>
+#include <yavin/errorcheck.h>
+#include <yavin/glfunctions.h>
+#include <yavin/idholder.h>
+#include <yavin/pixelunpackbuffer.h>
 #include <yavin/settings.h>
-#include <yavin/tex_components.h>
-#include <yavin/tex_settings.h>
-#include <yavin/tex_target.h>
+#include <yavin/texcomponents.h>
+#include <yavin/texsettings.h>
+#include <yavin/textarget.h>
 #include <yavin/type.h>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
@@ -16,7 +16,7 @@
 #include <utility>
 
 #if @USE_PNG@
-#include <yavin/tex_png.h>
+#include <yavin/texpng.h>
 #endif
 
 //==============================================================================

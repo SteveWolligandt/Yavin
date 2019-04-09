@@ -7,7 +7,7 @@
 #include "camera.h"
 #include "collision.h"
 #include "ray.h"
-#include "scene_object.h"
+#include "sceneobject.h"
 
 //==============================================================================
 namespace yavin {

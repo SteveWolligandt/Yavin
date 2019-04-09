@@ -2,7 +2,7 @@
 #define __YAVIN_COLLISION_H__
 
 #include <glm/glm.hpp>
-#include "scene_object.h"
+#include "sceneobject.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================

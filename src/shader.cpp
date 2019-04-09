@@ -1,6 +1,6 @@
 #include <yavin/shader.h>
 
-#include <yavin/gl_functions.h>
+#include <yavin/glfunctions.h>
 
 //==============================================================================
 namespace yavin {

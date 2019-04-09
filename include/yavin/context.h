@@ -6,7 +6,7 @@
 #include <list>
 #include <string>
 
-#include <yavin/gl_includes.h>
+#include <yavin/glincludes.h>
 #include <GL/glx.h>
 
 //==============================================================================

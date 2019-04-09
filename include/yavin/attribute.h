@@ -2,8 +2,8 @@
 #define __YAVIN_ATTRIBUTE_H__
 
 #include <ostream>
-#include "gl_includes.h"
-#include "gl_type.h"
+#include "glincludes.h"
+#include "gltype.h"
 
 //==============================================================================
 namespace yavin {

@@ -1,5 +1,5 @@
 #include <yavin/context.h>
-#include <yavin/index_buffer.h>
+#include <yavin/indexbuffer.h>
 #include <catch2/catch.hpp>
 
 //==============================================================================

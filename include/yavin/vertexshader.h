@@ -1,22 +1,20 @@
-#ifndef __YAVIN_MOVABLE_H__
-#define __YAVIN_MOVABLE_H__
+#ifndef __YAVIN_VERTEXSHADER_H__
+#define __YAVIN_VERTEXSHADER_H__
 
+#include <string>
+#include "glincludes.h"
+
+#include "shaderstage.h"
 #include "dllexport.h"
-#include "transform.h"
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
 
-class Movable {
+class VertexShader : public ShaderStage {
  public:
-  DLL_API Movable()          = default;
-  DLL_API virtual ~Movable() = default;
-  Transform&       transform() { return m_transform; }
-  const Transform& transform() const { return m_transform; }
-
- protected:
-  Transform m_transform;
+  DLL_API VertexShader(const std::string& filename);
+  DLL_API VertexShader(VertexShader&& other);
 };
 
 //==============================================================================

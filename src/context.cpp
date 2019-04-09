@@ -1,12 +1,13 @@
 #include <iostream>
 #include <cstring>
 
+#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
 #define YAVIN_X11_CONTEXT_DONT_DELETE
-#include <yavin/context.h>
-#include <yavin/gl_includes.h>
 
-#define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
-#define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
+#include <yavin/context.h>
+#include <yavin/glincludes.h>
+
 
 //==============================================================================
 namespace yavin {

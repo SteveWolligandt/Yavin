@@ -1,22 +1,22 @@
-#ifndef __YAVIN_MOVABLE_H__
-#define __YAVIN_MOVABLE_H__
+#ifndef __YAVIN_GLSL_VAR_H__
+#define __YAVIN_GLSL_VAR_H__
+
+#include <string>
 
 #include "dllexport.h"
-#include "transform.h"
+#include "windowsundefines.h"
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
 
-class Movable {
- public:
-  DLL_API Movable()          = default;
-  DLL_API virtual ~Movable() = default;
-  Transform&       transform() { return m_transform; }
-  const Transform& transform() const { return m_transform; }
+struct GLSLVar {
+  enum modifier_t { UNIFORM, IN, OUT, UNKNOWN };
+  modifier_t  modifier;
+  std::string datatype;
+  std::string name;
 
- protected:
-  Transform m_transform;
+  DLL_API static auto modifier_to_string(const GLSLVar::modifier_t& modifier);
 };
 
 //==============================================================================

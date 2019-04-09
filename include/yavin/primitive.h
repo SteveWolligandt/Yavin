@@ -1,7 +1,7 @@
 #ifndef __YAVIN_PRIMITIVE_H__
 #define __YAVIN_PRIMITIVE_H__
 
-#include "gl_includes.h"
+#include "glincludes.h"
 
 namespace yavin {
 enum Primitive {

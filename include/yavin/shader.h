@@ -7,16 +7,16 @@
 #include <map>
 #include <type_traits>
 #include <unordered_set>
-#include "compute_shader.h"
-#include "fragment_shader.h"
-#include "geometry_shader.h"
-#include "tesselation_control_shader.h"
-#include "tesselation_evaluation_shader.h"
-#include "vertex_shader.h"
+#include "computeshader.h"
+#include "fragmentshader.h"
+#include "geometryshader.h"
+#include "tesselationcontrolshader.h"
+#include "tesselationevaluationshader.h"
+#include "vertexshader.h"
 #include "attribute.h"
-#include "dll_export.h"
+#include "dllexport.h"
 
-#include "windows_undefines.h"
+#include "windowsundefines.h"
 
 //==============================================================================
 namespace yavin {

@@ -5,8 +5,8 @@
 #include <functional>
 #include <string>
 #include <thread>
-#include "dll_export.h"
-#include "gl_functions.h"
+#include "dllexport.h"
+#include "glfunctions.h"
 
 //==============================================================================
 namespace yavin {

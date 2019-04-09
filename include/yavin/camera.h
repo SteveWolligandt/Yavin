@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include "movable.h"
 #include "transform.h"
-#include "gl_functions.h"
+#include "glfunctions.h"
 
 //==============================================================================
 namespace yavin {

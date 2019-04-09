@@ -3,8 +3,8 @@
 
 #include <mutex>
 #include <vector>
-#include "gl_functions.h"
-#include "mutex_handler.h"
+#include "glfunctions.h"
+#include "mutexhandler.h"
 
 //==============================================================================
 namespace yavin {
