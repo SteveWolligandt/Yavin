@@ -6,11 +6,11 @@
 namespace yavin {
 //==============================================================================
 
-ComputeShader::ComputeShader(const std::string& filepath)
-    : yavin::ShaderStage(GL_COMPUTE_SHADER, filepath) {}
+computeshader::computeshader(const std::string& filepath)
+    : yavin::shaderstage(GL_COMPUTE_SHADER, filepath) {}
 
-ComputeShader::ComputeShader(ComputeShader&& other)
-    : ShaderStage(std::move(other)) {}
+computeshader::computeshader(computeshader&& other)
+    : shaderstage(std::move(other)) {}
 
 //==============================================================================
 }  // namespace yavin

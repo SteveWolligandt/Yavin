@@ -12,16 +12,16 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-class VertexArray {
+class vertexarray {
  public:
-  using this_t = VertexArray;
+  using this_t = vertexarray;
 
-  DLL_API VertexArray();
-  DLL_API VertexArray(const VertexArray& other) = delete;
-  DLL_API VertexArray(VertexArray&& other);
-  DLL_API VertexArray& operator=(const VertexArray& other) = delete;
-  DLL_API VertexArray& operator=(VertexArray&& other);
-  DLL_API ~VertexArray();
+  DLL_API vertexarray();
+  DLL_API vertexarray(const vertexarray& other) = delete;
+  DLL_API vertexarray(vertexarray&& other);
+  DLL_API vertexarray& operator=(const vertexarray& other) = delete;
+  DLL_API vertexarray& operator=(vertexarray&& other);
+  DLL_API ~vertexarray();
 
   DLL_API void destroy_handle();
   DLL_API void bind() const;

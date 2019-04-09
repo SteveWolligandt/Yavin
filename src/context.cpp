@@ -13,9 +13,9 @@
 namespace yavin {
 //==============================================================================
 
-std::list<Context *> Context::contexts;
-bool                 Context::error_occured      = false;
-const int Context::visual_attribs[23] = {
+std::list<context *> context::contexts;
+bool                 context::error_occured      = false;
+const int context::visual_attribs[23] = {
   GLX_X_RENDERABLE    , True,
   GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
   GLX_RENDER_TYPE     , GLX_RGBA_BIT,
@@ -32,7 +32,7 @@ const int Context::visual_attribs[23] = {
   None
 };
 
-Context::Context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
+context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   contexts.push_back(this);
   if (!display) throw std::runtime_error{"Failed to open X display"};
 
@@ -120,7 +120,7 @@ Context::Context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   // of a process use the same error handler, so be sure to guard against other
   // threads issuing X commands while this code is running.
   int (*oldHandler)(Display *, XErrorEvent *) =
-      XSetErrorHandler(&ctxErrorHandlerStatic);
+      XSetErrorHandler(&error_handler_static);
 
   // Check for the GLX_ARB_create_context extension string and the function.
   // If either is not present, use GLX 1.3 context creation method.
@@ -182,7 +182,7 @@ Context::Context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
 }
 
 //------------------------------------------------------------------------------
-Context::~Context() {
+context::~context() {
   glXMakeCurrent(display, 0, 0);
   glXDestroyContext(display, ctx);
 
@@ -193,7 +193,7 @@ Context::~Context() {
 }
 
 //------------------------------------------------------------------------------
-bool Context::extension_supported(const char *extList, const char *extension) {
+bool context::extension_supported(const char *extList, const char *extension) {
   const char *start;
   const char *where, *terminator;
 
@@ -216,14 +216,14 @@ bool Context::extension_supported(const char *extList, const char *extension) {
 }
 
 //------------------------------------------------------------------------------
-int Context::ctxErrorHandlerStatic(Display *display, XErrorEvent * ev) {
+int context::error_handler_static(Display *display, XErrorEvent * ev) {
   for (auto ctx : contexts)
     if (ctx->display == display)
-      return ctx->ctxErrorHandler(ev);
+      return ctx->error_handler(ev);
   return 0;
 }
 
-int Context::ctxErrorHandler(XErrorEvent * /*ev*/) {
+int context::error_handler(XErrorEvent * /*ev*/) {
   error_occured = true;
   return 0;
 }

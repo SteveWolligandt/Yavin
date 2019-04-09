@@ -10,10 +10,10 @@
 namespace yavin {
 //==============================================================================
 
-class GeometryShader : public ShaderStage {
+class geometryshader : public shaderstage {
  public:
-  DLL_API GeometryShader(const std::string& filename);
-  DLL_API GeometryShader(GeometryShader&& other);
+  DLL_API geometryshader(const std::string& filename);
+  DLL_API geometryshader(geometryshader&& other);
 };
 
 //==============================================================================

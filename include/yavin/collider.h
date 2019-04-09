@@ -2,7 +2,7 @@
 #define __COLLIDER_H__
 
 #include <glm/glm.hpp>
-#include "behaviour.h"
+#include "behavior.h"
 #include "collision.h"
 
 //==============================================================================
@@ -10,47 +10,47 @@ namespace yavin {
 //==============================================================================
 
 template <typename T>
-class collider_t : public behaviour_t<T> {
+class collider : public behavior<T> {
  public:
-  collider_t(scene_object_t<T>* o) : behaviour_t<T>(o) {}
-  collider_t(const collider_t& other) : behaviour_t<T>(other) {}
-  collider_t(collider_t&& other) : behaviour_t<T>(other) {}
+  collider(scene_object<T>* o) : behavior<T>(o) {}
+  collider(const collider& other) : behavior<T>(other) {}
+  collider(collider&& other) : behavior<T>(other) {}
 
-  virtual collider_t<T>& operator=(const collider_t& other) {
-    behaviour_t<T>::operator=(other);
+  virtual collider<T>& operator=(const collider& other) {
+    behavior<T>::operator=(other);
     return *this;
   }
 
-  virtual collider_t<T>& operator=(collider_t&& other) {
-    behaviour_t<T>::operator=(other);
+  virtual collider<T>& operator=(collider&& other) {
+    behavior<T>::operator=(other);
     return *this;
   }
 };
 
 template <typename T>
-class aabb_collider : public collider_t<T> {
+class aabb_collider : public collider<T> {
  public:
-  aabb_collider(scene_object_t<T>* o, T center_x, T center_y, T center_z,
+  aabb_collider(scene_object<T>* o, T center_x, T center_y, T center_z,
                 T size_x, T size_y, T size_z)
-      : collider_t<T>(o),
+      : collider<T>(o),
         m_center{center_x, center_y, center_z},
         m_size{size_x, size_y, size_z} {}
   aabb_collider(const aabb_collider& other)
-      : collider_t<T>(other), m_center(other.m_center), m_size(other.m_size) {}
+      : collider<T>(other), m_center(other.m_center), m_size(other.m_size) {}
   aabb_collider(aabb_collider&& other)
-      : collider_t<T>(other),
+      : collider<T>(other),
         m_center(std::move(other.m_center)),
         m_size(std::move(other.m_size)) {}
 
   virtual aabb_collider<T>& operator=(const aabb_collider& other) {
-    collider_t<T>::operator=(other);
+    collider<T>::operator=(other);
     m_center               = other.m_center;
     m_size                 = other.m_size;
     return *this;
   }
 
   virtual aabb_collider<T>& operator=(aabb_collider&& other) {
-    collider_t<T>::operator=(other);
+    collider<T>::operator=(other);
     m_center               = std::move(other.m_center);
     m_size                 = std::move(other.m_size);
     return *this;
@@ -75,8 +75,8 @@ class aabb_collider : public collider_t<T> {
   T bottom() const { return transformed_center()[2] - m_size[2] * 0.5; }
   T top() const { return transformed_center()[2] + m_size[2] * 0.5; }
 
-  virtual std::optional<collision_t<T>> check_collision(
-      const ray_t<T>& r) override {
+  virtual std::optional<collision<T>> check_collision(
+      const ray<T>& r) override {
     T    shortest_dist = 1e10;
     auto tr_center     = transformed_center();
     T    le            = tr_center[0] - m_size[0] * 0.5;
@@ -128,7 +128,7 @@ class aabb_collider : public collider_t<T> {
       if (top_hit && shortest_dist > top_dist) shortest_dist = top_dist;
       if (front_hit && shortest_dist > front_dist) shortest_dist = front_dist;
       if (back_hit && shortest_dist > back_dist) shortest_dist = back_dist;
-      return collision_t<T>(&this->object(), r(shortest_dist));
+      return collision<T>(&this->object(), r(shortest_dist));
     }
     return {};
   }
@@ -138,13 +138,13 @@ class aabb_collider : public collider_t<T> {
   glm::tvec3<T> m_size;
 };
 
-template <typename collider_t>
+template <typename collider>
 struct is_collider {
   static constexpr bool value = false;
 };
 
 template <typename T>
-struct is_collider<collider_t<T>> {
+struct is_collider<collider<T>> {
   static constexpr bool value = true;
 };
 

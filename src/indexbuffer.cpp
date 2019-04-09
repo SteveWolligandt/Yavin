@@ -6,48 +6,48 @@
 namespace yavin {
 //==============================================================================
 
-IndexBuffer::IndexBuffer(usage_t usage) : Buffer(usage) {}
+indexbuffer::indexbuffer(usage_t usage) : buffer(usage) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(const IndexBuffer& other) : Buffer(other) {}
+indexbuffer::indexbuffer(const indexbuffer& other) : buffer(other) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(IndexBuffer&& other) : Buffer(std::move(other)) {}
+indexbuffer::indexbuffer(indexbuffer&& other) : buffer(std::move(other)) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer& IndexBuffer::operator=(const IndexBuffer& other) {
+indexbuffer& indexbuffer::operator=(const indexbuffer& other) {
   parent_t::operator=(other);
   return *this;
 }
 
 //------------------------------------------------------------------------------
 
-IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) {
+indexbuffer& indexbuffer::operator=(indexbuffer&& other) {
   parent_t::operator=(std::move(other));
   return *this;
 }
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(size_t n, usage_t usage) : Buffer(n, usage) {}
+indexbuffer::indexbuffer(size_t n, usage_t usage) : buffer(n, usage) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(size_t n, unsigned int initial, usage_t usage)
-    : Buffer(n, initial, usage) {}
+indexbuffer::indexbuffer(size_t n, unsigned int initial, usage_t usage)
+    : buffer(n, initial, usage) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(const std::vector<unsigned int>& data, usage_t usage)
-    : Buffer(data, usage) {}
+indexbuffer::indexbuffer(const std::vector<unsigned int>& data, usage_t usage)
+    : buffer(data, usage) {}
 
 //------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer(std::initializer_list<unsigned int>&& list)
-    : Buffer(std::move(list), default_usage) {}
+indexbuffer::indexbuffer(std::initializer_list<unsigned int>&& list)
+    : buffer(std::move(list), default_usage) {}
 
 //==============================================================================
 }  // namespace yavin

@@ -16,10 +16,10 @@ namespace yavin {
 //==============================================================================
 
 template <typename... Ts>
-class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
+class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
  public:
-  using parent_t = Buffer<GL_ARRAY_BUFFER, tuple<Ts...>>;
-  using this_t   = VertexBuffer<Ts...>;
+  using parent_t = buffer<GL_ARRAY_BUFFER, tuple<Ts...>>;
+  using this_t   = vertexbuffer<Ts...>;
   using data_t   = typename parent_t::data_t;
   using usage_t  = typename parent_t::usage_t;
 
@@ -35,9 +35,9 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
 
   //----------------------------------------------------------------------------
 
-  VertexBuffer(usage_t usage = default_usage) : parent_t(usage) {}
-  VertexBuffer(const VertexBuffer& other) : parent_t(other) {}
-  VertexBuffer(VertexBuffer&& other) : parent_t(other) {}
+  vertexbuffer(usage_t usage = default_usage) : parent_t(usage) {}
+  vertexbuffer(const vertexbuffer& other) : parent_t(other) {}
+  vertexbuffer(vertexbuffer&& other) : parent_t(other) {}
 
   auto& operator=(const this_t& other) {
     parent_t::operator=(other);
@@ -49,12 +49,12 @@ class VertexBuffer : public Buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
     return *this;
   }
 
-  VertexBuffer(size_t n, usage_t usage = default_usage) : parent_t(n, usage) {}
-  VertexBuffer(size_t n, const data_t& initial, usage_t usage = default_usage)
+  vertexbuffer(size_t n, usage_t usage = default_usage) : parent_t(n, usage) {}
+  vertexbuffer(size_t n, const data_t& initial, usage_t usage = default_usage)
       : parent_t(n, initial, usage) {}
-  VertexBuffer(const std::vector<data_t>& data, usage_t usage = default_usage)
+  vertexbuffer(const std::vector<data_t>& data, usage_t usage = default_usage)
       : parent_t(data, usage) {}
-  VertexBuffer(std::initializer_list<data_t>&& list)
+  vertexbuffer(std::initializer_list<data_t>&& list)
       : parent_t(std::move(list), default_usage) {}
 
   void push_back(Ts&&... ts) {

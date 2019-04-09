@@ -4,11 +4,11 @@
 namespace yavin {
 //==============================================================================
 
-VertexShader::VertexShader(const std::string& filepath)
-    : ShaderStage(GL_VERTEX_SHADER, filepath) {}
+vertexshader::vertexshader(const std::string& filepath)
+    : shaderstage(GL_VERTEX_SHADER, filepath) {}
 
-VertexShader::VertexShader(VertexShader&& other)
-    : ShaderStage(std::move(other)) {}
+vertexshader::vertexshader(vertexshader&& other)
+    : shaderstage(std::move(other)) {}
 
 //==============================================================================
 }  // namespace yavin

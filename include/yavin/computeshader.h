@@ -10,10 +10,10 @@
 namespace yavin {
 //==============================================================================
 
-class ComputeShader : public ShaderStage {
+class computeshader : public shaderstage {
  public:
-  DLL_API ComputeShader(const std::string& filename);
-  DLL_API ComputeShader(ComputeShader&& other);
+  DLL_API computeshader(const std::string& filename);
+  DLL_API computeshader(computeshader&& other);
 };
 
 //==============================================================================

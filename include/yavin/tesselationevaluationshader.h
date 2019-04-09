@@ -10,10 +10,10 @@
 namespace yavin {
 //==============================================================================
 
-class TesselationEvaluationShader : public ShaderStage {
+class tesselationevaluationshader : public shaderstage {
  public:
-  DLL_API TesselationEvaluationShader(const std::string& filename);
-  DLL_API TesselationEvaluationShader(TesselationEvaluationShader&& other);
+  DLL_API tesselationevaluationshader(const std::string& filename);
+  DLL_API tesselationevaluationshader(tesselationevaluationshader&& other);
 };
 
 //==============================================================================

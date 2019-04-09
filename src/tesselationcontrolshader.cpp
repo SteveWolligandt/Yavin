@@ -6,12 +6,12 @@
 namespace yavin {
 //==============================================================================
 
-TesselationControlShader::TesselationControlShader(const std::string& filepath)
-    : ShaderStage(GL_TESS_CONTROL_SHADER, filepath) {}
+tesselationcontrolshader::tesselationcontrolshader(const std::string& filepath)
+    : shaderstage(GL_TESS_CONTROL_SHADER, filepath) {}
 
-TesselationControlShader::TesselationControlShader(
-    TesselationControlShader&& other)
-    : ShaderStage(std::move(other)) {}
+tesselationcontrolshader::tesselationcontrolshader(
+    tesselationcontrolshader&& other)
+    : shaderstage(std::move(other)) {}
 
 //==============================================================================
 }  // namespace yavin

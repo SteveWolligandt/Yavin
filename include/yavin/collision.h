@@ -8,29 +8,29 @@ namespace yavin {
 //==============================================================================
 
 template <typename T>
-class collision_t {
+class collision {
  public:
-  collision_t(scene_object_t<T> _o, const glm::tvec3<T>& _x)
+  collision(scene_object<T> _o, const glm::tvec3<T>& _x)
       : m_scene_object(&_o), m_x(_x) {}
-  collision_t(scene_object_t<T> _o, glm::tvec3<T>&& _x)
+  collision(scene_object<T> _o, glm::tvec3<T>&& _x)
       : m_scene_object(&_o), m_x(std::move(_x)) {}
-  collision_t(scene_object_t<T>* _o, const glm::tvec3<T>& _x)
+  collision(scene_object<T>* _o, const glm::tvec3<T>& _x)
       : m_scene_object(_o), m_x(_x) {}
-  collision_t(scene_object_t<T>* _o, glm::tvec3<T>&& _x)
+  collision(scene_object<T>* _o, glm::tvec3<T>&& _x)
       : m_scene_object(_o), m_x(std::move(_x)) {}
 
-  collision_t(const collision_t<T>& other)
+  collision(const collision<T>& other)
       : m_scene_object(other.m_scene_object), m_x(other.m_x) {}
-  collision_t(collision_t<T>&& other)
+  collision(collision<T>&& other)
       : m_scene_object(other.m_scene_object), m_x(std::move(other.m_x)) {}
 
-  auto& operator=(const collision_t<T>& other) {
+  auto& operator=(const collision<T>& other) {
     m_scene_object = other.m_scene_object;
     m_x            = other.m_x;
     return *this;
   }
 
-  auto& operator=(collision_t<T>&& other) {
+  auto& operator=(collision<T>&& other) {
     m_scene_object = other.m_scene_object;
     m_x            = std::move(other.m_x);
     return *this;
@@ -43,14 +43,9 @@ class collision_t {
   const auto& object() const { return *m_scene_object; }
 
  private:
-  scene_object_t<T>* m_scene_object;
-  glm::tvec3<T>      m_x;
+  scene_object<T>* m_scene_object;
+  glm::tvec3<T>    m_x;
 };
-
-using collision_d = collision_t<double>;
-using collision_f = collision_t<float>;
-
-using collision = collision_t<double>;
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

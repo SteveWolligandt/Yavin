@@ -6,11 +6,11 @@
 namespace yavin {
 //==============================================================================
 
-GeometryShader::GeometryShader(const std::string& filepath)
-    : yavin::ShaderStage(GL_GEOMETRY_SHADER, filepath) {}
+geometryshader::geometryshader(const std::string& filepath)
+    : yavin::shaderstage(GL_GEOMETRY_SHADER, filepath) {}
 
-GeometryShader::GeometryShader(GeometryShader&& other)
-    : ShaderStage(std::move(other)) {}
+geometryshader::geometryshader(geometryshader&& other)
+    : shaderstage(std::move(other)) {}
 
 //==============================================================================
 }  // namespace yavin

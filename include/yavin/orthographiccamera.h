@@ -8,25 +8,25 @@
 namespace yavin {
 //==============================================================================
 
-class OrthographicCamera : public Camera {
+class orthographiccamera : public camera {
  public:
-  DLL_API OrthographicCamera(const float left, const float right,
+  DLL_API orthographiccamera(const float left, const float right,
                              const float bottom, const float top,
                              const float near, const float far,
                              const float vp_x, const float vp_y,
                              const float vp_width, const float vp_height);
 
-  DLL_API OrthographicCamera(const float left, const float right,
+  DLL_API orthographiccamera(const float left, const float right,
                              const float bottom, const float top,
                              const float near, const float far,
                              const float vp_width, const float vp_height);
 
-  DLL_API OrthographicCamera(const float left, const float right,
+  DLL_API orthographiccamera(const float left, const float right,
                              const float bottom, const float top,
                              const float near, const float far,
                              const glm::vec4& vp);
 
-  DLL_API OrthographicCamera(const float left, const float right,
+  DLL_API orthographiccamera(const float left, const float right,
                              const float bottom, const float top,
                              const float near, const float far, glm::vec4&& vp);
 

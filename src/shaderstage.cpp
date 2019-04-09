@@ -9,17 +9,17 @@
 namespace yavin {
 //==============================================================================
 
-const std::regex ShaderStage::regex_nvidia_compiler_error(
+const std::regex shaderstage::regex_nvidia_compiler_error(
     R"(\d+\((\d+)\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
 
 //------------------------------------------------------------------------------
 
-const std::regex ShaderStage::regex_mesa_compiler_error(
+const std::regex shaderstage::regex_mesa_compiler_error(
     R"(\d+:(\d+)\(\d+\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
 
 //==============================================================================
 
-ShaderStage::ShaderStage(GLenum             shader_type,
+shaderstage::shaderstage(GLenum             shader_type,
                          const std::string &filename_or_source,
                          StringType string_type)
     : m_shader_type(shader_type),
@@ -29,7 +29,7 @@ ShaderStage::ShaderStage(GLenum             shader_type,
 
 //------------------------------------------------------------------------------
 
-ShaderStage::ShaderStage(ShaderStage &&other)
+shaderstage::shaderstage(shaderstage &&other)
     : m_id(other.m_id),
       m_shader_type(other.m_shader_type),
       m_string_type(other.m_string_type),
@@ -41,13 +41,13 @@ ShaderStage::ShaderStage(ShaderStage &&other)
 
 //------------------------------------------------------------------------------
 
-ShaderStage::~ShaderStage() {
+shaderstage::~shaderstage() {
   if (m_delete) delete_stage();
 }
 
 //------------------------------------------------------------------------------
 
-std::string ShaderStage::type_to_string(GLenum shader_type) {
+std::string shaderstage::type_to_string(GLenum shader_type) {
   switch (shader_type) {
     case GL_VERTEX_SHADER: return "Vertex";
     case GL_FRAGMENT_SHADER: return "Fragment";
@@ -61,7 +61,7 @@ std::string ShaderStage::type_to_string(GLenum shader_type) {
 
 //------------------------------------------------------------------------------
 
-void ShaderStage::compile(bool use_ansi_color) {
+void shaderstage::compile(bool use_ansi_color) {
   delete_stage();
   m_id           = gl::create_shader(m_shader_type);
   auto  source   = ShaderStageParser::parse(m_filename_or_source, m_glsl_vars,
@@ -74,14 +74,14 @@ void ShaderStage::compile(bool use_ansi_color) {
 
 //------------------------------------------------------------------------------
 
-void ShaderStage::delete_stage() {
+void shaderstage::delete_stage() {
   if (m_id) gl::delete_shader(m_id);
   m_id = 0;
 }
 
 //------------------------------------------------------------------------------
 
-void ShaderStage::info_log(bool use_ansi_color) {
+void shaderstage::info_log(bool use_ansi_color) {
   auto info_log_length = gl::get_shader_info_log_length(m_id);
   if (info_log_length > 0) {
     std::istringstream is(gl::get_shader_info_log(m_id, info_log_length));
@@ -111,7 +111,7 @@ void ShaderStage::info_log(bool use_ansi_color) {
 
 //------------------------------------------------------------------------------
 
-void ShaderStage::parse_compile_error(std::smatch &match, std::ostream &os,
+void shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
                                       bool use_ansi_color) {
   const size_t line_number = stoul(match.str(1));
   const auto [include_tree_ptr, error_line] =
@@ -150,7 +150,7 @@ void ShaderStage::parse_compile_error(std::smatch &match, std::ostream &os,
 
 //------------------------------------------------------------------------------
 
-void ShaderStage::print_line(const std::string &filename, size_t line_number,
+void shaderstage::print_line(const std::string &filename, size_t line_number,
                              std::ostream &os) {
   std::ifstream file(filename);
   if (!file.is_open()) file.open(shader_dir + filename);

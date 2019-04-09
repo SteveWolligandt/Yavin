@@ -3,10 +3,10 @@
 
 int main() {
   using namespace yavin;
-  Context c{4, 5};
+  context c{4, 5};
 
-  tex2D<float, RGBA> tex{200, 200};
-  framebuffer        fbo{tex};
+  tex2rgba<float> tex{200, 200};
+  framebuffer     fbo{tex};
 
   fbo.bind();
   gl::clear_color(0, 0.5, 1, 1);

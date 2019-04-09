@@ -13,12 +13,12 @@
 namespace yavin {
 //==============================================================================
 
-class Context {
+class context {
   typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig,
                                                        GLXContext, Bool,
                                                        const int *);
 
-  static std::list<Context *> contexts;
+  static std::list<context *> contexts;
   static bool                 error_occured;
   static const int            visual_attribs[23];
   Display *                   display;
@@ -27,16 +27,16 @@ class Context {
   Colormap                    cmap;
 
  public:
-  Context(int major = 3, int minor = 0);
-  ~Context();
+  context(int major = 3, int minor = 0);
+  ~context();
   void make_current() { glXMakeCurrent(display, win, ctx); }
 
   //! Helper to check for extension string presence.  Adapted from:
   //!   http://www.opengl.org/resources/features/OGLextensions/
   static bool extension_supported(const char *extList, const char *extension);
 
-  static int ctxErrorHandlerStatic(Display *dpy, XErrorEvent *ev);
-  int        ctxErrorHandler(XErrorEvent *ev);
+  static int error_handler_static(Display *dpy, XErrorEvent *ev);
+  int        error_handler(XErrorEvent *ev);
 };
 
 //==============================================================================

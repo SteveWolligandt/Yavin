@@ -11,10 +11,10 @@
 namespace yavin {
 //==============================================================================
 
-class VertexShader : public ShaderStage {
+class vertexshader : public shaderstage {
  public:
-  DLL_API VertexShader(const std::string& filename);
-  DLL_API VertexShader(VertexShader&& other);
+  DLL_API vertexshader(const std::string& filename);
+  DLL_API vertexshader(vertexshader&& other);
 };
 
 //==============================================================================

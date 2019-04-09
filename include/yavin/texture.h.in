@@ -467,7 +467,7 @@ class texture : public id_holder<GLuint> {
 
   //------------------------------------------------------------------------------
   template <unsigned int D_ = D, typename = std::enable_if_t<D_ == 2>>
-  void set_data(const PixelUnpackBuffer<type>& pbo) {
+  void set_data(const pixelunpackbuffer<type>& pbo) {
     bind();
     pbo.bind();
     gl::tex_sub_image_2d(GL_TEXTURE_2D, 0, 0, 0, width(), height(), gl_format,
@@ -551,14 +551,30 @@ class texture : public id_holder<GLuint> {
 };
 
 //==============================================================================
-template <typename T, typename C>
-using tex1D = texture<1, T, C>;
+template <typename T, typename C> using tex1 = texture<1, T, C>;
+template <typename T, typename C> using tex2 = texture<2, T, C>;
+template <typename T, typename C> using tex3 = texture<3, T, C>;
 
-template <typename T, typename C>
-using tex2D = texture<2, T, C>;
+template <typename T> using tex1r     = tex1<T, R>;
+template <typename T> using tex1rg    = tex1<T, RG>;
+template <typename T> using tex1rgb   = tex1<T, RGB>;
+template <typename T> using tex1rgba  = tex1<T, RGBA>; 
+template <typename T> using tex1bgr   = tex1<T, BGR>;
+template <typename T> using tex1bgra  = tex1<T, BGRA>;
+template <typename T> using tex2r     = tex2<T, R>;
+template <typename T> using tex2rg    = tex2<T, RG>;
+template <typename T> using tex2rgb   = tex2<T, RGB>;
+template <typename T> using tex2rgba  = tex2<T, RGBA>;
+template <typename T> using tex2bgr   = tex2<T, BGR>;
+template <typename T> using tex2bgra  = tex2<T, BGRA>;
+template <typename T> using tex2depth = tex2<T, Depth>;
+template <typename T> using tex3r     = tex3<T, R>;
+template <typename T> using tex3rg    = tex3<T, RG>;
+template <typename T> using tex3rgb   = tex3<T, RGB>;
+template <typename T> using tex3rgba  = tex3<T, RGBA>;
+template <typename T> using tex3bgr   = tex3<T, BGR>;
+template <typename T> using tex3bgra  = tex3<T, BGRA>;
 
-template <typename T, typename C>
-using tex3D = texture<3, T, C>;
 
 //==============================================================================
 }  // namespace yavin

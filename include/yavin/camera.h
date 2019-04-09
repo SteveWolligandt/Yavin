@@ -10,15 +10,15 @@
 namespace yavin {
 //==============================================================================
 
-class Camera : public Movable {
+class camera : public movable {
  public:
-  Camera(const float vp_x, const float vp_y, const float vp_width,
+  camera(const float vp_x, const float vp_y, const float vp_width,
          const float vp_height)
       : m_viewport{vp_x, vp_y, vp_width, vp_height} {}
-  Camera(const float vp_width, const float vp_height)
+  camera(const float vp_width, const float vp_height)
       : m_viewport{0, 0, vp_width, vp_height} {}
-  Camera(const glm::vec4& vp) : m_viewport(vp) {}
-  Camera(glm::vec4&& vp) : m_viewport(std::move(vp)) {}
+  camera(const glm::vec4& vp) : m_viewport(vp) {}
+  camera(glm::vec4&& vp) : m_viewport(std::move(vp)) {}
 
   auto&       projection_matrix() { return m_projection_matrix; }
   const auto& projection_matrix() const { return m_projection_matrix; }
@@ -43,7 +43,7 @@ class Camera : public Movable {
 };
 
 // namespace gl {
-// inline void viewport(const Camera& cam) {
+// inline void viewport(const camera& cam) {
 //   viewport(cam.viewport().x, cam.viewport().y, cam.viewport().z,
 //            cam.viewport().w);
 // }

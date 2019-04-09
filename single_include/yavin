@@ -31,6 +31,6 @@
 #include "yavin/ray.h"
 #include "yavin/scene.h"
 #include "yavin/sceneobject.h"
-#include "yavin/behaviour.h"
+#include "yavin/behavior.h"
 #include "yavin/collider.h"
 #include "yavin/collision.h"

@@ -1,66 +1,56 @@
 #include "yavin/atomiccounterbuffer.h"
 
-#include <cstring>
 #include <yavin/glincludes.h>
+#include <cstring>
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
-AtomicCounterBuffer::AtomicCounterBuffer(usage_t usage) : Buffer(usage) {}
-
-//------------------------------------------------------------------------------
-
-AtomicCounterBuffer::AtomicCounterBuffer(const AtomicCounterBuffer& other)
-    : Buffer(other) {}
+atomiccounterbuffer::atomiccounterbuffer(usage_t usage) : buffer(usage) {}
 
 //------------------------------------------------------------------------------
-
-AtomicCounterBuffer::AtomicCounterBuffer(AtomicCounterBuffer&& other)
-    : Buffer(std::move(other)) {}
+atomiccounterbuffer::atomiccounterbuffer(const atomiccounterbuffer& other)
+    : buffer(other) {}
 
 //------------------------------------------------------------------------------
+atomiccounterbuffer::atomiccounterbuffer(atomiccounterbuffer&& other)
+    : buffer(std::move(other)) {}
 
-AtomicCounterBuffer& AtomicCounterBuffer::operator=(
-    const AtomicCounterBuffer& other) {
+//------------------------------------------------------------------------------
+atomiccounterbuffer& atomiccounterbuffer::operator=(
+    const atomiccounterbuffer& other) {
   parent_t::operator=(other);
   return *this;
 }
 
 //------------------------------------------------------------------------------
-
-AtomicCounterBuffer& AtomicCounterBuffer::operator=(
-    AtomicCounterBuffer&& other) {
+atomiccounterbuffer& atomiccounterbuffer::operator=(
+    atomiccounterbuffer&& other) {
   parent_t::operator=(std::move(other));
   return *this;
 }
 
 //------------------------------------------------------------------------------
-
-AtomicCounterBuffer::AtomicCounterBuffer(size_t n, usage_t usage)
-    : Buffer(n, usage) {}
+atomiccounterbuffer::atomiccounterbuffer(size_t n, usage_t usage)
+    : buffer(n, usage) {}
 
 //------------------------------------------------------------------------------
-
-AtomicCounterBuffer::AtomicCounterBuffer(size_t n, unsigned int initial,
+atomiccounterbuffer::atomiccounterbuffer(size_t n, unsigned int initial,
                                          usage_t usage)
-    : Buffer(n, initial, usage) {}
+    : buffer(n, initial, usage) {}
 
 //------------------------------------------------------------------------------
-
-AtomicCounterBuffer::AtomicCounterBuffer(const std::vector<unsigned int>& data,
+atomiccounterbuffer::atomiccounterbuffer(const std::vector<unsigned int>& data,
                                          usage_t                          usage)
-    : Buffer(data, usage) {}
+    : buffer(data, usage) {}
 
 //------------------------------------------------------------------------------
-
-AtomicCounterBuffer::AtomicCounterBuffer(
+atomiccounterbuffer::atomiccounterbuffer(
     std::initializer_list<unsigned int>&& list)
-    : Buffer(std::move(list), default_usage) {}
+    : buffer(std::move(list), default_usage) {}
 
 //------------------------------------------------------------------------------
-
-void AtomicCounterBuffer::set_all_to(unsigned int val) {
+void atomiccounterbuffer::set_all_to(unsigned int val) {
   auto gpu_data = reinterpret_cast<unsigned char*>(
       gl::map_named_buffer(this->m_gl_handle, GL_WRITE_ONLY));
   gl_error_check("glMapNamedBuffer");
@@ -69,14 +59,12 @@ void AtomicCounterBuffer::set_all_to(unsigned int val) {
 }
 
 //------------------------------------------------------------------------------
-
-void AtomicCounterBuffer::bind(size_t i) {
+void atomiccounterbuffer::bind(size_t i) {
   gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
 }
 
 //------------------------------------------------------------------------------
-
-void AtomicCounterBuffer::unbind(size_t i) {
+void atomiccounterbuffer::unbind(size_t i) {
   gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, 0);
 }
 

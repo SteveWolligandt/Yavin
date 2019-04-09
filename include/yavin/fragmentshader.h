@@ -11,10 +11,10 @@
 namespace yavin {
 //==============================================================================
 
-class FragmentShader : public ShaderStage {
+class fragmentshader : public shaderstage {
  public:
-  DLL_API FragmentShader(const std::string& filename);
-  DLL_API FragmentShader(FragmentShader&& other);
+  DLL_API fragmentshader(const std::string& filename);
+  DLL_API fragmentshader(fragmentshader&& other);
 };
 
 //==============================================================================

@@ -4,12 +4,8 @@
 //==============================================================================
 namespace yavin::test {
 //==============================================================================
-
-extern Window window;
-
-//==============================================================================
 TEST_CASE("[VBO] download") {
-  using vbo_t = VertexBuffer<vec2, vec2>;
+  using vbo_t = vertexbuffer<vec2, vec2>;
   vbo_t vbo{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}};
 
   auto down = vbo.download_data();
@@ -25,7 +21,7 @@ TEST_CASE("[VBO] download") {
 
 //==============================================================================
 TEST_CASE("[VBO] element access") {
-  using vbo_t = VertexBuffer<vec3>;
+  using vbo_t = vertexbuffer<vec3>;
   REQUIRE(vbo_t::data_size == 3 * sizeof(float));
 
   vbo_t vbo{{1, 2, 3}, {4, 5, 6}};

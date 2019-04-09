@@ -10,19 +10,19 @@
 namespace yavin {
 //==============================================================================
 
-class PerspectiveCamera : public Camera {
+class perspectivecamera : public camera {
  public:
-  DLL_API PerspectiveCamera(float fovy, float aspect, float near, float far,
+  DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
                             const float vp_x, float vp_y, float vp_width,
                             float vp_height);
 
-  DLL_API PerspectiveCamera(float fovy, float aspect, float near, float far,
+  DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
                             float vp_width, float vp_height);
 
-  DLL_API PerspectiveCamera(float fovy, float aspect, float near, float far,
+  DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
                             glm::vec4& vp);
 
-  DLL_API PerspectiveCamera(float fovy, float aspect, float near, float far,
+  DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
                             glm::vec4&& vp);
 
   DLL_API void set_projection(float fovy, float aspect, float near, float far);
@@ -38,7 +38,7 @@ class PerspectiveCamera : public Camera {
     glm::vec3 world_pos = glm::unProject(screen_coord, view_matrix(),
                                          projection_matrix(), m_viewport);
     glm::vec3 origin    = transform().translation();
-    return ray_t<T>(origin, glm::normalize(world_pos - origin));
+    return ray<T>(origin, glm::normalize(world_pos - origin));
   }
 };
 

@@ -14,18 +14,18 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-class Transform {
+class transform {
  public:
-  Transform() {}
-  Transform(const Transform& other)
+  transform() {}
+  transform(const transform& other)
       : m_matrix(other.m_matrix),
         m_first_person_pitch(other.m_first_person_pitch),
         m_first_person_yaw(other.m_first_person_yaw) {}
-  Transform(Transform&& other)
+  transform(transform&& other)
       : m_matrix(std::move(other.m_matrix)),
         m_first_person_pitch(other.m_first_person_pitch),
         m_first_person_yaw(other.m_first_person_yaw) {}
-  virtual ~Transform() {}
+  virtual ~transform() {}
 
   glm::mat4x4& matrix() { return m_matrix; }
 

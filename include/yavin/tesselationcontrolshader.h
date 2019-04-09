@@ -10,10 +10,10 @@
 namespace yavin {
 //==============================================================================
 
-class TesselationControlShader : public ShaderStage {
+class tesselationcontrolshader : public shaderstage {
  public:
-  DLL_API TesselationControlShader(const std::string& filename);
-  DLL_API TesselationControlShader(TesselationControlShader&& other);
+  DLL_API tesselationcontrolshader(const std::string& filename);
+  DLL_API tesselationcontrolshader(tesselationcontrolshader&& other);
 };
 
 //==============================================================================

@@ -22,15 +22,15 @@
 namespace yavin {
 //==============================================================================
 
-class Shader {
+class shader {
  public:
-  Shader() = default;
-  ~Shader() {
+  shader() = default;
+  ~shader() {
     if (m_delete) delete_shader();
   }
 
   template <typename T, typename... Args>
-  void add_shader_stage(Args... args) {
+  void add_stage(Args... args) {
     m_shader_stages.push_back(T(args...));
   }
 
@@ -95,7 +95,7 @@ class Shader {
  private:
   std::map<std::string, GLint>    m_uniform_locations;
   std::map<std::string, GLint>    m_attribute_locations;
-  std::vector<ShaderStage>        m_shader_stages;
+  std::vector<shaderstage>        m_shader_stages;
   GLuint                          m_id = 0;
   std::unordered_set<std::string> m_uniform_var_names;
   std::unordered_set<std::string> m_attribute_var_names;

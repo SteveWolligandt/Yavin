@@ -6,11 +6,11 @@
 namespace yavin {
 //==============================================================================
 
-FragmentShader::FragmentShader(const std::string& filepath)
-    : yavin::ShaderStage(GL_FRAGMENT_SHADER, filepath) {}
+fragmentshader::fragmentshader(const std::string& filepath)
+    : shaderstage(GL_FRAGMENT_SHADER, filepath) {}
 
-FragmentShader::FragmentShader(FragmentShader&& other)
-    : ShaderStage(std::move(other)) {}
+fragmentshader::fragmentshader(fragmentshader&& other)
+    : shaderstage(std::move(other)) {}
 
 //==============================================================================
 }  // namespace yavin

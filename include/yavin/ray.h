@@ -8,13 +8,13 @@ namespace yavin {
 //==============================================================================
 
 template <typename T>
-class ray_t {
+class ray {
  public:
-  ray_t(T x, T y, T z, T dir_x, T dir_y, T dir_z)
+  ray(T x, T y, T z, T dir_x, T dir_y, T dir_z)
       : m_origin{x, y, z}, m_dir{dir_x, dir_y, dir_z} {}
-  ray_t(const glm::vec3& _origin, const glm::vec3& _dir)
+  ray(const glm::vec3& _origin, const glm::vec3& _dir)
       : m_origin(_origin), m_dir(_dir) {}
-  ray_t(glm::vec3&& _origin, glm::vec3&& _dir)
+  ray(glm::vec3&& _origin, glm::vec3&& _dir)
       : m_origin(std::move(_origin)), m_dir(std::move(_dir)) {}
 
   const auto& x() const { return m_origin; }
@@ -29,11 +29,6 @@ class ray_t {
   glm::tvec3<T> m_origin;
   glm::tvec3<T> m_dir;
 };
-
-using ray_d = ray_t<double>;
-using ray_f = ray_t<double>;
-
-using ray = ray_t<double>;
 
 //==============================================================================
 }  // namespace yavin

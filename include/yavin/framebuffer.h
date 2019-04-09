@@ -27,13 +27,13 @@ class framebuffer : public id_holder<GLuint> {
   }
 
   template <typename T, typename Components>
-  DLL_API void attach(const tex2D<T, Components>& tex, unsigned int i = 0);
+  DLL_API void attach(const tex2<T, Components>& tex, unsigned int i = 0);
   template <typename T>
-  DLL_API void attach(const tex2D<T, Depth>& depth_tex);
+  DLL_API void attach(const tex2<T, Depth>& depth_tex);
  private:
   // this is necessary for constructor taking variadic parameters
   template <typename T>
-  DLL_API void attach(const tex2D<T, Depth>& depth_tex, unsigned int) {
+  DLL_API void attach(const tex2<T, Depth>& depth_tex, unsigned int) {
     attach(depth_tex);
   }
 

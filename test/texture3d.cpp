@@ -10,8 +10,8 @@ namespace yavin::test {
 extern Window window;
 
 template <typename type, typename C>
-struct RandomTexture3D : tex3D<type, C> {
-  using parent_t = tex3D<type, C>;
+struct RandomTexture3D : tex3<type, C> {
+  using parent_t = tex3<type, C>;
   using dist_t   = std::conditional_t<std::is_floating_point_v<type>,
                                     std::uniform_real_distribution<type>,
                                     std::uniform_int_distribution<type>>;

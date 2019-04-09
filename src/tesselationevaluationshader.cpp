@@ -6,13 +6,13 @@
 namespace yavin {
 //==============================================================================
 
-TesselationEvaluationShader::TesselationEvaluationShader(
+tesselationevaluationshader::tesselationevaluationshader(
     const std::string& filepath)
-    : ShaderStage(GL_TESS_EVALUATION_SHADER, filepath) {}
+    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath) {}
 
-TesselationEvaluationShader::TesselationEvaluationShader(
-    TesselationEvaluationShader&& other)
-    : ShaderStage(std::move(other)) {}
+tesselationevaluationshader::tesselationevaluationshader(
+    tesselationevaluationshader&& other)
+    : shaderstage(std::move(other)) {}
 
 //==============================================================================
 }  // namespace yavin
