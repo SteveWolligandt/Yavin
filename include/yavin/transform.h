@@ -32,18 +32,16 @@ class transform {
   const glm::mat4x4& matrix() const { return m_matrix; }
 
   void look_at(const glm::vec3& eye, const glm::vec3& center,
-               const glm::vec3& up) {
+               const glm::vec3& up = {0, 1, 0}) {
     m_matrix = glm::inverse(glm::lookAt(eye, center, up));
   }
 
-  /**
-   * @brief      Pitch should be in the range of [-90 ... 90] degrees and yaw
-   * should be in the range of [0 ... 360] degrees.
-   *
-   * @param[in]  eye    The eye
-   * @param[in]  pitch  The pitch
-   * @param[in]  yaw    The yaw
-   */
+  // \brief      Pitch should be in the range of [-90 ... 90] degrees and yaw
+  // should be in the range of [0 ... 360] degrees.
+  //
+  // \param[in]  eye    The eye
+  // \param[in]  pitch  The pitch
+  // \param[in]  yaw    The yaw
   void first_person(const glm::vec3& eye, float pitch, float yaw) {
     m_matrix[3]          = glm::vec4(eye, 1);
     m_first_person_pitch = pitch;

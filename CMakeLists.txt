@@ -80,12 +80,12 @@ target_link_libraries(yavin
 )
 
 ################################################################################
-find_package(GLFW3)
-if(GLFW3_FOUND)
+find_package(GLFW3 REQUIRED)
+# if(${GLFW3_FOUND})
   target_include_directories(yavin PUBLIC ${GLFW3_INCLUDE_DIRECTORIES})
   target_link_libraries(yavin ${GLFW_LIBRARIES} ${X11_LIBRARIES})
-  target_compile_definitions(yavin PRIVATE USE_GLFW3)
-endif()
+  target_compile_definitions(yavin PRIVATE GLFW3_AVAILABLE)
+# endif()
 
 ################################################################################
 find_package(PNG)

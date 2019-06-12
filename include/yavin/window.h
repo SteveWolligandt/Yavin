@@ -1,4 +1,3 @@
-#ifdef USE_GLFW3
 #ifndef __YAVIN_WINDOW__
 #define __YAVIN_WINDOW__
 
@@ -12,14 +11,12 @@
 namespace yavin {
 //==============================================================================
 
-class Window {
+class window {
  public:
-  DLL_API Window(const std::string& name, const int width,
+  DLL_API window(const std::string& name, const int width,
                  const unsigned int height, const unsigned int major = 4,
                  const unsigned int minor = 5);
-  DLL_API ~Window();
-
-  DLL_API void start_rendering();
+  DLL_API ~window();
 
   DLL_API void set_key_callback(std::function<void(int, int, int, int)>);
   DLL_API void set_resize_callback(std::function<void(int, int)>);
@@ -32,7 +29,8 @@ class Window {
   DLL_API void get_framebuffer_size(int& width, int& height);
   DLL_API void poll_events();
 
-  DLL_API void should_close(bool b);
+  bool should_close() const { return glfwWindowShouldClose(m_window); }
+  void should_close(bool b) { glfwSetWindowShouldClose(m_window, b); }
 
   DLL_API std::string get_gl_version();
   DLL_API std::string get_glsl_version();
@@ -53,5 +51,4 @@ class Window {
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-#endif
 #endif

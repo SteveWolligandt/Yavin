@@ -12,11 +12,11 @@ class movable {
  public:
   DLL_API movable()          = default;
   DLL_API virtual ~movable() = default;
-  transform&       get_transform() { return m_transform; }
-  const transform& get_transform() const { return m_transform; }
+  auto&       transform() { return m_transform; }
+  const auto& transform() const { return m_transform; }
 
  protected:
-  transform m_transform;
+  yavin::transform m_transform;
 };
 
 //==============================================================================
