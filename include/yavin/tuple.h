@@ -40,10 +40,10 @@ auto make_tuple(Head&& head, Tail&&... tail) {
 
 //==============================================================================
 
-template <std::size_t I, typename Head, typename... Tail>
+template <std::size_t Idx, typename Head, typename... Tail>
 struct _tuple_get_t {
   static auto get(const tuple<Head, Tail...>& t) {
-    return _tuple_get_t<I - 1, Tail...>::get(t.tail);
+    return _tuple_get_t<Idx - 1, Tail...>::get(t.tail);
   }
 };
 
@@ -56,9 +56,9 @@ struct _tuple_get_t<0, Head, Tail...> {
 
 //------------------------------------------------------------------------------
 
-template <std::size_t I, typename... Ts>
+template <std::size_t Idx, typename... Ts>
 auto get(const tuple<Ts...>& t) {
-  return _tuple_get_t<I, Ts...>::get(t);
+  return _tuple_get_t<Idx, Ts...>::get(t);
 }
 
 //==============================================================================
