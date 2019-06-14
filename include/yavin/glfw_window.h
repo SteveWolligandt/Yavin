@@ -1,22 +1,23 @@
-#ifndef __YAVIN_WINDOW__
-#define __YAVIN_WINDOW__
+#ifndef YAVIN_GLFW_WINDOW
+#define YAVIN_GLFW_WINDOW
 
 #include <functional>
 #include <string>
 #include <thread>
 #include "dllexport.h"
 #include "glfunctions.h"
+#include <GLFW/glfw3.h>
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
 
-class window {
+class glfw_window {
  public:
-  DLL_API window(const std::string& name, const int width,
+  DLL_API glfw_window(const std::string& name, const int width,
                  const unsigned int height, const unsigned int major = 4,
                  const unsigned int minor = 5);
-  DLL_API ~window();
+  DLL_API ~glfw_window();
 
   DLL_API void set_key_callback(std::function<void(int, int, int, int)>);
   DLL_API void set_resize_callback(std::function<void(int, int)>);
@@ -37,6 +38,8 @@ class window {
   DLL_API void        print_versions();
 
   DLL_API void make_current();
+
+  auto glfw_window_ptr() const { return m_window; }
 
  private:
   GLFWwindow*  m_window;

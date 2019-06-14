@@ -12,23 +12,23 @@ namespace yavin {
 
 class camera : public movable {
  public:
-  camera(const float vp_x, const float vp_y, const float vp_width,
-         const float vp_height)
+  camera(size_t vp_x, size_t vp_y, size_t vp_width,
+         size_t vp_height)
       : m_viewport{vp_x, vp_y, vp_width, vp_height} {}
-  camera(const float vp_width, const float vp_height)
+  camera(size_t vp_width, size_t vp_height)
       : m_viewport{0, 0, vp_width, vp_height} {}
-  camera(const glm::vec4& vp) : m_viewport(vp) {}
-  camera(glm::vec4&& vp) : m_viewport(std::move(vp)) {}
+  camera(const glm::uvec4& vp) : m_viewport(vp) {}
+  camera(glm::uvec4&& vp) : m_viewport(std::move(vp)) {}
 
   auto&       projection_matrix() { return m_projection_matrix; }
   const auto& projection_matrix() const { return m_projection_matrix; }
   glm::mat4x4 view_matrix() const { return glm::inverse(m_transform.matrix()); }
 
-  void set_viewport(const float vp_x, const float vp_y, const float vp_width,
-                    const float vp_height) {
+  void set_viewport(size_t vp_x, size_t vp_y, size_t vp_width,
+                    size_t vp_height) {
     m_viewport = {vp_x, vp_y, vp_width, vp_height};
   }
-  void set_viewport(const float vp_width, const float vp_height) {
+  void set_viewport(size_t vp_width, size_t vp_height) {
     m_viewport = {0, 0, vp_width, vp_height};
   }
   void set_viewport(const glm::vec4& vp) { m_viewport = vp; }
@@ -39,7 +39,7 @@ class camera : public movable {
 
  protected:
   glm::mat4x4 m_projection_matrix;
-  glm::vec4   m_viewport;
+  glm::uvec4  m_viewport;
 };
 
 // namespace gl {

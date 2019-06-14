@@ -13,24 +13,24 @@ namespace yavin {
 class perspectivecamera : public camera {
  public:
   DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
-                            const float vp_x, float vp_y, float vp_width,
-                            float vp_height);
+                            size_t vp_x, size_t vp_y, size_t vp_width,
+                            size_t vp_height);
 
   DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
-                            float vp_width, float vp_height);
+                            size_t vp_width, size_t vp_height);
 
   DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
-                            glm::vec4& vp);
+                            glm::uvec4& vp);
 
   DLL_API perspectivecamera(float fovy, float aspect, float near, float far,
-                            glm::vec4&& vp);
+                            glm::uvec4&& vp);
 
   DLL_API void set_projection(float fovy, float aspect, float near, float far);
   DLL_API void set_projection(float fovy, float aspect, float near, float far,
-                              float vp_width, float vp_height);
+                              size_t vp_width, size_t vp_height);
   DLL_API void set_projection(float fovy, float aspect, float near, float far,
-                              float vp_x, float vp_y, float vp_width,
-                              float vp_height);
+                              size_t vp_x, size_t vp_y, size_t vp_width,
+                              size_t vp_height);
 
   template <typename T>
   auto create_ray(T x, T y) {

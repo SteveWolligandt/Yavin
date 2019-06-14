@@ -33,7 +33,8 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
   ${CMAKE_SOURCE_DIR}/src/vertexarray.cpp
   ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
-  ${CMAKE_SOURCE_DIR}/src/window.cpp
+  ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
+  ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
 

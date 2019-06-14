@@ -10,38 +10,38 @@ namespace yavin {
 
 class orthographiccamera : public camera {
  public:
-  DLL_API orthographiccamera(const float left, const float right,
-                             const float bottom, const float top,
-                             const float near, const float far,
-                             const float vp_x, const float vp_y,
-                             const float vp_width, const float vp_height);
+  DLL_API orthographiccamera(float left, float right,
+                             float bottom, float top,
+                             float near, float far,
+                             size_t vp_x, size_t vp_y,
+                             size_t vp_width, size_t vp_height);
 
-  DLL_API orthographiccamera(const float left, const float right,
-                             const float bottom, const float top,
-                             const float near, const float far,
-                             const float vp_width, const float vp_height);
+  DLL_API orthographiccamera(float left, float right,
+                             float bottom, float top,
+                             float near, float far,
+                             size_t vp_width, size_t vp_height);
 
-  DLL_API orthographiccamera(const float left, const float right,
-                             const float bottom, const float top,
-                             const float near, const float far,
-                             const glm::vec4& vp);
+  DLL_API orthographiccamera(float left, float right,
+                             float bottom, float top,
+                             float near, float far,
+                             const glm::uvec4& vp);
 
-  DLL_API orthographiccamera(const float left, const float right,
-                             const float bottom, const float top,
-                             const float near, const float far, glm::vec4&& vp);
+  DLL_API orthographiccamera(float left, float right,
+                             float bottom, float top,
+                             float near, float far, glm::uvec4&& vp);
 
-  DLL_API void set_projection(const float left, const float right,
-                              const float bottom, const float top,
-                              const float near, const float far);
-  DLL_API void set_projection(const float left, const float right,
-                              const float bottom, const float top,
-                              const float near, const float far, float vp_width,
-                              float vp_height);
-  DLL_API void set_projection(const float left, const float right,
-                              const float bottom, const float top,
-                              const float near, const float far,
-                              const float vp_x, const float vp_y,
-                              float vp_width, float vp_height);
+  DLL_API void set_projection(float left, float right,
+                              float bottom, float top,
+                              float near, float far);
+  DLL_API void set_projection(float left, float right,
+                              float bottom, float top,
+                              float near, float far, size_t vp_width,
+                              size_t vp_height);
+  DLL_API void set_projection(float left, float right,
+                              float bottom, float top,
+                              float near, float far,
+                              size_t vp_x, size_t vp_y,
+                              size_t vp_width, size_t vp_height);
 };
 
 //==============================================================================

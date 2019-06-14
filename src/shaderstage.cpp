@@ -84,7 +84,8 @@ void shaderstage::delete_stage() {
 void shaderstage::info_log(bool use_ansi_color) {
   auto info_log_length = gl::get_shader_info_log_length(m_id);
   if (info_log_length > 0) {
-    std::istringstream is(gl::get_shader_info_log(m_id, info_log_length));
+    auto info_log = gl::get_shader_info_log(m_id, info_log_length);
+    std::istringstream is(info_log);
     std::ostringstream os;
 
     std::string line;
