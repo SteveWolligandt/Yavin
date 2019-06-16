@@ -35,7 +35,7 @@ void shader::create() {
   }
 
   gl::link_program(m_id);
-  info_log();
+  if (auto log = info_log(); log) { throw std::runtime_error{std::move(*log)}; }
   bind();
   for (const auto& var : m_attribute_var_names) add_attribute(var);
   for (const auto& var : m_uniform_var_names) add_uniform(var);
@@ -306,15 +306,17 @@ void shader::set_uniform(const std::string& name, const Vec4<uint32_t>& value) {
 
 //------------------------------------------------------------------------------
 
-void shader::info_log() {
-  GLint   infoLogLength = 0;
-  GLsizei charsWritten  = 0;
-  auto    infoLog       = new char[infoLogLength];
+std::optional<std::string> shader::info_log() {
+  GLint   info_log_length = 0;
+  GLsizei chars_written  = 0;
 
-  gl::get_program_iv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-  gl::get_program_info_log(m_id, infoLogLength, &charsWritten, infoLog);
+  gl::get_program_iv(m_id, GL_INFO_LOG_LENGTH, &info_log_length);
+  if (info_log_length == 0) { return {}; }
+  std::string l(info_log_length, ' ');
+  gl::get_program_info_log(m_id, info_log_length, &chars_written,
+                           const_cast<GLchar*>(l.c_str()));
 
-  delete[] infoLog;
+  return l;
 }
 
 //==============================================================================

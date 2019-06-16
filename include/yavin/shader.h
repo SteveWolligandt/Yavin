@@ -2,6 +2,7 @@
 #define __YAVIN_SHADERGL_H__
 
 #include <string>
+#include <optional>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <map>
@@ -90,7 +91,7 @@ class shader {
   DLL_API void set_uniform(const std::string&, const Vec3<uint32_t>&);
   DLL_API void set_uniform(const std::string&, const Vec4<uint32_t>&);
 
-  DLL_API void info_log();
+  DLL_API std::optional<std::string> info_log();
 
  private:
   std::map<std::string, GLint>    m_uniform_locations;
