@@ -114,13 +114,13 @@ struct tex_png<type, RGBA> {
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
       image[image.get_height() - 1 - y][x].red =
-          data[idx * num_components] * 255.0f;
+          std::min(1.0f, data[idx * num_components]) * 255.0f;
       image[image.get_height() - 1 - y][x].green =
-          data[idx * num_components + 1] * 255.0f;
+          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
       image[image.get_height() - 1 - y][x].blue =
-          data[idx * num_components + 2] * 255.0f;
+          std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
       image[image.get_height() - 1 - y][x].alpha =
-          data[idx * num_components + 3] * 255.0f;
+          std::min(1.0f, data[idx * num_components + 3]) * 255.0f;
     } else {
       image[image.get_height() - 1 - y][x].red = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green =
