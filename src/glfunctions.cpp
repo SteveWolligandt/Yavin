@@ -72,6 +72,14 @@ GLenum gl::get_error() {
   return glGetError();
 }
 
+//------------------------------------------------------------------------------
+void gl::line_width(GLfloat width) {
+  if (verbose)
+    *out << "glLineWidth(" << width << ")\n";
+  glLineWidth(width);
+  gl_error_check("glLineWidth");
+}
+
 //==============================================================================
 // BACKBUFFER RELATED
 //==============================================================================
