@@ -13,6 +13,7 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <iostream>
+#include <type_traits>
 #include <utility>
 
 #if @USE_PNG@
@@ -127,12 +128,11 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  template <typename... Sizes>
+  template <typename... Sizes,
+            typename = std::enable_if_t<sizeof...(Sizes) == D>,
+            typename = std::enable_if_t<
+                (std::is_integral_v<typename std::decay_t<Sizes>> && ...)>>
   texture(Sizes... sizes) : m_size{static_cast<size_t>(sizes)...} {
-    static_assert(sizeof...(Sizes) == D,
-                  "number of sizes does not match number of dimensions");
-    static_assert((std::is_integral_v<Sizes> && ...),
-                  "types of sizes must be integral types");
     create_id();
     set_wrap_mode(default_wrap_mode);
     set_interpolation_mode(default_interpolation);
@@ -140,7 +140,10 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  template <typename S, typename... Sizes>
+  template <typename S, typename... Sizes,
+            typename = std::enable_if_t<sizeof...(Sizes) == D>,
+            typename = std::enable_if_t<
+                (std::is_integral_v<typename std::decay_t<Sizes>> && ...)>>
   texture(const std::vector<S>& data, Sizes... sizes) : m_size{sizes...} {
     static_assert(sizeof...(Sizes) == D,
                   "number of sizes does not match number of dimensions");
@@ -166,7 +169,10 @@ class texture : public id_holder<GLuint> {
       : texture{interp_mode, wrap_mode, std::make_index_sequence<D>{}} {}
 
   //----------------------------------------------------------------------------
-  template <typename... Sizes>
+  template <typename... Sizes,
+            typename = std::enable_if_t<sizeof...(Sizes) == D>,
+            typename = std::enable_if_t<
+                (std::is_integral_v<typename std::decay_t<Sizes>> && ...)>>
   texture(InterpolationMode interp_mode, WrapMode wrap_mode, Sizes... sizes)
       : m_size{sizes...} {
     static_assert(sizeof...(Sizes) == D,
@@ -180,7 +186,10 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  template <typename S, typename... Sizes>
+  template <typename S, typename... Sizes,
+            typename = std::enable_if_t<sizeof...(Sizes) == D>,
+            typename = std::enable_if_t<
+                (std::is_integral_v<typename std::decay_t<Sizes>> && ...)>>
   texture(InterpolationMode interp_mode, WrapMode wrap_mode,
           const std::vector<S>& data, Sizes... sizes)
       : m_size{sizes...} {
@@ -453,14 +462,14 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  template <typename... Components>
+  template <
+      typename... Components,
+      typename = std::enable_if_t<sizeof...(Components) == num_components>,
+      typename = std::enable_if_t<(std::is_arithmetic_v<Components> && ...)>>
   void clear(Components... components) {
-    static_assert(sizeof...(Components) == num_components);
-    static_assert((std::is_arithmetic_v<Components> && ...));
-    clear({static_cast<type>(components)...});
+    clear(std::array<type, num_components>{static_cast<type>(components)...});
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  template <typename type, typename components>
   void clear(const std::array<type, num_components>& col) {
     gl::clear_tex_image(id(), 0, gl_format, gl_type, col.data());
   }
