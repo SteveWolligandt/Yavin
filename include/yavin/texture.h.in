@@ -92,7 +92,7 @@ class texture : public id_holder<GLuint> {
 
  public:
   //============================================================================
-  texture() : texture{std::make_index_sequence<D>{}} {}
+  texture() : texture(std::make_index_sequence<D>{}) {}
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   template <size_t... Is>
   texture(std::index_sequence<Is...>) : m_size{((void)Is, 0)...} {
@@ -103,7 +103,7 @@ class texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   //! TODO: copy wrap and interpolation modes
-  texture(const texture& other) : texture{} { copy_data(other); }
+  texture(const texture& other) { copy_data(other); }
 
   //----------------------------------------------------------------------------
   texture(texture&& other)
@@ -140,6 +140,17 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
+  template <size_t _D = D, typename = std::enable_if_t<_D == 1>>
+  texture(const std::initializer_list<std::array<float, num_components>>&& data)
+      : m_size{data.size()} {
+    create_id();
+    set_interpolation_mode(default_interpolation);
+    set_wrap_mode(default_wrap_mode);
+    upload_data(reinterpret_cast<const float*>(&*begin(data)),
+                data.size() * num_components);
+  }
+
+  //----------------------------------------------------------------------------
   template <typename S, typename... Sizes,
             typename = std::enable_if_t<sizeof...(Sizes) == D>,
             typename = std::enable_if_t<
@@ -166,7 +177,7 @@ class texture : public id_holder<GLuint> {
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   texture(InterpolationMode interp_mode, WrapMode wrap_mode)
-      : texture{interp_mode, wrap_mode, std::make_index_sequence<D>{}} {}
+      : texture(interp_mode, wrap_mode, std::make_index_sequence<D>{}) {}
 
   //----------------------------------------------------------------------------
   template <typename... Sizes,
@@ -204,12 +215,12 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  texture(const std::string& filepath) : texture{} { read(filepath); }
+  texture(const std::string& filepath) { read(filepath); }
 
   //----------------------------------------------------------------------------
   texture(InterpolationMode interp_mode, WrapMode wrap_mode,
           const std::string& filepath)
-      : texture{interp_mode, wrap_mode} {
+      : texture(interp_mode, wrap_mode) {
     read(filepath);
   }
 
@@ -332,19 +343,29 @@ class texture : public id_holder<GLuint> {
     boost::copy(data, begin(casted_data));
     upload_data(casted_data);
   }
+
   //------------------------------------------------------------------------------
   void upload_data(const std::vector<type>& data) {
-    assert(data.size() == num_texels() * num_components);
+    upload_data(data.data(), data.size());
+  }
+
+  //------------------------------------------------------------------------------
+  void upload_data(const type* data, [[maybe_unused]] size_t size) {
+    if constexpr (D==1) {
+      std::cerr << "data\n";
+    }
+    assert(size == num_texels() * num_components);
     bind();
-    if constexpr (D == 1)
+    if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
-                       gl_type, data.data());
-    else if constexpr (D == 2)
+                       gl_type, data);
+    } else if constexpr (D == 2) {
       gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
-                       gl_format, gl_type, data.data());
-    else if constexpr (D == 3)
+                       gl_format, gl_type, data);
+    } else if constexpr (D == 3) {
       gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
-                       depth(), 0, gl_format, gl_type, data.data());
+                       depth(), 0, gl_format, gl_type, data);
+    }
   }
 
  public:
@@ -431,6 +452,27 @@ class texture : public id_holder<GLuint> {
     set_wrap_mode(2, mode);
   }
 
+
+  //----------------------------------------------------------------------------
+  void set_clamp_to_border() {
+    set_wrap_mode(CLAMP_TO_BORDER);
+  }
+
+  //----------------------------------------------------------------------------
+  void set_clamp_to_edge() {
+    set_wrap_mode(CLAMP_TO_EDGE);
+  }
+
+  //----------------------------------------------------------------------------
+  void set_repeat() {
+    set_wrap_mode(REPEAT);
+  }
+
+  //----------------------------------------------------------------------------
+  void set_mirrored_repeat() {
+    set_wrap_mode(MIRRORED_REPEAT);
+  }
+  
   //------------------------------------------------------------------------------
   void set_interpolation_mode(InterpolationMode mode) {
     set_interpolation_mode_min(mode);
@@ -445,6 +487,16 @@ class texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   void set_interpolation_mode_mag(InterpolationMode mode) {
     gl::texture_parameter_i(id(), GL_TEXTURE_MAG_FILTER, mode);
+  }
+
+  //------------------------------------------------------------------------------
+  void set_nearest_neighbor_interpolation() {
+    set_interpolation_mode(InterpolationMode::NEAREST);
+  }
+
+  //------------------------------------------------------------------------------
+  void set_linear_interpolation() {
+    set_interpolation_mode(InterpolationMode::LINEAR);
   }
 
   //----------------------------------------------------------------------------
