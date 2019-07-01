@@ -328,9 +328,7 @@ class texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   template <typename S>
   void upload_data(const std::vector<S>& data) {
-    std::vector<type> casted_data(data.size());
-    boost::copy(data, begin(casted_data));
-    upload_data(casted_data);
+    upload_data(std::vector<type>(begin(data), end(data)));
   }
   //------------------------------------------------------------------------------
   void upload_data(const std::vector<type>& data) {
@@ -526,7 +524,7 @@ class texture : public id_holder<GLuint> {
       m_size[1] = image.get_height();
       std::vector<type> data;
       data.reserve(num_texels() * num_components);
-      for (png::uint_32 y = image.get_height(); y > 0; --y)
+      for (png::uint_32 y = 0; y < image.get_height(); ++y)
         for (png::uint_32 x = 0; x < image.get_width(); ++x)
           tex_png_t::load_pixel(data, image, x, y);
       if constexpr (std::is_same_v<type, float>) {

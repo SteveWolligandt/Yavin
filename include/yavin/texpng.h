@@ -7,7 +7,6 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 template <typename type, typename tex_t>
 struct tex_png;
 
@@ -18,9 +17,9 @@ struct tex_png<type, R> {
   using png_t                            = png::image<png::rgb_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
-    data.push_back(static_cast<type>(image[y - 1][x].red));
-    data.push_back(static_cast<type>(image[y - 1][x].green));
-    data.push_back(static_cast<type>(image[y - 1][x].blue));
+    data.push_back(static_cast<type>(image[y][x].red));
+    data.push_back(static_cast<type>(image[y][x].green));
+    data.push_back(static_cast<type>(image[y][x].blue));
   };
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
@@ -46,9 +45,9 @@ struct tex_png<type, RGB> {
   using png_t                            = png::image<png::rgb_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
-    data.push_back(static_cast<type>(image[y - 1][x].red));
-    data.push_back(static_cast<type>(image[y - 1][x].green));
-    data.push_back(static_cast<type>(image[y - 1][x].blue));
+    data.push_back(static_cast<type>(image[y][x].red));
+    data.push_back(static_cast<type>(image[y][x].green));
+    data.push_back(static_cast<type>(image[y][x].blue));
   };
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
@@ -76,9 +75,9 @@ struct tex_png<type, BGR> {
   using png_t                            = png::image<png::rgb_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
-    data.push_back(static_cast<type>(image[y - 1][x].blue));
-    data.push_back(static_cast<type>(image[y - 1][x].green));
-    data.push_back(static_cast<type>(image[y - 1][x].red));
+    data.push_back(static_cast<type>(image[y][x].blue));
+    data.push_back(static_cast<type>(image[y][x].green));
+    data.push_back(static_cast<type>(image[y][x].red));
   };
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
@@ -105,10 +104,10 @@ struct tex_png<type, RGBA> {
   using png_t                            = png::image<png::rgba_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
-    data.push_back(static_cast<type>(image[y - 1][x].red));
-    data.push_back(static_cast<type>(image[y - 1][x].green));
-    data.push_back(static_cast<type>(image[y - 1][x].blue));
-    data.push_back(static_cast<type>(image[y - 1][x].alpha));
+    data.push_back(static_cast<type>(image[y][x].red));
+    data.push_back(static_cast<type>(image[y][x].green));
+    data.push_back(static_cast<type>(image[y][x].blue));
+    data.push_back(static_cast<type>(image[y][x].alpha));
   };
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
@@ -140,10 +139,10 @@ struct tex_png<type, BGRA> {
   using png_t                            = png::image<png::rgba_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
-    data.push_back(static_cast<type>(image[y - 1][x].blue));
-    data.push_back(static_cast<type>(image[y - 1][x].green));
-    data.push_back(static_cast<type>(image[y - 1][x].red));
-    data.push_back(static_cast<type>(image[y - 1][x].alpha));
+    data.push_back(static_cast<type>(image[y][x].blue));
+    data.push_back(static_cast<type>(image[y][x].green));
+    data.push_back(static_cast<type>(image[y][x].red));
+    data.push_back(static_cast<type>(image[y][x].alpha));
   };
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
