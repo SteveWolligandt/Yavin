@@ -16,9 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-#if @USE_PNG@
 #include <yavin/texpng.h>
-#endif
 
 //==============================================================================
 namespace yavin {
@@ -351,9 +349,6 @@ class texture : public id_holder<GLuint> {
 
   //------------------------------------------------------------------------------
   void upload_data(const type* data, [[maybe_unused]] size_t size) {
-    if constexpr (D==1) {
-      std::cerr << "data\n";
-    }
     assert(size == num_texels() * num_components);
     bind();
     if constexpr (D == 1) {
@@ -452,27 +447,18 @@ class texture : public id_holder<GLuint> {
     set_wrap_mode(2, mode);
   }
 
+  //----------------------------------------------------------------------------
+  void set_clamp_to_border() { set_wrap_mode(CLAMP_TO_BORDER); }
 
   //----------------------------------------------------------------------------
-  void set_clamp_to_border() {
-    set_wrap_mode(CLAMP_TO_BORDER);
-  }
+  void set_clamp_to_edge() { set_wrap_mode(CLAMP_TO_EDGE); }
 
   //----------------------------------------------------------------------------
-  void set_clamp_to_edge() {
-    set_wrap_mode(CLAMP_TO_EDGE);
-  }
+  void set_repeat() { set_wrap_mode(REPEAT); }
 
   //----------------------------------------------------------------------------
-  void set_repeat() {
-    set_wrap_mode(REPEAT);
-  }
+  void set_mirrored_repeat() { set_wrap_mode(MIRRORED_REPEAT); }
 
-  //----------------------------------------------------------------------------
-  void set_mirrored_repeat() {
-    set_wrap_mode(MIRRORED_REPEAT);
-  }
-  
   //------------------------------------------------------------------------------
   void set_interpolation_mode(InterpolationMode mode) {
     set_interpolation_mode_min(mode);
@@ -539,12 +525,10 @@ class texture : public id_holder<GLuint> {
   void read(const std::string filepath) {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_readable) {
-#if @USE_PNG@
       if (ext == "png") {
         read_png(filepath);
         return;
       }
-#endif
     }
 
     throw std::runtime_error("could not read fileformat ." + ext);
@@ -554,40 +538,37 @@ class texture : public id_holder<GLuint> {
   void write(const std::string filepath) const {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_readable) {
-#if @USE_PNG@
       if (ext == "png") {
         write_png(filepath);
         return;
       }
-#endif
     }
     throw std::runtime_error("could not write fileformat ." + ext);
   }
 
-#if @USE_PNG@
   //------------------------------------------------------------------------------
   template <unsigned int D_ = D,
             typename        = std::enable_if_t<D_ == 2 && is_readable>,
             typename        = std::enable_if_t<settings::use_png>>
   void read_png(const std::string& filepath) {
-    if constexpr (settings::use_png) {
-      using tex_png_t = tex_png<type, components>;
-      typename tex_png_t::png_t image;
-      image.read(filepath);
-      m_size[0] = image.get_width();
-      m_size[1] = image.get_height();
-      std::vector<type> data;
-      data.reserve(num_texels() * num_components);
-      for (png::uint_32 y = image.get_height(); y > 0; --y)
-        for (png::uint_32 x = 0; x < image.get_width(); ++x)
-          tex_png_t::load_pixel(data, image, x, y);
-      if constexpr (std::is_same_v<type, float>) {
-        auto normalize = [](auto d) { return d / 255.0f; };
-        boost::transform(data, begin(data), normalize);
+    using tex_png_t = tex_png<type, components>;
+    typename tex_png_t::png_t image;
+    image.read(filepath);
+    m_size[0] = image.get_width();
+    m_size[1] = image.get_height();
+    std::vector<type> data;
+    data.reserve(num_texels() * num_components);
+    for (png::uint_32 y = 0; y < height(); ++y) {
+      for (png::uint_32 x = 0; x < width(); ++x) {
+        tex_png_t::load_pixel(data, image, x, y);
       }
-
-      upload_data(data);
     }
+    if constexpr (std::is_same_v<type, float>) {
+      auto normalize = [](auto d) { return d / 255.0f; };
+      boost::transform(data, begin(data), normalize);
+    }
+
+    upload_data(data);
   }
 
   //------------------------------------------------------------------------------
@@ -608,34 +589,54 @@ class texture : public id_holder<GLuint> {
       image.write(filepath);
     }
   }
-#endif
 };
 
 //==============================================================================
-template <typename T, typename C> using tex1 = texture<1, T, C>;
-template <typename T, typename C> using tex2 = texture<2, T, C>;
-template <typename T, typename C> using tex3 = texture<3, T, C>;
+template <typename T, typename C>
+using tex1 = texture<1, T, C>;
+template <typename T, typename C>
+using tex2 = texture<2, T, C>;
+template <typename T, typename C>
+using tex3 = texture<3, T, C>;
 
-template <typename T> using tex1r     = tex1<T, R>;
-template <typename T> using tex1rg    = tex1<T, RG>;
-template <typename T> using tex1rgb   = tex1<T, RGB>;
-template <typename T> using tex1rgba  = tex1<T, RGBA>; 
-template <typename T> using tex1bgr   = tex1<T, BGR>;
-template <typename T> using tex1bgra  = tex1<T, BGRA>;
-template <typename T> using tex2r     = tex2<T, R>;
-template <typename T> using tex2rg    = tex2<T, RG>;
-template <typename T> using tex2rgb   = tex2<T, RGB>;
-template <typename T> using tex2rgba  = tex2<T, RGBA>;
-template <typename T> using tex2bgr   = tex2<T, BGR>;
-template <typename T> using tex2bgra  = tex2<T, BGRA>;
-template <typename T> using tex2depth = tex2<T, Depth>;
-template <typename T> using tex3r     = tex3<T, R>;
-template <typename T> using tex3rg    = tex3<T, RG>;
-template <typename T> using tex3rgb   = tex3<T, RGB>;
-template <typename T> using tex3rgba  = tex3<T, RGBA>;
-template <typename T> using tex3bgr   = tex3<T, BGR>;
-template <typename T> using tex3bgra  = tex3<T, BGRA>;
-
+template <typename T>
+using tex1r = tex1<T, R>;
+template <typename T>
+using tex1rg = tex1<T, RG>;
+template <typename T>
+using tex1rgb = tex1<T, RGB>;
+template <typename T>
+using tex1rgba = tex1<T, RGBA>;
+template <typename T>
+using tex1bgr = tex1<T, BGR>;
+template <typename T>
+using tex1bgra = tex1<T, BGRA>;
+template <typename T>
+using tex2r = tex2<T, R>;
+template <typename T>
+using tex2rg = tex2<T, RG>;
+template <typename T>
+using tex2rgb = tex2<T, RGB>;
+template <typename T>
+using tex2rgba = tex2<T, RGBA>;
+template <typename T>
+using tex2bgr = tex2<T, BGR>;
+template <typename T>
+using tex2bgra = tex2<T, BGRA>;
+template <typename T>
+using tex2depth = tex2<T, Depth>;
+template <typename T>
+using tex3r = tex3<T, R>;
+template <typename T>
+using tex3rg = tex3<T, RG>;
+template <typename T>
+using tex3rgb = tex3<T, RGB>;
+template <typename T>
+using tex3rgba = tex3<T, RGBA>;
+template <typename T>
+using tex3bgr = tex3<T, BGR>;
+template <typename T>
+using tex3bgra = tex3<T, BGRA>;
 
 //==============================================================================
 }  // namespace yavin
