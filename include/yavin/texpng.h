@@ -18,6 +18,7 @@ struct tex_png<type, R> {
   using png_t                            = png::image<png::rgb_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
+    y = image.get_height() - 1 - y;
     data.push_back(static_cast<type>(image[y][x].red));
     data.push_back(static_cast<type>(image[y][x].green));
     data.push_back(static_cast<type>(image[y][x].blue));
@@ -46,6 +47,7 @@ struct tex_png<type, RGB> {
   using png_t                            = png::image<png::rgb_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
+    y = image.get_height() - 1 - y;
     data.push_back(static_cast<type>(image[y][x].red));
     data.push_back(static_cast<type>(image[y][x].green));
     data.push_back(static_cast<type>(image[y][x].blue));
@@ -76,6 +78,7 @@ struct tex_png<type, BGR> {
   using png_t                            = png::image<png::rgb_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
+    y = image.get_height() - 1 - y;
     data.push_back(static_cast<type>(image[y][x].blue));
     data.push_back(static_cast<type>(image[y][x].green));
     data.push_back(static_cast<type>(image[y][x].red));
@@ -105,6 +108,7 @@ struct tex_png<type, RGBA> {
   using png_t                            = png::image<png::rgba_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
+    y = image.get_height() - 1 - y;
     data.push_back(static_cast<type>(image[y][x].red));
     data.push_back(static_cast<type>(image[y][x].green));
     data.push_back(static_cast<type>(image[y][x].blue));
@@ -140,6 +144,7 @@ struct tex_png<type, BGRA> {
   using png_t                            = png::image<png::rgba_pixel>;
   static constexpr auto load_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y) {
+    y = image.get_height() - 1 - y;
     data.push_back(static_cast<type>(image[y][x].blue));
     data.push_back(static_cast<type>(image[y][x].green));
     data.push_back(static_cast<type>(image[y][x].red));

@@ -16,7 +16,9 @@
 #include <type_traits>
 #include <utility>
 
+#if @USE_PNG@
 #include <yavin/texpng.h>
+#endif
 
 //==============================================================================
 namespace yavin {
@@ -90,7 +92,7 @@ class texture : public id_holder<GLuint> {
 
  public:
   //============================================================================
-  texture() : texture(std::make_index_sequence<D>{}) {}
+  texture() : texture{std::make_index_sequence<D>{}} {}
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   template <size_t... Is>
   texture(std::index_sequence<Is...>) : m_size{((void)Is, 0)...} {
@@ -101,7 +103,7 @@ class texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   //! TODO: copy wrap and interpolation modes
-  texture(const texture& other) { copy_data(other); }
+  texture(const texture& other) : texture{} { copy_data(other); }
 
   //----------------------------------------------------------------------------
   texture(texture&& other)
@@ -138,17 +140,6 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  template <size_t _D = D, typename = std::enable_if_t<_D == 1>>
-  texture(const std::initializer_list<std::array<float, num_components>>&& data)
-      : m_size{data.size()} {
-    create_id();
-    set_interpolation_mode(default_interpolation);
-    set_wrap_mode(default_wrap_mode);
-    upload_data(reinterpret_cast<const float*>(&*begin(data)),
-                data.size() * num_components);
-  }
-
-  //----------------------------------------------------------------------------
   template <typename S, typename... Sizes,
             typename = std::enable_if_t<sizeof...(Sizes) == D>,
             typename = std::enable_if_t<
@@ -175,7 +166,7 @@ class texture : public id_holder<GLuint> {
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   texture(InterpolationMode interp_mode, WrapMode wrap_mode)
-      : texture(interp_mode, wrap_mode, std::make_index_sequence<D>{}) {}
+      : texture{interp_mode, wrap_mode, std::make_index_sequence<D>{}} {}
 
   //----------------------------------------------------------------------------
   template <typename... Sizes,
@@ -213,12 +204,12 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  texture(const std::string& filepath) { read(filepath); }
+  texture(const std::string& filepath) : texture{} { read(filepath); }
 
   //----------------------------------------------------------------------------
   texture(InterpolationMode interp_mode, WrapMode wrap_mode,
           const std::string& filepath)
-      : texture(interp_mode, wrap_mode) {
+      : texture{interp_mode, wrap_mode} {
     read(filepath);
   }
 
@@ -337,30 +328,21 @@ class texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   template <typename S>
   void upload_data(const std::vector<S>& data) {
-    std::vector<type> casted_data(data.size());
-    boost::copy(data, begin(casted_data));
-    upload_data(casted_data);
+    upload_data(std::vector<type>(begin(data), end(data)));
   }
-
   //------------------------------------------------------------------------------
   void upload_data(const std::vector<type>& data) {
-    upload_data(data.data(), data.size());
-  }
-
-  //------------------------------------------------------------------------------
-  void upload_data(const type* data, [[maybe_unused]] size_t size) {
-    assert(size == num_texels() * num_components);
+    assert(data.size() == num_texels() * num_components);
     bind();
-    if constexpr (D == 1) {
+    if constexpr (D == 1)
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
-                       gl_type, data);
-    } else if constexpr (D == 2) {
+                       gl_type, data.data());
+    else if constexpr (D == 2)
       gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
-                       gl_format, gl_type, data);
-    } else if constexpr (D == 3) {
+                       gl_format, gl_type, data.data());
+    else if constexpr (D == 3)
       gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
-                       depth(), 0, gl_format, gl_type, data);
-    }
+                       depth(), 0, gl_format, gl_type, data.data());
   }
 
  public:
@@ -447,18 +429,6 @@ class texture : public id_holder<GLuint> {
     set_wrap_mode(2, mode);
   }
 
-  //----------------------------------------------------------------------------
-  void set_clamp_to_border() { set_wrap_mode(CLAMP_TO_BORDER); }
-
-  //----------------------------------------------------------------------------
-  void set_clamp_to_edge() { set_wrap_mode(CLAMP_TO_EDGE); }
-
-  //----------------------------------------------------------------------------
-  void set_repeat() { set_wrap_mode(REPEAT); }
-
-  //----------------------------------------------------------------------------
-  void set_mirrored_repeat() { set_wrap_mode(MIRRORED_REPEAT); }
-
   //------------------------------------------------------------------------------
   void set_interpolation_mode(InterpolationMode mode) {
     set_interpolation_mode_min(mode);
@@ -473,16 +443,6 @@ class texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   void set_interpolation_mode_mag(InterpolationMode mode) {
     gl::texture_parameter_i(id(), GL_TEXTURE_MAG_FILTER, mode);
-  }
-
-  //------------------------------------------------------------------------------
-  void set_nearest_neighbor_interpolation() {
-    set_interpolation_mode(InterpolationMode::NEAREST);
-  }
-
-  //------------------------------------------------------------------------------
-  void set_linear_interpolation() {
-    set_interpolation_mode(InterpolationMode::LINEAR);
   }
 
   //----------------------------------------------------------------------------
@@ -525,10 +485,12 @@ class texture : public id_holder<GLuint> {
   void read(const std::string filepath) {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_readable) {
+#if @USE_PNG@
       if (ext == "png") {
         read_png(filepath);
         return;
       }
+#endif
     }
 
     throw std::runtime_error("could not read fileformat ." + ext);
@@ -592,51 +554,30 @@ class texture : public id_holder<GLuint> {
 };
 
 //==============================================================================
-template <typename T, typename C>
-using tex1 = texture<1, T, C>;
-template <typename T, typename C>
-using tex2 = texture<2, T, C>;
-template <typename T, typename C>
-using tex3 = texture<3, T, C>;
+template <typename T, typename C> using tex1 = texture<1, T, C>;
+template <typename T, typename C> using tex2 = texture<2, T, C>;
+template <typename T, typename C> using tex3 = texture<3, T, C>;
 
-template <typename T>
-using tex1r = tex1<T, R>;
-template <typename T>
-using tex1rg = tex1<T, RG>;
-template <typename T>
-using tex1rgb = tex1<T, RGB>;
-template <typename T>
-using tex1rgba = tex1<T, RGBA>;
-template <typename T>
-using tex1bgr = tex1<T, BGR>;
-template <typename T>
-using tex1bgra = tex1<T, BGRA>;
-template <typename T>
-using tex2r = tex2<T, R>;
-template <typename T>
-using tex2rg = tex2<T, RG>;
-template <typename T>
-using tex2rgb = tex2<T, RGB>;
-template <typename T>
-using tex2rgba = tex2<T, RGBA>;
-template <typename T>
-using tex2bgr = tex2<T, BGR>;
-template <typename T>
-using tex2bgra = tex2<T, BGRA>;
-template <typename T>
-using tex2depth = tex2<T, Depth>;
-template <typename T>
-using tex3r = tex3<T, R>;
-template <typename T>
-using tex3rg = tex3<T, RG>;
-template <typename T>
-using tex3rgb = tex3<T, RGB>;
-template <typename T>
-using tex3rgba = tex3<T, RGBA>;
-template <typename T>
-using tex3bgr = tex3<T, BGR>;
-template <typename T>
-using tex3bgra = tex3<T, BGRA>;
+template <typename T> using tex1r     = tex1<T, R>;
+template <typename T> using tex1rg    = tex1<T, RG>;
+template <typename T> using tex1rgb   = tex1<T, RGB>;
+template <typename T> using tex1rgba  = tex1<T, RGBA>; 
+template <typename T> using tex1bgr   = tex1<T, BGR>;
+template <typename T> using tex1bgra  = tex1<T, BGRA>;
+template <typename T> using tex2r     = tex2<T, R>;
+template <typename T> using tex2rg    = tex2<T, RG>;
+template <typename T> using tex2rgb   = tex2<T, RGB>;
+template <typename T> using tex2rgba  = tex2<T, RGBA>;
+template <typename T> using tex2bgr   = tex2<T, BGR>;
+template <typename T> using tex2bgra  = tex2<T, BGRA>;
+template <typename T> using tex2depth = tex2<T, Depth>;
+template <typename T> using tex3r     = tex3<T, R>;
+template <typename T> using tex3rg    = tex3<T, RG>;
+template <typename T> using tex3rgb   = tex3<T, RGB>;
+template <typename T> using tex3rgba  = tex3<T, RGBA>;
+template <typename T> using tex3bgr   = tex3<T, BGR>;
+template <typename T> using tex3bgra  = tex3<T, BGRA>;
+
 
 //==============================================================================
 }  // namespace yavin
