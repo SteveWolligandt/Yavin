@@ -578,6 +578,7 @@ template <typename T> using tex3rgba  = tex3<T, RGBA>;
 template <typename T> using tex3bgr   = tex3<T, BGR>;
 template <typename T> using tex3bgra  = tex3<T, BGRA>;
 
+using texdepth = tex2<unsigned int, Depth>;
 
 //==============================================================================
 }  // namespace yavin
