@@ -870,6 +870,8 @@ void gl::bind_image_texture(GLuint unit, GLuint texture, GLint level,
 void gl::tex_image_1d(GLenum target, GLint level, GLint internal_format,
                       GLsizei width, GLint border, GLenum format, GLenum type,
                       const GLvoid* data) {
+  assert(width >= 0);
+  assert(width < GL_MAX_TEXTURE_SIZE);
   if (verbose)
     *out << "glTexImage1D(" << to_string(target) << ", " << level << ", "
          << to_string(internal_format) << ", " << width << ", " << border
@@ -884,6 +886,11 @@ void gl::tex_image_1d(GLenum target, GLint level, GLint internal_format,
 void gl::tex_image_2d(GLenum target, GLint level, GLint internal_format,
                       GLsizei width, GLsizei height, GLint border,
                       GLenum format, GLenum type, const GLvoid* data) {
+  assert(width >= 0);
+  assert(height >= 0);
+  assert(width < GL_MAX_TEXTURE_SIZE);
+  assert(height < GL_MAX_TEXTURE_SIZE);
+
   if (verbose)
     *out << "glTexImage2D(" << to_string(target) << ", " << level << ", "
          << to_string(internal_format) << ", " << width << ", " << height
@@ -923,6 +930,12 @@ void gl::tex_image_3d(GLenum target, GLint level, GLint internal_format,
                       GLsizei width, GLsizei height, GLsizei depth,
                       GLint border, GLenum format, GLenum type,
                       const GLvoid* data) {
+  assert(width >= 0);
+  assert(height >= 0);
+  assert(depth >= 0);
+  assert(width < GL_MAX_TEXTURE_SIZE);
+  assert(height < GL_MAX_TEXTURE_SIZE);
+  assert(depth < GL_MAX_TEXTURE_SIZE);
   if (verbose)
     *out << "glTexImage3D(" << to_string(target) << ", " << level << ", "
          << to_string(internal_format) << ", " << width << ", " << height
@@ -1004,7 +1017,7 @@ void gl::texture_parameter_f(GLuint texture, GLenum pname, GLfloat param) {
 void gl::texture_parameter_i(GLuint texture, GLenum pname, GLint param) {
   if (verbose)
     *out << "glTextureParameteri(" << texture << ", " << to_string(pname)
-         << ", " << param << ")\n";
+         << ", " << texparami_to_string(param) << ")\n";
   glTextureParameteri(texture, pname, param);
   gl_error_check("glTexParameteri");
 }

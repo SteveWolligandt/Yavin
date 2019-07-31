@@ -8,6 +8,25 @@
 namespace yavin {
 //==============================================================================
 
+inline std::string texparami_to_string(GLint i) {
+  switch (i) {
+    // texture wrapping
+    case GL_CLAMP_TO_BORDER: return "GL_CLAMP_TO_BORDER";
+    case GL_CLAMP_TO_EDGE: return "GL_CLAMP_TO_EDGE";
+    case GL_REPEAT: return "GL_REPEAT";
+    case GL_MIRRORED_REPEAT: return "GL_MIRRORED_REPEAT";
+
+    // texture interpolation
+    case GL_NEAREST: return "GL_NEAREST";
+    case GL_LINEAR: return "GL_LINEAR";
+    case GL_NEAREST_MIPMAP_NEAREST: return "GL_NEAREST_MIPMAP_NEAREST";
+    case GL_LINEAR_MIPMAP_NEAREST: return "GL_LINEAR_MIPMAP_NEAREST";
+    case GL_NEAREST_MIPMAP_LINEAR: return "GL_NEAREST_MIPMAP_LINEAR";
+    case GL_LINEAR_MIPMAP_LINEAR: return "GL_LINEAR_MIPMAP_LINEAR";
+    default: return std::to_string(i);
+  }
+}
+
 inline std::string to_string(GLenum e) {
   switch (e) {
     // buffers
@@ -239,6 +258,14 @@ inline std::string to_string(GLenum e) {
     case GL_TRIANGLE_STRIP_ADJACENCY: return "GL_TRIANGLE_STRIP_ADJACENCY";
     case GL_TRIANGLES_ADJACENCY: return "GL_TRIANGLES_ADJACENCY";
     case GL_PATCHES: return "GL_PATCHES";
+
+
+    case GL_TEXTURE_WRAP_S: return "GL_TEXTURE_WRAP_S";
+    case GL_TEXTURE_WRAP_T: return "GL_TEXTURE_WRAP_T";
+    case GL_TEXTURE_WRAP_R: return "GL_TEXTURE_WRAP_R";
+
+    case GL_TEXTURE_MIN_FILTER: return "GL_TEXTURE_MIN_FILTER";
+    case GL_TEXTURE_MAG_FILTER: return "GL_TEXTURE_MAG_FILTER";
 
     default: return "GLenum(" + std::to_string(e) + ")";
   }
