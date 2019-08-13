@@ -27,12 +27,12 @@ class shader {
  public:
   shader() = default;
   ~shader() {
-    if (m_delete) delete_shader();
+    if (m_delete) { delete_shader(); }
   }
 
   template <typename T, typename... Args>
-  void add_stage(Args... args) {
-    m_shader_stages.push_back(T(args...));
+  void add_stage(Args&&... args) {
+    m_shader_stages.push_back(T{std::forward<Args>(args)...});
   }
 
   DLL_API void create();

@@ -14,7 +14,7 @@
 namespace yavin {
 //==============================================================================
 
-class ShaderStageParser {
+class shaderstageparser {
  public:
   enum StringType { FILE, SOURCE };
   DLL_API static std::string parse(const std::string&    filename_or_source,

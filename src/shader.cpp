@@ -6,17 +6,6 @@
 namespace yavin {
 //==============================================================================
 
-template void shader::add_stage<vertexshader, char const*>(char const*);
-template void shader::add_stage<fragmentshader, char const*>(char const*);
-template void shader::add_stage<geometryshader, char const*>(char const*);
-template void shader::add_stage<tesselationevaluationshader, char const*>(
-    char const*);
-template void shader::add_stage<tesselationcontrolshader, char const*>(
-    char const*);
-template void shader::add_stage<computeshader, char const*>(char const*);
-
-//------------------------------------------------------------------------------
-
 void shader::create() {
   delete_shader();
   m_id = gl::create_program();

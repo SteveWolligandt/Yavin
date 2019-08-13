@@ -13,7 +13,9 @@ namespace yavin {
 
 class vertexshader : public shaderstage {
  public:
-  DLL_API vertexshader(const std::string& filename);
+  using StringType = shaderstage::StringType;
+  DLL_API vertexshader(const std::string& filename,
+                         StringType         string_type = StringType::FILE);
   DLL_API vertexshader(vertexshader&& other);
 };
 

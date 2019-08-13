@@ -7,16 +7,16 @@
 namespace yavin {
 //==============================================================================
 
-const std::regex ShaderStageParser::regex_var(
+const std::regex shaderstageparser::regex_var(
     R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|double|int|uint|bool|sampler\dD|mat\d|vec\d|ivec\d|uvec\d|bvec\d|dvec\d)\s(.*)[;])");
 
 //------------------------------------------------------------------------------
 
-const std::regex ShaderStageParser::regex_include(R"(#include\s+\"(.*)\")");
+const std::regex shaderstageparser::regex_include(R"(#include\s+\"(.*)\")");
 
 //==============================================================================
 
-std::string ShaderStageParser::parse(const std::string&    filename_or_source,
+std::string shaderstageparser::parse(const std::string&    filename_or_source,
                                      std::vector<GLSLVar>& vars,
                                      IncludeTree&          include_tree,
                                      StringType            string_type) {
@@ -28,7 +28,7 @@ std::string ShaderStageParser::parse(const std::string&    filename_or_source,
 
 //------------------------------------------------------------------------------
 
-std::string ShaderStageParser::parse_file(const std::string&    filename,
+std::string shaderstageparser::parse_file(const std::string&    filename,
                                           std::vector<GLSLVar>& vars,
                                           IncludeTree&          include_tree) {
   include_tree.filename = filename;
@@ -46,7 +46,7 @@ std::string ShaderStageParser::parse_file(const std::string&    filename,
 
 //------------------------------------------------------------------------------
 
-std::string ShaderStageParser::parse_source(const std::string&    source,
+std::string shaderstageparser::parse_source(const std::string&    source,
                                             std::vector<GLSLVar>& vars,
                                             IncludeTree& include_tree) {
   include_tree.filename = "from string";
@@ -56,7 +56,7 @@ std::string ShaderStageParser::parse_source(const std::string&    source,
 
 //------------------------------------------------------------------------------
 
-std::optional<GLSLVar> ShaderStageParser::parse_varname(
+std::optional<GLSLVar> shaderstageparser::parse_varname(
     const std::string& line) {
   std::smatch match;
 
@@ -80,7 +80,7 @@ std::optional<GLSLVar> ShaderStageParser::parse_varname(
 
 //------------------------------------------------------------------------------
 
-std::optional<std::string> ShaderStageParser::parse_include(
+std::optional<std::string> shaderstageparser::parse_include(
     const std::string& line) {
   std::smatch match;
 
