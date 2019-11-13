@@ -20,55 +20,47 @@ class indexeddata {
   using vbo_data_vec = std::vector<vbo_data_t>;
   using ibo_data_vec = std::vector<ibo_data_t>;
 
-
- private:
   //============================================================================
+ private:
   vertexarray m_vao;
   vbo_ptr_t   m_vbo;
   indexbuffer m_ibo;
 
- public:
   //============================================================================
+ public:
   indexeddata() : m_vbo(std::make_shared<vbo_t>()), m_ibo() { setup_vao(); }
-
   //----------------------------------------------------------------------------
   indexeddata(size_t num_vbo_data, size_t num_ibo_data)
       : m_vbo(std::make_shared<vbo_t>(num_vbo_data)), m_ibo(num_ibo_data) {
     setup_vao();
   }
-
   //----------------------------------------------------------------------------
   indexeddata(const vbo_data_vec& vbo_data, const ibo_data_vec& ibo_data)
       : m_vbo(std::make_shared<vbo_t>(vbo_data)), m_ibo(ibo_data) {
     setup_vao();
   }
-
   //----------------------------------------------------------------------------
   indexeddata(vbo_ptr_t& vbo, const ibo_data_vec& ibo_data)
       : m_vbo{vbo}, m_ibo{ibo_data} {
     setup_vao();
   }
-
   //----------------------------------------------------------------------------
   indexeddata(const indexeddata& other)
       : m_vbo{std::shared_ptr<vbo_t>{new vbo_t(*other.m_vbo.get())}},
         m_ibo{other.m_ibo} {
     setup_vao();
   }
-
   //----------------------------------------------------------------------------
   indexeddata(indexeddata&& other)
       : m_vao{std::move(other.m_vao)},
         m_vbo{std::move(other.m_vbo)},
         m_ibo{std::move(other.m_ibo)} {}
-
   //----------------------------------------------------------------------------
   auto& operator=(const indexeddata& other) {
     m_vbo = std::make_shared<vbo_t>(new vbo_t{*other.m_vbo.get()});
     m_ibo = other.m_ibo;
     setup_vao();
   }
-
   //----------------------------------------------------------------------------
   auto& operator=(indexeddata&& other) {
     m_vao = std::move(other.m_vao);
@@ -76,7 +68,6 @@ class indexeddata {
     m_ibo = std::move(other.m_ibo);
     setup_vao();
   }
-
   //----------------------------------------------------------------------------
   void setup_vao() {
     m_vao.bind();
@@ -88,7 +79,6 @@ class indexeddata {
     m_vbo->unbind();
     m_ibo.unbind();
   }
-
   //----------------------------------------------------------------------------
   void draw_points() const {
     m_vao.bind();

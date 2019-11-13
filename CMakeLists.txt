@@ -118,6 +118,7 @@ configure_file(include/yavin/settings.h.in
                include/yavin/settings.h)
 
 export(TARGETS yavin FILE yavinConfig.cmake)
+export(PACKAGE yavin)
 
 add_subdirectory(test)
 

@@ -17,13 +17,13 @@ class framebuffer : public id_holder<GLuint> {
   template <typename... Textures>
   DLL_API framebuffer(const Textures&... textures) : framebuffer{} {
     unsigned int i = 0;
-    using discard = int[];
     // attach textures one after another, incrementing i if texture is a color
     // texture
-    (void)discard{((void)(std::is_same_v<typename Textures::components, Depth>
-                              ? attach(textures, i)
-                              : attach(textures, i++)),
-                   0)...};
+    (void)std::array{
+        ((void)(std::is_same_v<typename Textures::components, Depth>
+                    ? attach(textures)
+                    : attach(textures, i++)),
+         0)...};
   }
 
   template <typename T, typename Components>
@@ -33,7 +33,7 @@ class framebuffer : public id_holder<GLuint> {
  private:
   // this is necessary for constructor taking variadic parameters
   template <typename T>
-  DLL_API void attach(const tex2<T, Depth>& depth_tex, unsigned int) {
+  constexpr void attach(const tex2<T, Depth>& depth_tex, unsigned int) {
     attach(depth_tex);
   }
 

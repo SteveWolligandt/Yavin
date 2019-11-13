@@ -8,9 +8,9 @@ using namespace std::chrono_literals;
 namespace yavin {
 //==============================================================================
 
-glfw_window::glfw_window(const std::string& name, const int width,
-               const unsigned int height, const unsigned int major,
-               const unsigned int minor)
+glfw_window::glfw_window(const std::string& name, const size_t width,
+               const size_t height, const unsigned short major,
+               const unsigned short minor)
     : m_key_callback_function([](int, int, int, int) {}),
       m_resize_callback_function([](int, int) {}),
       m_cursor_pos_callback_function([](double, double) {}),

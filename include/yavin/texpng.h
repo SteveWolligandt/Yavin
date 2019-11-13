@@ -42,6 +42,27 @@ struct tex_png<type, R> {
 
 //==============================================================================
 template <typename type>
+struct tex_png<type, RG> {
+  static constexpr size_t num_components = RG::num_components;
+  using png_t                            = png::image<png::rgb_pixel>;
+
+  static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
+                                        size_t x, size_t y, size_t idx) {
+    if constexpr (std::is_same_v<float, type>) {
+      image[image.get_height() - 1 - y][x].red =
+          std::min(1.0f, data[idx * num_components]) * 255.0f;
+      image[image.get_height() - 1 - y][x].green =
+          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+    } else {
+      image[image.get_height() - 1 - y][x].red = data[idx * num_components];
+      image[image.get_height() - 1 - y][x].green =
+          data[idx * num_components + 1];
+    }
+  };
+};
+
+//==============================================================================
+template <typename type>
 struct tex_png<type, RGB> {
   static constexpr size_t num_components = RGB::num_components;
   using png_t                            = png::image<png::rgb_pixel>;

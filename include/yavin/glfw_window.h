@@ -14,9 +14,9 @@ namespace yavin {
 
 class glfw_window {
  public:
-  DLL_API glfw_window(const std::string& name, const int width,
-                 const unsigned int height, const unsigned int major = 4,
-                 const unsigned int minor = 5);
+  DLL_API glfw_window(const std::string& name, const size_t width,
+                 const size_t height, const unsigned short major = 4,
+                 const unsigned short minor = 5);
   DLL_API ~glfw_window();
 
   DLL_API void set_key_callback(std::function<void(int, int, int, int)>);

@@ -5,7 +5,7 @@ namespace yavin {
 //==============================================================================
 
 void clear_color_buffer() { gl::clear(GL_COLOR_BUFFER_BIT); }
-void clear_depth_Buffer() { gl::clear(GL_DEPTH_BUFFER_BIT); }
+void clear_depth_buffer() { gl::clear(GL_DEPTH_BUFFER_BIT); }
 void clear_color_depth_buffer() {
   gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

@@ -82,9 +82,18 @@ class texture : public id_holder<GLuint> {
       GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_R};
 
   static constexpr bool is_readable =
-      (D == 2 && std::is_same_v<C, R>) || (D == 2 && std::is_same_v<C, RGB>) ||
+      (D == 2 && std::is_same_v<C, R>)    ||
+      (D == 2 && std::is_same_v<C, RGB>)  ||
       (D == 2 && std::is_same_v<C, RGBA>) ||
-      (D == 2 && std::is_same_v<C, BGR>) || (D == 2 && std::is_same_v<C, BGRA>);
+      (D == 2 && std::is_same_v<C, BGR>)  ||
+      (D == 2 && std::is_same_v<C, BGRA>);
+  static constexpr bool is_writable =
+      (D == 2 && std::is_same_v<C, R>)    ||
+      (D == 2 && std::is_same_v<C, RG>)   ||
+      (D == 2 && std::is_same_v<C, RGB>)  ||
+      (D == 2 && std::is_same_v<C, RGBA>) ||
+      (D == 2 && std::is_same_v<C, BGR>)  ||
+      (D == 2 && std::is_same_v<C, BGRA>);
 
  protected:
   //============================================================================
@@ -499,7 +508,7 @@ class texture : public id_holder<GLuint> {
   //------------------------------------------------------------------------------
   void write(const std::string filepath) const {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
-    if constexpr (D == 2 && is_readable) {
+    if constexpr (D == 2 && is_writable) {
       if (ext == "png") {
         write_png(filepath);
         return;
@@ -535,7 +544,7 @@ class texture : public id_holder<GLuint> {
 
   //------------------------------------------------------------------------------
   template <unsigned int D_ = D,
-            typename        = std::enable_if_t<D_ == 2 && is_readable>,
+            typename        = std::enable_if_t<D_ == 2 && is_writable>,
             typename        = std::enable_if_t<settings::use_png>>
   void write_png(const std::string& filepath) const {
     if constexpr (settings::use_png) {

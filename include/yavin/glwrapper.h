@@ -12,7 +12,7 @@ namespace yavin {
 //==============================================================================
 
 DLL_API void clear_color_buffer();
-DLL_API void clear_depth_Buffer();
+DLL_API void clear_depth_buffer();
 DLL_API void clear_color_depth_buffer();
 
 DLL_API void enable_depth_test();
