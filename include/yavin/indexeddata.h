@@ -76,8 +76,6 @@ class indexeddata {
     m_ibo.bind();
 
     m_vao.unbind();
-    m_vbo->unbind();
-    m_ibo.unbind();
   }
   //----------------------------------------------------------------------------
   void draw_points() const {

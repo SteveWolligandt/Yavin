@@ -570,6 +570,10 @@ struct gl {
   //------------------------------------------------------------------------------
   DLL_API static GLenum check_named_framebuffer_status(GLuint framebuffer,
                                                        GLenum target);
+  //------------------------------------------------------------------------------
+  DLL_API static void named_framebuffer_draw_buffers(GLuint        framebuffer,
+                                                     GLsizei       n,
+                                                     const GLenum* bufs);
 };
 //==============================================================================
 }  // namespace yavin

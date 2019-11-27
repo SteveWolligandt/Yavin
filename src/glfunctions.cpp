@@ -1194,6 +1194,18 @@ GLenum gl::check_named_framebuffer_status(GLuint framebuffer, GLenum target) {
   gl_error_check("glCheckNamedFramebufferStatus");
   return result;
 }
+//------------------------------------------------------------------------------
+void gl::named_framebuffer_draw_buffers(GLuint framebuffer, GLsizei n,
+                                               const GLenum* bufs) {
+  if (verbose) {
+    *out << "glNamedFramebufferDrawBuffers(" << framebuffer << ", " << n
+         << ", {";
+    for (GLsizei i = 0; i < n - 1; ++i) { *out << to_string(bufs[i]) << ", "; }
+    *out << to_string(bufs[n - 1]) << "})\n";
+  }
+  glNamedFramebufferDrawBuffers(framebuffer, n, bufs);
+  gl_error_check("glCheckNamedFramebufferStatus");
+}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
