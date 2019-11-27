@@ -2,6 +2,7 @@
 #define __YAVIN_TEX_PNG_H__
 
 #include <png++/png.hpp>
+
 #include "texcomponents.h"
 
 //==============================================================================
@@ -26,12 +27,18 @@ struct tex_png<type, R> {
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
-      image[image.get_height() - 1 - y][x].red =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].green =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].blue =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
+      if (std::isnan(data[idx * num_components])) {
+        image[image.get_height() - 1 - y][x].red   = 0;
+        image[image.get_height() - 1 - y][x].green = 0;
+        image[image.get_height() - 1 - y][x].blue  = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].red =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+        image[image.get_height() - 1 - y][x].green =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+        image[image.get_height() - 1 - y][x].blue =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+      }
     } else {
       image[image.get_height() - 1 - y][x].red   = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green = data[idx * num_components];
@@ -49,14 +56,24 @@ struct tex_png<type, RG> {
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
-      image[image.get_height() - 1 - y][x].red =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].green =
-          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+      if (std::isnan(data[idx * num_components])) {
+        image[image.get_height() - 1 - y][x].red = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].red =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 1])) {
+        image[image.get_height() - 1 - y][x].green = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].green =
+            std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+      }
+      image[image.get_height() - 1 - y][x].blue = 0;
     } else {
       image[image.get_height() - 1 - y][x].red = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green =
           data[idx * num_components + 1];
+      image[image.get_height() - 1 - y][x].blue = 0;
     }
   };
 };
@@ -76,12 +93,24 @@ struct tex_png<type, RGB> {
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
-      image[image.get_height() - 1 - y][x].red =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].green =
-          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
-      image[image.get_height() - 1 - y][x].blue =
-          std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
+      if (std::isnan(data[idx * num_components])) {
+        image[image.get_height() - 1 - y][x].red = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].red =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 1])) {
+        image[image.get_height() - 1 - y][x].green = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].green =
+            std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 2])) {
+        image[image.get_height() - 1 - y][x].blue = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].blue =
+            std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
+      }
     } else {
       image[image.get_height() - 1 - y][x].red = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green =
@@ -107,12 +136,24 @@ struct tex_png<type, BGR> {
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
-      image[image.get_height() - 1 - y][x].blue =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].green =
-          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
-      image[image.get_height() - 1 - y][x].red =
-          std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
+      if (std::isnan(data[idx * num_components])) {
+        image[image.get_height() - 1 - y][x].blue = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].blue =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 1])) {
+        image[image.get_height() - 1 - y][x].green = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].green =
+            std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 2])) {
+        image[image.get_height() - 1 - y][x].red = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].red =
+            std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
+      }
     } else {
       image[image.get_height() - 1 - y][x].blue = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green =
@@ -138,14 +179,30 @@ struct tex_png<type, RGBA> {
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
-      image[image.get_height() - 1 - y][x].red =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].green =
-          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
-      image[image.get_height() - 1 - y][x].blue =
-          std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
-      image[image.get_height() - 1 - y][x].alpha =
-          std::min(1.0f, data[idx * num_components + 3]) * 255.0f;
+      if (std::isnan(data[idx * num_components])) {
+        image[image.get_height() - 1 - y][x].red = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].red =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 1])) {
+        image[image.get_height() - 1 - y][x].green = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].green =
+            std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 2])) {
+        image[image.get_height() - 1 - y][x].blue = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].blue =
+            std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 3])) {
+        image[image.get_height() - 1 - y][x].alpha = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].alpha =
+            std::min(1.0f, data[idx * num_components + 3]) * 255.0f;
+      }
     } else {
       image[image.get_height() - 1 - y][x].red = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green =
@@ -174,14 +231,30 @@ struct tex_png<type, BGRA> {
   static constexpr auto save_pixel = [](std::vector<type>& data, png_t& image,
                                         size_t x, size_t y, size_t idx) {
     if constexpr (std::is_same_v<float, type>) {
-      image[image.get_height() - 1 - y][x].blue =
-          std::min(1.0f, data[idx * num_components]) * 255.0f;
-      image[image.get_height() - 1 - y][x].green =
-          std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
-      image[image.get_height() - 1 - y][x].red =
-          std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
-      image[image.get_height() - 1 - y][x].alpha =
-          std::min(1.0f, data[idx * num_components + 3]) * 255.0f;
+      if (std::isnan(data[idx * num_components])) {
+        image[image.get_height() - 1 - y][x].blue = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].blue =
+            std::min(1.0f, data[idx * num_components]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 1])) {
+        image[image.get_height() - 1 - y][x].green = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].green =
+            std::min(1.0f, data[idx * num_components + 1]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 2])) {
+        image[image.get_height() - 1 - y][x].red = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].red =
+            std::min(1.0f, data[idx * num_components + 2]) * 255.0f;
+      }
+      if (std::isnan(data[idx * num_components + 3])) {
+        image[image.get_height() - 1 - y][x].alpha = 0;
+      } else {
+        image[image.get_height() - 1 - y][x].alpha =
+            std::min(1.0f, data[idx * num_components + 3]) * 255.0f;
+      }
     } else {
       image[image.get_height() - 1 - y][x].blue = data[idx * num_components];
       image[image.get_height() - 1 - y][x].green =
