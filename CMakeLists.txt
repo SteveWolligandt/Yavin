@@ -13,7 +13,8 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomiccounterbuffer.cpp
   ${CMAKE_SOURCE_DIR}/src/attribute.cpp
   ${CMAKE_SOURCE_DIR}/src/computeshader.cpp
-  ${CMAKE_SOURCE_DIR}/src/context.cpp
+  #${CMAKE_SOURCE_DIR}/src/glx_context.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
   ${CMAKE_SOURCE_DIR}/src/errorcheck.cpp
   ${CMAKE_SOURCE_DIR}/src/fragmentshader.cpp
   ${CMAKE_SOURCE_DIR}/src/framebuffer.cpp
@@ -33,13 +34,15 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
   ${CMAKE_SOURCE_DIR}/src/vertexarray.cpp
   ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
+  ${CMAKE_BINARY_DIR}/src/glverbose.cpp
+)
+set(YAVIN_GLFW_SOURCES
   ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
   ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
-  ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
 
 # create library target
-add_library(yavin SHARED ${YAVIN_SOURCES})
+add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_GLFW_SOURCES})
 target_compile_features(yavin PUBLIC cxx_std_17)
 
 target_compile_definitions(yavin
@@ -55,13 +58,16 @@ target_compile_options(yavin
 )
 
 set(OpenGL_GL_PREFERENCE "GLVND")
-find_package(OpenGL)
+find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL GLX)
 find_path(GLEW_INCLUDE_DIR GL/glew.h)
 find_library(GLEW_LIBRARY NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(Boost REQUIRED)
 find_package(X11 REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
 
 target_include_directories(yavin
   PUBLIC 
@@ -72,11 +78,16 @@ target_include_directories(yavin
     ${GLM_INCLUDE_DIRS} 
     ${GLEW_INCLUDE_DIR}
     ${X11_INCLUDE_DIR}
+    ${GLFW3_INCLUDE_DIRS}
 )
 
 target_link_libraries(yavin 
-  ${OPENGL_LIBRARIES}
+  OpenGL::GL
+  OpenGL::GLU
+  OpenGL::EGL
+  OpenGL::GLX
   ${GLEW_LIBRARY}
+  ${GLFW_LIBRARIES}
   ${X11_LIBRARIES}
 )
 

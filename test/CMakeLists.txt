@@ -19,17 +19,15 @@ add_executable (unittests
   ${YAVIN_SOURCES}
   ${ARGN})
 
-target_compile_features(unittests
-  PRIVATE
-    cxx_std_17
-)
-
+target_compile_features(unittests PRIVATE cxx_std_17)
 target_link_libraries(unittests
-  ${OPENGL_LIBRARIES}
+  OpenGL::GL
+  OpenGL::GLU
+  OpenGL::EGL
+  #OpenGL::GLX
   ${GLEW_LIBRARY}
-  ${X11_LIBRARIES}
+  #${X11_LIBRARIES}
   Catch2::Catch2)
-
 target_include_directories(unittests
   PRIVATE
     ${CMAKE_SOURCE_DIR}/include
