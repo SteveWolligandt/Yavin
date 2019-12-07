@@ -1,5 +1,5 @@
-#ifndef __YAVIN_TEX_PNG_H__
-#define __YAVIN_TEX_PNG_H__
+#ifndef YAVIN_TEX_PNG_H
+#define YAVIN_TEX_PNG_H
 
 #include <png++/png.hpp>
 
