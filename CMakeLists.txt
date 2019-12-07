@@ -13,11 +13,20 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   if(NOT GIT_SUBMOD_RESULT EQUAL "0")
     message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
   endif()
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+  # build glew
   execute_process(COMMAND make
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/auto
                   RESULT_VARIABLE GIT_SUBMOD_RESULT)
   execute_process(COMMAND make SYSTEM=linux-egl
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
+                  RESULT_VARIABLE GIT_SUBMOD_RESULT)
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+  # build glfw
+  # TODO make this work
+  execute_process(COMMAND cmake -Bbuild .
+                  COMMAND cmake --build build/ --
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw
                   RESULT_VARIABLE GIT_SUBMOD_RESULT)
 endif()
 
@@ -61,6 +70,8 @@ set(YAVIN_GLFW_SOURCES
   ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
   ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
 )
+set(GLFW_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include)
+set(GLFW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a)
 
 # create library target
 add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_GLFW_SOURCES})
@@ -86,8 +97,6 @@ find_package(glm REQUIRED)
 find_package(Boost REQUIRED)
 find_package(X11 REQUIRED)
 
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
 
 target_include_directories(yavin
   PUBLIC 
@@ -98,26 +107,18 @@ target_include_directories(yavin
     ${GLM_INCLUDE_DIRS} 
     ${GLEW_INCLUDE_DIR}
     ${X11_INCLUDE_DIR}
-    ${GLFW3_INCLUDE_DIRS}
+    ${GLFW_INCLUDE_DIRS}
 )
 
 target_link_libraries(yavin 
   OpenGL::GL
   OpenGL::GLU
   OpenGL::EGL
-  OpenGL::GLX
   ${GLEW_LIBRARY}
+  ${GLFW_LIBRARY}
   ${GLFW_LIBRARIES}
   ${X11_LIBRARIES}
 )
-
-################################################################################
-find_package(GLFW3 REQUIRED)
-# if(${GLFW3_FOUND})
-  target_include_directories(yavin PUBLIC ${GLFW3_INCLUDE_DIRECTORIES})
-  target_link_libraries(yavin ${GLFW_LIBRARIES} ${X11_LIBRARIES})
-  target_compile_definitions(yavin PRIVATE GLFW3_AVAILABLE)
-# endif()
 
 ################################################################################
 find_package(PNG)
