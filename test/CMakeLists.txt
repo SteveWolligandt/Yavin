@@ -33,6 +33,7 @@ target_include_directories(unittests
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/single_include
     ${CMAKE_BINARY_DIR}/include
+    ${GLEW_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIR}
     ${GLM_INCLUDE_DIRS}
     ${X11_INCLUDE_DIR}
