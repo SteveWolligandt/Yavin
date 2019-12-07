@@ -24,16 +24,13 @@ egl_context::egl_context(EGLint major, EGLint minor)
   m_egl_context =
       eglCreateContext(m_egl_display, egl_cfg, EGL_NO_CONTEXT, nullptr);
   std::cerr << "Created GL " << major << "." << minor << " egl_context\n";
-
+  glewExperimental = true;
   eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, m_egl_context);
-
-  //glewExperimental = true;
   GLenum err       = glewInit();
   if (GLEW_OK != err) {
     throw std::runtime_error{std::string("cannot initialize GLEW: ") +
                              std::string((char *)glewGetErrorString(err))};
   }
-
 }
 //------------------------------------------------------------------------------
 egl_context::~egl_context() {

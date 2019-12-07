@@ -4,9 +4,9 @@ enable_testing()
 include(CTest)
 include(Catch)
 
-add_executable (glxcontext glxcontext.cpp)
-target_compile_features(glxcontext PUBLIC cxx_std_17)
-target_link_libraries(glxcontext yavin)
+#add_executable (glxcontext glxcontext.cpp)
+#target_compile_features(glxcontext PUBLIC cxx_std_17)
+#target_link_libraries(glxcontext yavin)
 
 add_executable (unittests
   main.cpp
@@ -21,7 +21,7 @@ add_executable (unittests
 
 target_compile_features(unittests PRIVATE cxx_std_17)
 target_link_libraries(unittests
-  OpenGL::GL
+  OpenGL::OpenGL
   OpenGL::GLU
   OpenGL::EGL
   #OpenGL::GLX
