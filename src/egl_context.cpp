@@ -19,7 +19,6 @@ egl_context::egl_context(EGLint major, EGLint minor)
                        &num_cfgs)) {
     throw std::runtime_error{"[EGL] failed to choose config"};
   }
-  //m_egl_surf = eglCreatePbufferSurface(m_egl_display, egl_cfg, pbufferAttribs);
   eglBindAPI(EGL_OPENGL_API);
   m_egl_context =
       eglCreateContext(m_egl_display, egl_cfg, EGL_NO_CONTEXT, nullptr);

@@ -15,8 +15,8 @@ class egl_context {
   //============================================================================
   // static fields
   //============================================================================
-  static constexpr std::array<EGLint, 13> attribute_list  {
-    EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,
+  static constexpr std::array<EGLint, 11> attribute_list  {
+    //EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,
     EGL_BLUE_SIZE,       8,
     EGL_GREEN_SIZE,      8,
     EGL_RED_SIZE,        8,
@@ -34,7 +34,6 @@ class egl_context {
   // fields
   //============================================================================
   EGLDisplay m_egl_display;
-  //EGLSurface m_egl_surf;
   EGLContext m_egl_context;
   //============================================================================
   // ctors / dtor

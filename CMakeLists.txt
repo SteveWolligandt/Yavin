@@ -79,7 +79,7 @@ target_compile_options(yavin
 )
 
 set(OpenGL_GL_PREFERENCE "GLVND")
-find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL GLX)
+find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
 set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
 set(GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
 find_package(glm REQUIRED)
