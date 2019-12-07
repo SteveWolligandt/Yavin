@@ -11,6 +11,7 @@ target_link_libraries(glfwcontext yavin)
 add_executable (unittests
   main.cpp
   tuple.cpp
+  framebuffer.cpp
   indexbuffer.cpp
   vertexbuffer.cpp
   texture1d.cpp

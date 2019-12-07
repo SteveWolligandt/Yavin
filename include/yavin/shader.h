@@ -1,5 +1,5 @@
-#ifndef __YAVIN_SHADERGL_H__
-#define __YAVIN_SHADERGL_H__
+#ifndef YAVIN_SHADER_H
+#define YAVIN_SHADER_H
 
 #include <string>
 #include <optional>
