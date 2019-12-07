@@ -4,9 +4,9 @@ enable_testing()
 include(CTest)
 include(Catch)
 
-add_executable (glfwcontext glfwcontext.cpp)
-target_compile_features(glfwcontext PUBLIC cxx_std_17)
-target_link_libraries(glfwcontext yavin)
+#add_executable (glfwcontext glfwcontext.cpp)
+#target_compile_features(glfwcontext PUBLIC cxx_std_17)
+#target_link_libraries(glfwcontext yavin)
 
 add_executable (unittests
   main.cpp
