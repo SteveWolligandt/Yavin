@@ -1,5 +1,5 @@
-#ifndef __YAVIN_TEXTURE_H__
-#define __YAVIN_TEXTURE_H__
+#ifndef YAVIN_TEXTURE_H
+#define YAVIN_TEXTURE_H
 
 #include <yavin/errorcheck.h>
 #include <yavin/glfunctions.h>

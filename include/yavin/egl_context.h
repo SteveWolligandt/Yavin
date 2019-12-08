@@ -15,8 +15,8 @@ class egl_context {
   //============================================================================
   // static fields
   //============================================================================
-  static constexpr std::array<EGLint, 11> attribute_list  {
-    //EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,
+  static constexpr std::array<EGLint, 13> attribute_list  {
+    EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,
     EGL_BLUE_SIZE,       8,
     EGL_GREEN_SIZE,      8,
     EGL_RED_SIZE,        8,
@@ -25,11 +25,6 @@ class egl_context {
     EGL_NONE
   };
 
-  //static constexpr EGLint pbufferAttribs[] = {
-  //  EGL_WIDTH,  8,
-  //  EGL_HEIGHT, 8,
-  //  EGL_NONE,
-  //};
   //============================================================================
   // fields
   //============================================================================

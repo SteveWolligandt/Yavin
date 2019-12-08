@@ -1,5 +1,5 @@
-#ifndef __YAVIN_SHADERSTAGEPARSER_H__
-#define __YAVIN_SHADERSTAGEPARSER_H__
+#ifndef YAVIN_SHADERSTAGEPARSER_H
+#define YAVIN_SHADERSTAGEPARSER_H
 
 #include <exception>
 #include <fstream>

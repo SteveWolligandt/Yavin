@@ -22,10 +22,12 @@ egl_context::egl_context(EGLint major, EGLint minor)
   eglBindAPI(EGL_OPENGL_API);
   m_egl_context =
       eglCreateContext(m_egl_display, egl_cfg, EGL_NO_CONTEXT, nullptr);
+
+  // initialize glew
   std::cerr << "Created GL " << major << "." << minor << " egl_context\n";
   glewExperimental = true;
   eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, m_egl_context);
-  GLenum err       = glewInit();
+  GLenum err = glewInit();
   if (GLEW_OK != err) {
     throw std::runtime_error{std::string("cannot initialize GLEW: ") +
                              std::string((char *)glewGetErrorString(err))};

@@ -1,5 +1,5 @@
-#ifndef __YAVIN_FRAMEBUFFER_H__
-#define __YAVIN_FRAMEBUFFER_H__
+#ifndef YAVIN_FRAMEBUFFER_H
+#define YAVIN_FRAMEBUFFER_H
 
 #include "errorcheck.h"
 
@@ -18,7 +18,6 @@ class framebuffer : public id_holder<GLuint> {
   DLL_API framebuffer(const Textures&... textures) : framebuffer{} {
     constexpr auto num_color_attachements =
         num_color_components<typename Textures::components...>();
-    std::cerr << "num_color_attachements: " << num_color_attachements << '\n';
     unsigned int i = 0;
     // attach textures one after another, incrementing i if texture is a color
     // texture

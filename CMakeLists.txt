@@ -66,12 +66,12 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
-set(YAVIN_GLFW_SOURCES
-  ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
-  ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
-)
-set(GLFW_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include)
-set(GLFW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a)
+#set(YAVIN_GLFW_SOURCES
+#  ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
+#  ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
+#)
+#set(GLFW_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include)
+#set(GLFW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a)
 
 # create library target
 add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_GLFW_SOURCES})
@@ -90,7 +90,7 @@ target_compile_options(yavin
 )
 
 set(OpenGL_GL_PREFERENCE "GLVND")
-find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
+find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL GLX)
 set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
 set(GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
 find_package(glm REQUIRED)
@@ -107,7 +107,7 @@ target_include_directories(yavin
     ${GLM_INCLUDE_DIRS} 
     ${GLEW_INCLUDE_DIR}
     ${X11_INCLUDE_DIR}
-    ${GLFW_INCLUDE_DIRS}
+    #${GLFW_INCLUDE_DIRS}
 )
 
 target_link_libraries(yavin 
@@ -115,9 +115,9 @@ target_link_libraries(yavin
   OpenGL::GL
   OpenGL::GLU
   OpenGL::EGL
+  OpenGL::GLX
   ${GLEW_LIBRARY}
-  ${GLFW_LIBRARY}
-  ${GLFW_LIBRARIES}
+  #${GLFW_LIBRARY}
   ${X11_LIBRARIES}
 )
 
