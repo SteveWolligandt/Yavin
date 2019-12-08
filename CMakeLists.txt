@@ -43,8 +43,8 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomiccounterbuffer.cpp
   ${CMAKE_SOURCE_DIR}/src/attribute.cpp
   ${CMAKE_SOURCE_DIR}/src/computeshader.cpp
-  #${CMAKE_SOURCE_DIR}/src/glx_context.cpp
   ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
   ${CMAKE_SOURCE_DIR}/src/errorcheck.cpp
   ${CMAKE_SOURCE_DIR}/src/fragmentshader.cpp
   ${CMAKE_SOURCE_DIR}/src/framebuffer.cpp
@@ -70,7 +70,7 @@ set(YAVIN_SOURCES
 #  ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
 #  ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
 #)
-#set(GLFW_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include)
+#set(GLFW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include)
 #set(GLFW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a)
 
 # create library target
@@ -107,7 +107,7 @@ target_include_directories(yavin
     ${GLM_INCLUDE_DIRS} 
     ${GLEW_INCLUDE_DIR}
     ${X11_INCLUDE_DIR}
-    #${GLFW_INCLUDE_DIRS}
+    #${GLFW_INCLUDE_DIR}
 )
 
 target_link_libraries(yavin 

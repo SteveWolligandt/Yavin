@@ -9,12 +9,10 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 template <GLsizei array_type, typename T>
 class buffer;
 
 //==============================================================================
-
 template <GLsizei ArrayType, typename T, GLbitfield Access>
 class buffer_map {
  public:
