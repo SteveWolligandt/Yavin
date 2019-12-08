@@ -35,8 +35,8 @@ const std::string gl_error_to_string(GLenum err) {
       return "out of memory";
       // case GL_TABLE_TOO_LARGE:
       //   return "table too large";
+    default: return "unknown GL error";
   }
-  return "";
 }
 
 //------------------------------------------------------------------------------
