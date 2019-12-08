@@ -24,10 +24,10 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   # build glfw
   # TODO make this work
-  execute_process(COMMAND cmake -Bbuild .
-                  COMMAND cmake --build build/ --
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw
-                  RESULT_VARIABLE GIT_SUBMOD_RESULT)
+  #execute_process(COMMAND cmake -Bbuild .
+  #                COMMAND cmake --build build/ --
+  #                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw
+  #                RESULT_VARIABLE GIT_SUBMOD_RESULT)
 endif()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -111,6 +111,7 @@ target_include_directories(yavin
 )
 
 target_link_libraries(yavin 
+ PRIVATE
   OpenGL::GL
   OpenGL::GLU
   OpenGL::EGL
@@ -127,7 +128,8 @@ if(PNG_FOUND AND PNG++_FOUND)
   target_include_directories(yavin PUBLIC
                              ${PNG_INCLUDE_DIRS} ${PNG++_INCLUDE_DIRS})
   target_link_libraries(yavin
-                        ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
+                         PRIVATE
+                          ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
   set(USE_PNG "true")
 else()
   set(USE_PNG "false")

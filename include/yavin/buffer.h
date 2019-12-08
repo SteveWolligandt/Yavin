@@ -23,7 +23,7 @@ class buffer_map {
   using buffer_t                   = buffer<array_type, T>;
   static constexpr auto data_size  = buffer_t::data_size;
 
-  //! constructor gets a mapping to gpu_buffer
+  /// constructor gets a mapping to gpu_buffer
   buffer_map(const buffer_t* buffer, size_t offset, size_t length)
       : m_buffer(buffer), m_offset(offset), m_length(length) {
     m_gpu_mapping = (T*)gl::map_named_buffer_range(
@@ -32,7 +32,7 @@ class buffer_map {
     detail::mutex::gl_call.lock();
   }
 
-  //! destructor unmaps the buffer
+  /// destructor unmaps the buffer
   ~buffer_map() { unmap(); }
 
   void unmap() {
@@ -82,7 +82,7 @@ using rwbuffer_map =
     buffer_map<array_type, T, GL_MAP_READ_BIT | GL_MAP_WRITE_BIT>;
 
 //==============================================================================
-//! Returned by buffer::operator[] const for reading single elements
+/// Returned by buffer::operator[] const for reading single elements
 template <GLsizei array_type, typename T>
 class readable_buffer_element {
  public:
@@ -96,7 +96,7 @@ class readable_buffer_element {
   readable_buffer_element(readable_buffer_element&& other)
       : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
 
-  //! for accessing single gpu data element.
+  /// for accessing single gpu data element.
   operator T() const { return download(); }
 
   auto download() const {
@@ -117,7 +117,7 @@ inline auto& operator<<(std::ostream&                         out,
 }
 
 //==============================================================================
-//! Returned by buffer::operator[] for reading and writing single elements
+/// Returned by buffer::operator[] for reading and writing single elements
 template <GLsizei array_type, typename T>
 class writeable_buffer_element : public readable_buffer_element<array_type, T> {
  public:
@@ -132,7 +132,7 @@ class writeable_buffer_element : public readable_buffer_element<array_type, T> {
   writeable_buffer_element(writeable_buffer_element&& other)
       : parent_t(std::move(other)) {}
 
-  //! for assigning single gpu data element.
+  /// for assigning single gpu data element.
   auto& operator=(T&& data) {
     gl::named_buffer_sub_data(this->m_buffer->m_gl_handle,
                               this->m_idx * buffer_t::data_size,
@@ -151,7 +151,7 @@ inline auto& operator<<(std::ostream&                          out,
 }
 
 //==============================================================================
-//! non-const buffer iterator
+/// non-const buffer iterator
 template <GLsizei array_type, typename T>
 class buffer_iterator {
  public:
@@ -197,45 +197,45 @@ class buffer_iterator {
   }
 
   //----------------------------------------------------------------------------
-  //! get the buffer element the iterator refers to
+  /// get the buffer element the iterator refers to
   T operator*() const { return readable_buffer_element(m_buffer, m_idx); }
 
   //----------------------------------------------------------------------------
-  //! are two iterators equal?
+  /// are two iterators equal?
   bool operator==(const buffer_iterator& other) const {
     return (m_idx == other.m_idx);
   }
 
   //----------------------------------------------------------------------------
-  //! are two iterators different?
+  /// are two iterators different?
   bool operator!=(const buffer_iterator& other) const {
     return !operator==(other);
   }
 
   //----------------------------------------------------------------------------
-  //! pre-increment iterator
+  /// pre-increment iterator
   auto& operator++() {
     ++m_idx;
     return *this;
   }
 
   //----------------------------------------------------------------------------
-  //! post-increment iterator
+  /// post-increment iterator
   auto operator++(int) {
-    buffer_iterator vi(*this);
+    buffer_iterator vi{*this};
     ++(*this);
     return vi;
   }
 
   //----------------------------------------------------------------------------
-  //! pre-decrement iterator
+  /// pre-decrement iterator
   auto& operator--() {
     --m_idx;
     return *this;
   }
 
   //----------------------------------------------------------------------------
-  //! post-decrement iterator
+  /// post-decrement iterator
   auto operator--(int) {
     buffer_iterator vi(*this);
     --(*this);
@@ -248,7 +248,7 @@ class buffer_iterator {
 };
 
 //==============================================================================
-//! const buffer iterator
+/// const buffer iterator
 template <GLsizei array_type, typename T>
 class cbuffer_iterator {
  public:
@@ -293,30 +293,30 @@ class cbuffer_iterator {
   }
 
   //----------------------------------------------------------------------------
-  //! get the buffer element the iterator refers to
+  /// get the buffer element the iterator refers to
   T operator*() const { return readable_buffer_element(m_buffer, m_idx); }
 
   //----------------------------------------------------------------------------
-  //! are two iterators equal?
+  /// are two iterators equal?
   bool operator==(const cbuffer_iterator& other) const {
     return (m_idx == other.m_idx);
   }
 
   //----------------------------------------------------------------------------
-  //! are two iterators different?
+  /// are two iterators different?
   bool operator!=(const cbuffer_iterator& other) const {
     return !operator==(other);
   }
 
   //----------------------------------------------------------------------------
-  //! pre-increment iterator
+  /// pre-increment iterator
   auto& operator++() {
     ++m_idx;
     return *this;
   }
 
   //----------------------------------------------------------------------------
-  //! post-increment iterator
+  /// post-increment iterator
   auto operator++(int) {
     cbuffer_iterator vi(*this);
     ++(*this);
@@ -324,14 +324,14 @@ class cbuffer_iterator {
   }
 
   //----------------------------------------------------------------------------
-  //! pre-decrement iterator
+  /// pre-decrement iterator
   auto& operator--() {
     --m_idx;
     return *this;
   }
 
   //----------------------------------------------------------------------------
-  //! post-decrement iterator
+  /// post-decrement iterator
   auto operator--(int) {
     cbuffer_iterator vi(*this);
     --(*this);
@@ -345,7 +345,7 @@ class cbuffer_iterator {
 
 
 //==============================================================================
-//! buffer base class for each of the OpenGL buffer types
+/// buffer base class for each of the OpenGL buffer types
 template <GLsizei _array_type, typename T>
 class buffer {
   friend class readable_buffer_element<_array_type, T>;
@@ -436,6 +436,11 @@ class buffer {
   auto end() const { return const_iterator_t(this, m_size); }
 
   auto gl_handle() { return m_gl_handle; }
+
+  auto wmap() { return wmap_t(this, 0, m_size); }
+
+  auto rmap() { return rmap_t(this, 0, m_size); }
+  auto rmap() const { return rap_t(this, 0, m_size); }
 
   auto map() { return rwmap_t(this, 0, m_size); }
   auto map() const { return rmap_t(this, 0, m_size); }
