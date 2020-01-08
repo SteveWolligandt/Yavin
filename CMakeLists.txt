@@ -21,13 +21,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   execute_process(COMMAND make SYSTEM=linux-egl
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
                   RESULT_VARIABLE GIT_SUBMOD_RESULT)
-  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-  # build glfw
-  # TODO make this work
-  #execute_process(COMMAND cmake -Bbuild .
-  #                COMMAND cmake --build build/ --
-  #                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw
-  #                RESULT_VARIABLE GIT_SUBMOD_RESULT)
 endif()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -45,6 +38,8 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/computeshader.cpp
   ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
   ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
+  ${CMAKE_SOURCE_DIR}/src/glx_context.cpp
+  ${CMAKE_SOURCE_DIR}/src/glx_window.cpp
   ${CMAKE_SOURCE_DIR}/src/errorcheck.cpp
   ${CMAKE_SOURCE_DIR}/src/fragmentshader.cpp
   ${CMAKE_SOURCE_DIR}/src/framebuffer.cpp
@@ -66,12 +61,6 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
-#set(YAVIN_GLFW_SOURCES
-#  ${CMAKE_SOURCE_DIR}/src/glfw_window.cpp
-#  ${CMAKE_SOURCE_DIR}/src/glfw_context.cpp
-#)
-#set(GLFW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include)
-#set(GLFW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a)
 
 # create library target
 add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_GLFW_SOURCES})
@@ -107,7 +96,6 @@ target_include_directories(yavin
     ${GLM_INCLUDE_DIRS} 
     ${GLEW_INCLUDE_DIR}
     ${X11_INCLUDE_DIR}
-    #${GLFW_INCLUDE_DIR}
 )
 
 target_link_libraries(yavin 
@@ -117,7 +105,6 @@ target_link_libraries(yavin
   OpenGL::EGL
   OpenGL::GLX
   ${GLEW_LIBRARY}
-  #${GLFW_LIBRARY}
   ${X11_LIBRARIES}
 )
 

@@ -4,10 +4,15 @@ enable_testing()
 include(CTest)
 include(Catch)
 
-#add_executable (glfwcontext glfwcontext.cpp)
-#target_compile_features(glfwcontext PUBLIC cxx_std_17)
-#target_link_libraries(glfwcontext yavin)
-
+#-------------------------------------------------------------------------------
+add_executable (egl_window egl_window.cpp)
+target_compile_features(egl_window PRIVATE cxx_std_17)
+target_link_libraries(egl_window yavin)
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+add_executable (glx_window glx_window.cpp)
+target_compile_features(glx_window PRIVATE cxx_std_17)
+target_link_libraries(glx_window yavin)
+#-------------------------------------------------------------------------------
 add_executable (unittests
   main.cpp
   tuple.cpp
@@ -25,9 +30,9 @@ target_link_libraries(unittests
   OpenGL::OpenGL
   OpenGL::GLU
   OpenGL::EGL
-  #OpenGL::GLX
+  OpenGL::GLX
   ${GLEW_LIBRARY}
-  #${X11_LIBRARIES}
+  ${X11_LIBRARIES}
   Catch2::Catch2)
 target_include_directories(unittests
   PRIVATE

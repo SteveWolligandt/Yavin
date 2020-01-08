@@ -5,17 +5,16 @@
 #define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
 #define YAVIN_X11_CONTEXT_DONT_DELETE
 
-#include <yavin/glx_context.h>
+#include <yavin/glx_window.h>
 #include <yavin/glincludes.h>
-
 
 //==============================================================================
 namespace yavin::glx {
 //==============================================================================
 
-std::list<context *> context::contexts;
-bool                 context::error_occured      = false;
-const int context::visual_attribs[23] = {
+std::list<window *> window::contexts;
+bool                 window::error_occured      = false;
+const int window::visual_attribs[23] = {
   GLX_X_RENDERABLE    , True,
   GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
   GLX_RENDER_TYPE     , GLX_RGBA_BIT,
@@ -32,7 +31,8 @@ const int context::visual_attribs[23] = {
   None
 };
 
-context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
+window::window(const std::string& title, int major, int minor)
+    : display{XOpenDisplay(nullptr)}, ctx{} {
   contexts.push_back(this);
   if (!display) throw std::runtime_error{"Failed to open X display"};
 
@@ -106,7 +106,7 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   const char *glxExts =
       glXQueryExtensionsString(display, DefaultScreen(display));
 
-  // NOTE: It is not necessary to create or make current to a glx::context before
+  // NOTE: It is not necessary to create or make current to a glx::window before
   // calling glXGetProcAddressARB
   glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
   glXCreateContextAttribsARB =
@@ -114,7 +114,7 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
           (const GLubyte *)"glXCreateContextAttribsARB");
 
   // Install an X error handler so the application won't exit if GL 3.0
-  // context allocation fails.
+  // window allocation fails.
   //
   // Note this error handler is global.  All display connections in all threads
   // of a process use the same error handler, so be sure to guard against other
@@ -144,7 +144,7 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
     // Sync to ensure any errors generated are processed.
     XSync(display, False);
     if (!error_occured && ctx) {
-      std::cout << "Created GL " << major << "." << minor << " glx::context\n";
+      std::cout << "Created GL " << major << "." << minor << " glx::window\n";
       make_current();
 
       glewExperimental = true;
@@ -182,7 +182,7 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
 }
 
 //------------------------------------------------------------------------------
-context::~context() {
+window::~window() {
   glXMakeCurrent(display, 0, 0);
   glXDestroyContext(display, ctx);
 
@@ -193,7 +193,7 @@ context::~context() {
 }
 
 //------------------------------------------------------------------------------
-bool context::extension_supported(const char *extList, const char *extension) {
+bool window::extension_supported(const char *extList, const char *extension) {
   const char *start;
   const char *where, *terminator;
 
@@ -216,14 +216,14 @@ bool context::extension_supported(const char *extList, const char *extension) {
 }
 
 //------------------------------------------------------------------------------
-int context::error_handler_static(Display *display, XErrorEvent * ev) {
+int window::error_handler_static(Display *display, XErrorEvent * ev) {
   for (auto ctx : contexts)
     if (ctx->display == display)
       return ctx->error_handler(ev);
   return 0;
 }
 
-int context::error_handler(XErrorEvent * /*ev*/) {
+int window::error_handler(XErrorEvent * /*ev*/) {
   error_occured = true;
   return 0;
 }

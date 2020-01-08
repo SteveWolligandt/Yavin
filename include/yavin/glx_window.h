@@ -1,7 +1,8 @@
-#ifndef YAVIN_GLX_CONTEXT_H
-#define YAVIN_GLX_CONTEXT_H
+#ifndef YAVIN_GLX_WINDOW_H
+#define YAVIN_GLX_WINDOW_H
 
 #include "x11.h"
+
 #include <list>
 #include <string>
 
@@ -12,12 +13,11 @@
 namespace yavin::glx {
 //==============================================================================
 
-class context {
+class window {
   typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig,
                                                        GLXContext, Bool,
                                                        const int *);
-
-  static std::list<context *> contexts;
+  static std::list<window *> contexts;
   static bool                 error_occured;
   static const int            visual_attribs[23];
   Display *                   display;
@@ -26,8 +26,8 @@ class context {
   Colormap                    cmap;
 
  public:
-  context(int major = 3, int minor = 0);
-  ~context();
+  window(const std::string& title, int major = 3, int minor = 0);
+  ~window();
   void make_current() { glXMakeCurrent(display, win, ctx); }
 
   //! Helper to check for extension string presence.  Adapted from:

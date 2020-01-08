@@ -1,9 +1,9 @@
 #include <yavin/egl_window.h>
 
 //==============================================================================
-namespace yavin {
+namespace yavin::egl {
 //==============================================================================
-egl_window::egl_window(EGLint w, EGLint h, EGLint major, EGLint minor)
+window::window(EGLint w, EGLint h, EGLint major, EGLint minor)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
   if (m_egl_display == EGL_NO_DISPLAY) {
     throw std::runtime_error{"[EGL] could not get a display"};
@@ -33,7 +33,7 @@ egl_window::egl_window(EGLint w, EGLint h, EGLint major, EGLint minor)
       eglCreateContext(m_egl_display, egl_cfg, EGL_NO_CONTEXT, nullptr);
 
   // initialize glew
-  std::cerr << "Created GL " << major << "." << minor << " egl_window\n";
+  std::cerr << "Created GL " << major << "." << minor << " egl::window\n";
   glewExperimental = true;
   eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface, m_egl_context);
   GLenum err = glewInit();
@@ -43,7 +43,7 @@ egl_window::egl_window(EGLint w, EGLint h, EGLint major, EGLint minor)
   }
 }
 //------------------------------------------------------------------------------
-egl_window::~egl_window() {
+window::~window() {
   eglTerminate(m_egl_display);
 }
 
