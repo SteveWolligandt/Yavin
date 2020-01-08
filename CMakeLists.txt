@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(yavin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+set(GLEW_BUILD "GLX" CACHE STRING "GLX or EGL")
+set_property(CACHE GLEW_BUILD PROPERTY STRINGS GLX EGL)
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-# Update submodules as needed
-  message(STATUS "Submodule update")
+  # Update submodules as needed
   execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                   RESULT_VARIABLE GIT_SUBMOD_RESULT)
@@ -16,11 +18,19 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   # build glew
   execute_process(COMMAND make
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/auto
-                  RESULT_VARIABLE GIT_SUBMOD_RESULT)
-  execute_process(COMMAND make SYSTEM=linux-egl
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
-                  RESULT_VARIABLE GIT_SUBMOD_RESULT)
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/auto)
+  if(GLEW_BUILD STREQUAL "GLX")
+    execute_process(COMMAND make
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
+                    RESULT_VARIABLE GLEW_BUILD_RESULT)
+  elseif(GLEW_BUILD STREQUAL "EGL")
+    execute_process(COMMAND make SYSTEM=linux-egl
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
+                    RESULT_VARIABLE GLEW_BUILD_RESULT)
+  endif()
+  if(NOT GLEW_BUILD_RESULT EQUAL 0)
+    message(FATAL_ERROR "building GLEW failed with ${GLEW_BUILD_RESULT}!")
+  endif()
 endif()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
