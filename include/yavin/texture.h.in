@@ -586,8 +586,39 @@ template <typename T> using tex3rgb   = tex3<T, RGB>;
 template <typename T> using tex3rgba  = tex3<T, RGBA>;
 template <typename T> using tex3bgr   = tex3<T, BGR>;
 template <typename T> using tex3bgra  = tex3<T, BGRA>;
-
 using texdepth = tex2<unsigned int, Depth>;
+
+using tex2rui8  = tex2r<std::uint8_t>;
+using tex2rui16 = tex2r<std::uint16_t>;
+using tex2rui32 = tex2r<std::uint32_t>;
+using tex2ri8   = tex2r<std::int8_t>;
+using tex2ri16  = tex2r<std::int16_t>;
+using tex2ri32  = tex2r<std::int32_t>;
+using tex2rf    = tex2r<float>;
+
+using tex2rgui8  = tex2rg<std::uint8_t>;
+using tex2rgui16 = tex2rg<std::uint16_t>;
+using tex2rgui32 = tex2rg<std::uint32_t>;
+using tex2rgi8   = tex2rg<std::int8_t>;
+using tex2rgi16  = tex2rg<std::int16_t>;
+using tex2rgi32  = tex2rg<std::int32_t>;
+using tex2rgf    = tex2rg<float>;
+
+using tex2rgbui8  = tex2rgb<std::uint8_t>;
+using tex2rgbui16 = tex2rgb<std::uint16_t>;
+using tex2rgbui32 = tex2rgb<std::uint32_t>;
+using tex2rgbi8   = tex2rgb<std::int8_t>;
+using tex2rgbi16  = tex2rgb<std::int16_t>;
+using tex2rgbi32  = tex2rgb<std::int32_t>;
+using tex2rgbf    = tex2rgb<float>;
+
+using tex2rgbaui8  = tex2rgba<std::uint8_t>;
+using tex2rgbaui16 = tex2rgba<std::uint16_t>;
+using tex2rgbaui32 = tex2rgba<std::uint32_t>;
+using tex2rgbai8   = tex2rgba<std::int8_t>;
+using tex2rgbai16  = tex2rgba<std::int16_t>;
+using tex2rgbai32  = tex2rgba<std::int32_t>;
+using tex2rgbaf    = tex2rgba<float>;
 
 //==============================================================================
 }  // namespace yavin

@@ -32,7 +32,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     message(FATAL_ERROR "building GLEW failed with ${GLEW_BUILD_RESULT}!")
   endif()
 endif()
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # for color with ninja
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -40,7 +39,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_compile_options(-fdiagnostics-color=always)
 endif()
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomiccounterbuffer.cpp
