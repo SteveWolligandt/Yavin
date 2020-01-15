@@ -1,7 +1,7 @@
 #include <yavin/egl_context.h>
 
 //==============================================================================
-namespace yavin::egl {
+namespace yavin {
 //==============================================================================
 context::context(EGLint major, EGLint minor)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
@@ -39,5 +39,5 @@ context::~context() {
 }
 
 //==============================================================================
-}  // namespace yavin::egl
+}  // namespace yavin
 //==============================================================================

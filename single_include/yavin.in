@@ -1,18 +1,23 @@
+#define YAVIN_GLX @USE_GLX@
+#define YAVIN_EGL @USE_EGL@
+#if YAVIN_GLX
+#include "yavin/glx_context.h"
+#include "yavin/glx_window.h"
+#elif YAVIN_EGL
+#include "yavin/egl_context.h"
+#include "yavin/egl_window.h"
+#endif
 #include "yavin/atomiccounterbuffer.h"
 // #include "yavin/behavior.h"
 // #include "yavin/collider.h"
 // #include "yavin/collision.h"
 #include "yavin/computeshader.h"
-#include "yavin/egl_context.h"
-#include "yavin/egl_window.h"
 #include "yavin/errorcheck.h"
 #include "yavin/fragmentshader.h"
 #include "yavin/framebuffer.h"
 #include "yavin/geometryshader.h"
 #include "yavin/glslvar.h"
 #include "yavin/glwrapper.h"
-#include "yavin/glx_context.h"
-#include "yavin/glx_window.h"
 #include "yavin/indexbuffer.h"
 #include "yavin/indexeddata.h"
 #include "yavin/movable.h"
