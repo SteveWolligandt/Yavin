@@ -3,16 +3,16 @@ project(yavin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-set(GLEW_BUILD "GLX" CACHE STRING "GLX or EGL")
-set_property(CACHE GLEW_BUILD PROPERTY STRINGS GLX EGL)
-
-if(GLEW_BUILD STREQUAL "GLX")
-  set(USE_EGL 0)
-  set(USE_GLX 1)
-elseif(GLEW_BUILD STREQUAL "EGL")
-  set(USE_EGL 1)
-  set(USE_GLX 0)
+# for color with ninja
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_compile_options(-fcolor-diagnostics)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_compile_options(-fdiagnostics-color=always)
 endif()
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# git submodules
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
@@ -23,30 +23,58 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   if(NOT GIT_SUBMOD_RESULT EQUAL "0")
     message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
   endif()
-  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-  # build glew
-  execute_process(COMMAND make
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/auto)
-  if(USE_GLX)
-    execute_process(COMMAND make
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
-                    RESULT_VARIABLE GLEW_BUILD_RESULT)
-  elseif(USE_EGL)
-    execute_process(COMMAND make SYSTEM=linux-egl
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
-                    RESULT_VARIABLE GLEW_BUILD_RESULT)
-  endif()
-  if(NOT GLEW_BUILD_RESULT EQUAL 0)
-    message(FATAL_ERROR "building GLEW failed with ${GLEW_BUILD_RESULT}!")
-  endif()
 endif()
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# for color with ninja
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  add_compile_options(-fcolor-diagnostics)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  add_compile_options(-fdiagnostics-color=always)
+# build glew
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+set(CONTEXT_SYSTEM "GLX" CACHE STRING "GLX or EGL")
+set_property(CACHE CONTEXT_SYSTEM PROPERTY STRINGS GLX EGL)
+
+if(CONTEXT_SYSTEM STREQUAL "GLX")
+  set(USE_EGL 0)
+  set(USE_GLX 1)
+elseif(CONTEXT_SYSTEM STREQUAL "EGL")
+  set(USE_EGL 1)
+  set(USE_GLX 0)
 endif()
+execute_process(COMMAND make
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/auto)
+if(USE_GLX)
+  execute_process(COMMAND make
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
+                  RESULT_VARIABLE GLEW_BUILD_RESULT)
+elseif(USE_EGL)
+  execute_process(COMMAND make SYSTEM=linux-egl
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
+                  RESULT_VARIABLE GLEW_BUILD_RESULT)
+endif()
+if(NOT GLEW_BUILD_RESULT EQUAL 0)
+  message(FATAL_ERROR "building GLEW failed with ${GLEW_BUILD_RESULT}!")
+endif()
+set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
+set(GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# find OpenGL packages
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+set(OpenGL_GL_PREFERENCE "GLVND")
+if(USE_GLX)
+  find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
+  find_package(X11 REQUIRED)
+elseif(USE_EGL)
+  find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
+endif()
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# find misc packages
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+find_package(Boost REQUIRED)
+find_package(glm REQUIRED)
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# setup yavin library target
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomiccounterbuffer.cpp
@@ -84,38 +112,12 @@ elseif(USE_EGL)
     ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
   )
 endif()
-
-# create library target
-add_library(yavin SHARED ${YAVIN_SOURCES} ${YAVIN_GLFW_SOURCES})
+add_library(yavin SHARED ${YAVIN_SOURCES})
 target_compile_features(yavin PUBLIC cxx_std_17)
 
-target_compile_definitions(yavin
-  PRIVATE
-    DLL_EXPORT)
-
-target_compile_options(yavin
-  PRIVATE
-    -Wall
-    -Wextra
-    -Wno-missing-braces
-    -pedantic
-)
-
-set(OpenGL_GL_PREFERENCE "GLVND")
-set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
-set(GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
-find_package(glm REQUIRED)
-find_package(Boost REQUIRED)
-if(USE_GLX)
-  find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
-  find_package(X11 REQUIRED)
-elseif(USE_EGL)
-  find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
-endif()
-
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/single_include/yavin.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/single_include/yavin")
-
+target_compile_definitions(yavin PRIVATE DLL_EXPORT)
+target_compile_options(yavin PRIVATE
+                       -Wall -Wextra -Wno-missing-braces -pedantic)
 
 target_include_directories(yavin
   PUBLIC 
@@ -127,33 +129,46 @@ target_include_directories(yavin
     ${GLEW_INCLUDE_DIR}
 )
 
-target_link_libraries(yavin 
- PRIVATE
-  OpenGL::GL
-  OpenGL::GLU
-  ${GLEW_LIBRARY}
-)
-
-if(USE_EGL)
-  target_link_libraries(yavin PRIVATE OpenGL::EGL)
-elseif(USE_GLX)
-  target_link_libraries(yavin PRIVATE OpenGL::GLX ${X11_LIBRARIES})
-  target_include_directories(yavin PUBLIC ${X11_INCLUDE_DIR})
+target_link_libraries(
+  yavin PRIVATE
+  OpenGL::OpenGL OpenGL::GLU ${GLEW_LIBRARY})
+if(USE_GLX)
+  target_link_libraries(
+    yavin PRIVATE
+    OpenGL::GLX ${X11_LIBRARIES})
+  target_include_directories(
+    yavin PRIVATE
+    ${X11_INCLUDE_DIR})
+elseif(USE_EGL)
+  target_link_libraries(
+    yavin PRIVATE
+    OpenGL::EGL)
 endif()
+
+# target export
+export(TARGETS yavin FILE yavinConfig.cmake)
+export(PACKAGE yavin)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# setup png library
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(PNG)
 find_package(PNG++)
 if(PNG_FOUND AND PNG++_FOUND)
-  target_include_directories(yavin PUBLIC
-                             ${PNG_INCLUDE_DIRS} ${PNG++_INCLUDE_DIRS})
-  target_link_libraries(yavin
-                         PRIVATE
-                          ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
-  set(USE_PNG "true")
+  target_include_directories(
+    yavin PRIVATE
+    ${PNG_INCLUDE_DIRS} ${PNG++_INCLUDE_DIRS})
+  target_link_libraries(
+    yavin PRIVATE
+    ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
+  set(USE_PNG 1)
 else()
-  set(USE_PNG "false")
+  set(USE_PNG 0)
 endif()
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# OpenGL call output
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 option(VERBOSE "verbose OpenGL calls" OFF)
 if (VERBOSE)
   set(VERBOSE_GL "true")
@@ -161,6 +176,11 @@ else()
   set(VERBOSE_GL "false")
 endif()
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# configure files
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/single_include/yavin.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/single_include/yavin")
 configure_file(src/glverbose.cpp.in
                src/glverbose.cpp)
 configure_file(include/yavin/shaderincludepaths.h.in
@@ -170,11 +190,14 @@ configure_file(include/yavin/texture.h.in
 configure_file(include/yavin/settings.h.in
                include/yavin/settings.h)
 
-export(TARGETS yavin FILE yavinConfig.cmake)
-export(PACKAGE yavin)
-
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# subdirectories
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 add_subdirectory(test)
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Doxygen
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # check if Doxygen is installed
 find_package(Doxygen)
 if (DOXYGEN_FOUND)

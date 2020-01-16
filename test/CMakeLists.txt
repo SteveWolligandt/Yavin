@@ -5,13 +5,13 @@ include(CTest)
 include(Catch)
 
 #-------------------------------------------------------------------------------
-add_executable (egl_window egl_window.cpp)
-target_compile_features(egl_window PRIVATE cxx_std_17)
-target_link_libraries(egl_window yavin)
+#add_executable (egl_window egl_window.cpp)
+#target_compile_features(egl_window PRIVATE cxx_std_17)
+#target_link_libraries(egl_window yavin)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-add_executable (glx_window glx_window.cpp)
-target_compile_features(glx_window PRIVATE cxx_std_17)
-target_link_libraries(glx_window yavin)
+#add_executable (glx_window glx_window.cpp)
+#target_compile_features(glx_window PRIVATE cxx_std_17)
+#target_link_libraries(glx_window yavin)
 #-------------------------------------------------------------------------------
 add_executable (unittests
   main.cpp
@@ -26,14 +26,21 @@ add_executable (unittests
   ${ARGN})
 
 target_compile_features(unittests PRIVATE cxx_std_17)
-target_link_libraries(unittests
-  OpenGL::OpenGL
-  OpenGL::GLU
-  OpenGL::EGL
-  OpenGL::GLX
-  ${GLEW_LIBRARY}
-  ${X11_LIBRARIES}
-  Catch2::Catch2)
+
+if(USE_EGL)
+  target_link_libraries(unittests
+                         PRIVATE
+                          OpenGL::OpenGL OpenGL::GLU ${GLEW_LIBRARY}
+                          OpenGL::EGL
+                          Catch2::Catch2)
+elseif(USE_GLX)
+  target_link_libraries(unittests
+                         PRIVATE
+                           OpenGL::OpenGL OpenGL::GLU ${GLEW_LIBRARY}
+                           OpenGL::GLX ${X11_LIBRARIES}
+                           Catch2::Catch2)
+  target_include_directories(yavin PUBLIC ${X11_INCLUDE_DIR})
+endif()
 target_include_directories(unittests
   PRIVATE
     ${CMAKE_SOURCE_DIR}/include
@@ -54,7 +61,7 @@ target_compile_options(unittests
 if(PNG_FOUND AND PNG++_FOUND)
   target_include_directories(unittests PUBLIC
                              ${PNG_INCLUDE_DIRS} ${PNG++_INCLUDE_DIRS})
-  target_link_libraries(unittests
+  target_link_libraries(unittests PRIVATE
                         ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
 endif()
 catch_discover_tests(unittests)
