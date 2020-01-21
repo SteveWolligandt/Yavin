@@ -6,16 +6,11 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 const std::regex shaderstageparser::regex_var(
-    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s(float|double|int|uint|bool|sampler\dD|mat\d|vec\d|ivec\d|uvec\d|bvec\d|dvec\d)\s(.*)[;])");
-
+    R"((layout\s*\(location\s*=\s*\d+\s*\))?\s*(in|out|uniform)\s*(float|double|int|uint|bool|sampler\dD|mat\d|vec\d|ivec\d|uvec\d|bvec\d|dvec\d)\s*(.*)[;])");
 //------------------------------------------------------------------------------
-
 const std::regex shaderstageparser::regex_include(R"(#include\s+\"(.*)\")");
-
 //==============================================================================
-
 std::string shaderstageparser::parse(const std::string&    filename_or_source,
                                      std::vector<GLSLVar>& vars,
                                      IncludeTree&          include_tree,
@@ -25,9 +20,7 @@ std::string shaderstageparser::parse(const std::string&    filename_or_source,
   else /*if (string_type == SOURCE)*/
     return parse_source(filename_or_source, vars, include_tree);
 }
-
 //------------------------------------------------------------------------------
-
 std::string shaderstageparser::parse_file(const std::string&    filename,
                                           std::vector<GLSLVar>& vars,
                                           IncludeTree&          include_tree) {
@@ -43,9 +36,7 @@ std::string shaderstageparser::parse_file(const std::string&    filename,
   file.close();
   return content;
 }
-
 //------------------------------------------------------------------------------
-
 std::string shaderstageparser::parse_source(const std::string&    source,
                                             std::vector<GLSLVar>& vars,
                                             IncludeTree& include_tree) {
@@ -53,15 +44,11 @@ std::string shaderstageparser::parse_source(const std::string&    source,
   std::stringstream stream(source);
   return parse_stream(stream, vars, include_tree);
 }
-
 //------------------------------------------------------------------------------
-
 std::optional<GLSLVar> shaderstageparser::parse_varname(
     const std::string& line) {
   std::smatch match;
-
   std::regex_match(line, match, regex_var);
-
   if (!match.str(4).empty()) {
     return GLSLVar{[](const std::string& mod_name) {
                      if (mod_name == "uniform")
@@ -74,12 +61,9 @@ std::optional<GLSLVar> shaderstageparser::parse_varname(
                        return GLSLVar::UNKNOWN;
                    }(match.str(2)),
                    match.str(3), match.str(4)};
-  } else
-    return {};
+  } else { return {}; }
 }
-
 //------------------------------------------------------------------------------
-
 std::optional<std::string> shaderstageparser::parse_include(
     const std::string& line) {
   std::smatch match;
@@ -91,7 +75,6 @@ std::optional<std::string> shaderstageparser::parse_include(
   else
     return {};
 }
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

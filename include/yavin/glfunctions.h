@@ -444,14 +444,12 @@ struct gl {
                                        GLsizei width, GLsizei height,
                                        GLenum format, GLenum type,
                                        const GLvoid* pixels);
-
   //------------------------------------------------------------------------------
   DLL_API static void texture_sub_image_2d(GLuint texture, GLint level,
                                            GLint xoffset, GLint yoffset,
                                            GLsizei width, GLsizei height,
                                            GLenum format, GLenum type,
                                            const void* pixels);
-
   //------------------------------------------------------------------------------
   DLL_API static void tex_image_3d(GLenum target, GLint level,
                                    GLint internal_format, GLsizei width,

@@ -579,7 +579,10 @@ void gl::program_uniform_4i(GLuint program, GLint location, GLint v0, GLint v1,
 
 //------------------------------------------------------------------------------
 void gl::program_uniform_1ui(GLuint program, GLint location, GLuint v0) {
-  if (verbose) *out << "glProgramUniform1ui\n";
+  if (verbose) {
+    *out << "glProgramUniform1ui(" << program << ", " << location << ", " << v0
+         << ")\n";
+  }
   glProgramUniform1ui(program, location, v0);
   gl_error_check("glProgramUniform1ui");
 }
@@ -900,7 +903,6 @@ void gl::tex_image_2d(GLenum target, GLint level, GLint internal_format,
                type, data);
   gl_error_check("glTexImage2D");
 }
-
 //------------------------------------------------------------------------------
 void gl::tex_sub_image_2d(GLenum target, GLint level, GLint xoffset,
                           GLint yoffset, GLsizei width, GLsizei height,
@@ -914,14 +916,19 @@ void gl::tex_sub_image_2d(GLenum target, GLint level, GLint xoffset,
                   pixels);
   gl_error_check("glTexSubImage2D");
 }
-
 //------------------------------------------------------------------------------
 void gl::texture_sub_image_2d(GLuint texture, GLint level, GLint xoffset,
                               GLint yoffset, GLsizei width, GLsizei height,
-                              GLenum format, GLenum type, const void* pixels) {
-  if (verbose) *out << "glTexSubImage2D\n";
-  glTexSubImage2D(texture, level, xoffset, yoffset, width, height, format, type,
-                  pixels);
+                              GLenum format, GLenum type,
+                              const GLvoid* pixels) {
+  if (verbose) {
+    *out << "glTextureSubImage2D(" << texture << ", " << level << ", "
+         << xoffset << ", " << yoffset << ", " << width << ", " << height
+         << ", " << to_string(format) << ", " << to_string(type) << ", "
+         << pixels << ")\n";
+    glTextureSubImage2D(texture, level, xoffset, yoffset, width, height, format,
+                        type, pixels);
+  }
   gl_error_check("glTextureSubImage2D");
 }
 
