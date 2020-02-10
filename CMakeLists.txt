@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(yavin)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/catch2/contrib/")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/catch2/contrib/")
 add_subdirectory(external/catch2)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # for color with ninja
@@ -28,41 +28,48 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # build glew
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-set(CONTEXT_SYSTEM "GLX" CACHE STRING "GLX or EGL")
-set_property(CACHE CONTEXT_SYSTEM PROPERTY STRINGS GLX EGL)
+set(YAVIN_CONTEXT_SYSTEM "GLX" CACHE STRING "GLX or EGL")
+set_property(CACHE YAVIN_CONTEXT_SYSTEM PROPERTY STRINGS GLX EGL)
+set(YAVIN_GLEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
+set(YAVIN_GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
+set(YAVIN_GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
 
-if(CONTEXT_SYSTEM STREQUAL "GLX")
-  set(USE_EGL 0)
-  set(USE_GLX 1)
-elseif(CONTEXT_SYSTEM STREQUAL "EGL")
-  set(USE_EGL 1)
-  set(USE_GLX 0)
+if(YAVIN_CONTEXT_SYSTEM STREQUAL "GLX")
+  set(YAVIN_USE_EGL 0)
+  set(YAVIN_USE_GLX 1)
+elseif(YAVIN_CONTEXT_SYSTEM STREQUAL "EGL")
+  set(YAVIN_USE_EGL 1)
+  set(YAVIN_USE_GLX 0)
 endif()
-execute_process(COMMAND make
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/auto)
-if(USE_GLX)
-  execute_process(COMMAND make
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
-                  RESULT_VARIABLE GLEW_BUILD_RESULT)
-elseif(USE_EGL)
-  execute_process(COMMAND make SYSTEM=linux-egl
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew
-                  RESULT_VARIABLE GLEW_BUILD_RESULT)
+add_custom_target(glew.download
+                  COMMAND make
+                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
+add_custom_target(glew.download.clean
+                  COMMAND make clean
+                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
+add_custom_target(glew.clean
+                  COMMAND make clean
+                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+if(YAVIN_USE_GLX)
+  add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
+                    COMMAND make
+                    DEPENDS glew.download
+                    WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+elseif(YAVIN_USE_EGL)
+  add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
+                    COMMAND make SYSTEM=linux-egl
+                    DEPENDS glew.download
+                    WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
 endif()
-if(NOT GLEW_BUILD_RESULT EQUAL 0)
-  message(FATAL_ERROR "building GLEW failed with ${GLEW_BUILD_RESULT}!")
-endif()
-set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
-set(GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # find OpenGL packages
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(OpenGL_GL_PREFERENCE "GLVND")
-if(USE_GLX)
+if(YAVIN_USE_GLX)
   find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
   find_package(X11 REQUIRED)
-elseif(USE_EGL)
+elseif(YAVIN_USE_EGL)
   find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
 endif()
 
@@ -100,18 +107,18 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
-if(USE_GLX)
+if(YAVIN_USE_GLX)
   list(APPEND YAVIN_SOURCES 
     ${CMAKE_SOURCE_DIR}/src/glx_context.cpp
     ${CMAKE_SOURCE_DIR}/src/glx_window.cpp
   )
-elseif(USE_EGL)
+elseif(YAVIN_USE_EGL)
   list(APPEND YAVIN_SOURCES 
     ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
     ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
   )
 endif()
-add_library(yavin SHARED ${YAVIN_SOURCES})
+add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES})
 target_compile_features(yavin PUBLIC cxx_std_17)
 
 target_compile_definitions(yavin PRIVATE DLL_EXPORT)
@@ -125,20 +132,20 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${OPENGL_INCLUDE_DIR} 
     ${GLM_INCLUDE_DIRS} 
-    ${GLEW_INCLUDE_DIR}
+    ${YAVIN_GLEW_INCLUDE_DIR}
 )
 
 target_link_libraries(
   yavin PRIVATE
-  OpenGL::OpenGL OpenGL::GLU ${GLEW_LIBRARY})
-if(USE_GLX)
+  OpenGL::OpenGL OpenGL::GLU ${YAVIN_GLEW_LIBRARY})
+if(YAVIN_USE_GLX)
   target_link_libraries(
     yavin PRIVATE
     OpenGL::GLX ${X11_LIBRARIES})
   target_include_directories(
     yavin PRIVATE
     ${X11_INCLUDE_DIR})
-elseif(USE_EGL)
+elseif(YAVIN_USE_EGL)
   target_link_libraries(
     yavin PRIVATE
     OpenGL::EGL)
@@ -160,9 +167,9 @@ if(PNG_FOUND AND PNG++_FOUND)
   target_link_libraries(
     yavin PRIVATE
     ${PNG_LIBRARIES} ${PNG++_LIBRARIES})
-  set(USE_PNG 1)
+  set(YAVIN_HAS_PNG_SUPPORT true)
 else()
-  set(USE_PNG 0)
+  set(YAVIN_HAS_PNG_SUPPORT false)
 endif()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -184,10 +191,8 @@ configure_file(src/glverbose.cpp.in
                src/glverbose.cpp)
 configure_file(include/yavin/shaderincludepaths.h.in
                include/yavin/shaderincludepaths.h)
-configure_file(include/yavin/texture.h.in
-               include/yavin/texture.h)
-configure_file(include/yavin/settings.h.in
-               include/yavin/settings.h)
+configure_file(include/yavin/texpng.h.in
+               include/yavin/texpng.h)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # subdirectories

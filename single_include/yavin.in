@@ -1,5 +1,5 @@
-#define YAVIN_GLX @USE_GLX@
-#define YAVIN_EGL @USE_EGL@
+#define YAVIN_GLX @YAVIN_USE_GLX@
+#define YAVIN_EGL @YAVIN_USE_EGL@
 #if YAVIN_GLX
 #include "yavin/glx_context.h"
 #include "yavin/glx_window.h"

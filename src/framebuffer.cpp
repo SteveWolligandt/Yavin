@@ -1,18 +1,14 @@
 #include <yavin/framebuffer.h>
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 framebuffer::framebuffer() {
   gl::create_framebuffers(1, &id());
 }
-
 //------------------------------------------------------------------------------
 framebuffer::~framebuffer() {
   gl::delete_framebuffers(1, &id());
 }
-
 //------------------------------------------------------------------------------
 template <typename T, typename Components>
 GLenum framebuffer::attach(const tex2<T, Components>& tex, unsigned int i) {
@@ -21,7 +17,6 @@ GLenum framebuffer::attach(const tex2<T, Components>& tex, unsigned int i) {
   gl_framebuffer_not_complete_check(id());
   return GL_COLOR_ATTACHMENT0 + i;
 }
-
 //------------------------------------------------------------------------------
 template <typename T>
 GLenum framebuffer::attach(const tex2<T, Depth>& tex) {
@@ -29,23 +24,19 @@ GLenum framebuffer::attach(const tex2<T, Depth>& tex) {
   gl_framebuffer_not_complete_check(id());
   return GL_DEPTH_ATTACHMENT;
 }
-
 //------------------------------------------------------------------------------
 void framebuffer::bind() {
   gl::bind_framebuffer(GL_FRAMEBUFFER, id());
 }
-
 //------------------------------------------------------------------------------
 void framebuffer::unbind() {
   gl::bind_framebuffer(GL_FRAMEBUFFER, 0);
 }
-
 //------------------------------------------------------------------------------
 void framebuffer::clear() {
   // glClearNamedFramebufferfi(id(), GLenum buffer, GLint drawbuffer,
   //                           GLfloat depth, GLint stencil);
 }
-
 //==============================================================================
 template GLenum framebuffer::attach<float, R>(const tex2r<float>&,
                                               unsigned int);

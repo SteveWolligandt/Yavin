@@ -1,14 +1,19 @@
 #ifndef YAVIN_TEX_PNG_H
 #define YAVIN_TEX_PNG_H
+#define YAVIN_HAS_PNG_SUPPORT @YAVIN_HAS_PNG_SUPPORT@
 
 #include <png++/png.hpp>
 
-#include "texcomponents.h"
+#include <yavin/texcomponents.h>
 
 //==============================================================================
 namespace yavin {
 //==============================================================================
+constexpr bool has_png_support() {
+  return @YAVIN_HAS_PNG_SUPPORT@;
+}
 
+//#if YAVIN_AVAILABLE
 template <typename type, typename tex_t>
 struct tex_png;
 
@@ -264,6 +269,7 @@ struct tex_png<type, BGRA> {
     }
   };
 };
+//#endif
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
