@@ -33,9 +33,13 @@ void shader::delete_shader() {
   m_id = 0;
 }
 //------------------------------------------------------------------------------
-void shader::bind() { gl::use_program(m_id); }
+void shader::bind() const {
+  gl::use_program(m_id);
+}
 //------------------------------------------------------------------------------
-void shader::unbind() { gl::use_program(0); }
+void shader::unbind() const {
+  gl::use_program(0);
+}
 //------------------------------------------------------------------------------
 void shader::add_uniform(const std::string& uniformVarName) {
   m_uniform_locations.insert(std::pair<std::string, GLint>(

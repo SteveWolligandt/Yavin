@@ -38,8 +38,8 @@ class shader {
   DLL_API void create();
   DLL_API void delete_shader();
 
-  DLL_API virtual void bind();
-  DLL_API virtual void unbind();
+  DLL_API virtual void bind() const;
+  DLL_API virtual void unbind() const;
   DLL_API void         add_uniform(const std::string& uniformVarName);
   DLL_API void         add_attribute(const std::string& attributeVarName);
   DLL_API GLint uniform(const std::string& uniformVarName);

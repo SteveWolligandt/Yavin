@@ -1,9 +1,6 @@
-find_package(Catch2 REQUIRED)
-
 enable_testing()
 include(CTest)
 include(Catch)
-
 #-------------------------------------------------------------------------------
 #add_executable (egl_window egl_window.cpp)
 #target_compile_features(egl_window PRIVATE cxx_std_17)
@@ -29,16 +26,16 @@ target_compile_features(unittests PRIVATE cxx_std_17)
 
 if(USE_EGL)
   target_link_libraries(unittests
-                         PRIVATE
+                         PUBLIC
                           OpenGL::OpenGL OpenGL::GLU ${GLEW_LIBRARY}
                           OpenGL::EGL
-                          Catch2::Catch2)
+                          Catch2)
 elseif(USE_GLX)
   target_link_libraries(unittests
-                         PRIVATE
+                         PUBLIC
                            OpenGL::OpenGL OpenGL::GLU ${GLEW_LIBRARY}
                            OpenGL::GLX ${X11_LIBRARIES}
-                           Catch2::Catch2)
+                           Catch2)
   target_include_directories(yavin PUBLIC ${X11_INCLUDE_DIR})
 endif()
 target_include_directories(unittests

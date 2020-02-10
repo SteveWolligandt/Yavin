@@ -59,7 +59,7 @@ void atomiccounterbuffer::set_all_to(unsigned int val) {
 }
 
 //------------------------------------------------------------------------------
-void atomiccounterbuffer::bind(size_t i) {
+void atomiccounterbuffer::bind(size_t i) const {
   gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
 }
 
