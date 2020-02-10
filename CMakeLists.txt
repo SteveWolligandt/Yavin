@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(yavin)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/catch2/contrib/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/catch2/contrib/")
 add_subdirectory(external/catch2)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # for color with ninja
@@ -32,7 +32,7 @@ set(YAVIN_CONTEXT_SYSTEM "GLX" CACHE STRING "GLX or EGL")
 set_property(CACHE YAVIN_CONTEXT_SYSTEM PROPERTY STRINGS GLX EGL)
 set(YAVIN_GLEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
 set(YAVIN_GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
-set(YAVIN_GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.so)
+set(YAVIN_GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.a)
 
 if(YAVIN_CONTEXT_SYSTEM STREQUAL "GLX")
   set(YAVIN_USE_EGL 0)
@@ -44,11 +44,14 @@ endif()
 add_custom_target(glew.download
                   COMMAND make
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
+add_custom_target(glew.build.clean
+                  COMMAND make clean
+                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
 add_custom_target(glew.download.clean
                   COMMAND make clean
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
 add_custom_target(glew.clean
-                  COMMAND make clean
+                  DEPENDS glew.download.clean glew.build.clean
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
 if(YAVIN_USE_GLX)
   add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
@@ -61,6 +64,9 @@ elseif(YAVIN_USE_EGL)
                     DEPENDS glew.download
                     WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
 endif()
+add_custom_target(glew.build
+                  DEPENDS ${YAVIN_GLEW_LIBRARY}
+                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # find OpenGL packages
