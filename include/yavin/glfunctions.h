@@ -1,5 +1,5 @@
-#ifndef __YAVIN_GL_FUNCTIONS_WRAPPER_H__
-#define __YAVIN_GL_FUNCTIONS_WRAPPER_H__
+#ifndef YAVIN_GL_FUNCTIONS_WRAPPER_H
+#define YAVIN_GL_FUNCTIONS_WRAPPER_H
 
 #include <vector>
 #include "camera.h"
@@ -23,6 +23,8 @@ struct gl {
   //==============================================================================
   // MISC
   //==============================================================================
+  DLL_API static void point_size(GLfloat size);
+  //------------------------------------------------------------------------------
   DLL_API static void get_boolean_v(GLenum pname, GLboolean* params);
 
   //------------------------------------------------------------------------------

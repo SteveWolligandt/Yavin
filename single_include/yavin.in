@@ -1,12 +1,5 @@
-#define YAVIN_GLX @YAVIN_USE_GLX@
-#define YAVIN_EGL @YAVIN_USE_EGL@
-#if YAVIN_GLX
-#include "yavin/glx_context.h"
-#include "yavin/glx_window.h"
-#elif YAVIN_EGL
-#include "yavin/egl_context.h"
-#include "yavin/egl_window.h"
-#endif
+#include <yavin/context.h>
+#include <yavin/window.h>
 #include "yavin/atomiccounterbuffer.h"
 // #include "yavin/behavior.h"
 // #include "yavin/collider.h"

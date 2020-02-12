@@ -102,33 +102,27 @@ class texture : public id_holder<GLuint> {
     set_wrap_mode(default_wrap_mode);
     set_interpolation_mode(default_interpolation);
   }
-
   //----------------------------------------------------------------------------
   //! TODO: copy wrap and interpolation modes
   texture(const texture& other) : texture{} { copy_data(other); }
-
   //----------------------------------------------------------------------------
   texture(texture&& other)
       : id_holder{std::move(other)}, m_size{std::move(other.m_size)} {}
-
   //----------------------------------------------------------------------------
   auto& operator=(const texture& other) {
     copy_data(other);
     return *this;
   }
-
   //----------------------------------------------------------------------------
   auto& operator=(texture&& other) {
     id_holder::operator=(std::move(other));
     m_size             = std::move(other.m_size);
     return *this;
   }
-
   //----------------------------------------------------------------------------
   ~texture() {
     if (id()) { gl::delete_textures(1, &id()); }
   }
-
   //----------------------------------------------------------------------------
   template <typename... Sizes,
             typename = std::enable_if_t<sizeof...(Sizes) == D>,
@@ -140,7 +134,6 @@ class texture : public id_holder<GLuint> {
     set_interpolation_mode(default_interpolation);
     resize(sizes...);
   }
-
   //----------------------------------------------------------------------------
   template <typename S, typename... Sizes,
             typename = std::enable_if_t<sizeof...(Sizes) == D>,
@@ -294,18 +287,19 @@ class texture : public id_holder<GLuint> {
   //----------------------------------------------------------------------------
   void copy_data(const texture& other) {
     m_size = other.m_size;
-    if constexpr (D == 1)
+    if constexpr (D == 1) {
       gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
                               GL_TEXTURE_1D, 0, 0, 0, 0, m_size[0], 1, 1);
-    else if (D == 2)
+    } else if (D == 2) {
       gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
                               GL_TEXTURE_1D, 0, 0, 0, 0, m_size[0], m_size[1],
                               1);
 
-    else
+    } else {
       gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
                               GL_TEXTURE_1D, 0, 0, 0, 0, m_size[0], m_size[1],
                               m_size[2]);
+    }
   }
 
   //------------------------------------------------------------------------------
@@ -315,15 +309,16 @@ class texture : public id_holder<GLuint> {
     static_assert((std::is_integral_v<Sizes> && ...));
     bind();
     m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
-    if constexpr (D == 1)
+    if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
                        gl_type, nullptr);
-    else if constexpr (D == 2)
+    } else if constexpr (D == 2) {
       gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
                        gl_format, gl_type, nullptr);
-    else if constexpr (D == 3)
+    } else if constexpr (D == 3) {
       gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
                        depth(), 0, gl_format, gl_type, nullptr);
+    }
   }
 
  private:
@@ -336,15 +331,16 @@ class texture : public id_holder<GLuint> {
   void upload_data(const std::vector<type>& data) {
     assert(data.size() == num_texels() * num_components);
     bind();
-    if constexpr (D == 1)
+    if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
                        gl_type, data.data());
-    else if constexpr (D == 2)
+    } else if constexpr (D == 2) {
       gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
                        gl_format, gl_type, data.data());
-    else if constexpr (D == 3)
+    } else if constexpr (D == 3) {
       gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
                        depth(), 0, gl_format, gl_type, data.data());
+    }
   }
 
  public:
@@ -365,7 +361,18 @@ class texture : public id_holder<GLuint> {
                           data.data());
     return data;
   }
-
+  //------------------------------------------------------------------------------
+  void download_data(std::vector<type>& data) const {
+    assert(data.size() == num_components * num_texels());
+    gl::get_texture_image(id(), 0, gl_format, gl_type,
+                          num_texels() * num_components * sizeof(type),
+                          data.data());
+  }
+  //------------------------------------------------------------------------------
+  void download_data(type* data) const {
+    gl::get_texture_image(id(), 0, gl_format, gl_type,
+                          num_texels() * num_components * sizeof(type), data);
+  }
   //----------------------------------------------------------------------------
   auto width() const { return m_size[0]; }
 

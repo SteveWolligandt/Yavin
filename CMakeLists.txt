@@ -191,6 +191,10 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # configure files
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/yavin/context.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/yavin/context.h")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/yavin/window.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/yavin/window.h")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/single_include/yavin.in"
                "${CMAKE_CURRENT_BINARY_DIR}/single_include/yavin")
 configure_file(src/glverbose.cpp.in

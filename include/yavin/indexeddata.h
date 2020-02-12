@@ -1,15 +1,13 @@
-#ifndef __YAVIN_INDEXED_DATA_H__
-#define __YAVIN_INDEXED_DATA_H__
-
+#ifndef YAVIN_INDEXED_DATA_H
+#define YAVIN_INDEXED_DATA_H
+//==============================================================================
 #include <memory>
 #include "indexbuffer.h"
 #include "vertexarray.h"
 #include "vertexbuffer.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 template <typename... Ts>
 class indexeddata {
  public:
@@ -19,13 +17,11 @@ class indexeddata {
   using ibo_data_t   = unsigned int;
   using vbo_data_vec = std::vector<vbo_data_t>;
   using ibo_data_vec = std::vector<ibo_data_t>;
-
   //============================================================================
  private:
   vertexarray m_vao;
   vbo_ptr_t   m_vbo;
   indexbuffer m_ibo;
-
   //============================================================================
  public:
   indexeddata() : m_vbo(std::make_shared<vbo_t>()), m_ibo() { setup_vao(); }

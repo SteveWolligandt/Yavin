@@ -1,5 +1,5 @@
-#ifndef __YAVIN_GL_WRAPPER_H__
-#define __YAVIN_GL_WRAPPER_H__
+#ifndef YAVIN_GL_WRAPPER_H
+#define YAVIN_GL_WRAPPER_H
 
 #include <glm/glm.hpp>
 #include "camera.h"

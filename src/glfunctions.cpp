@@ -6,13 +6,18 @@ namespace yavin {
 //==============================================================================
 // MISC
 //==============================================================================
+void gl::point_size(GLfloat size) {
+  if (verbose) { *out << "glPointSize(" << size << ")\n"; }
+  glPointSize(size);
+  gl_error_check("glPointSize");
+}
+//------------------------------------------------------------------------------
 void gl::get_boolean_v(GLenum pname, GLboolean* params) {
   if (verbose)
     *out << "glGetBooleanv(" << to_string(pname) << ", " << params << ")\n";
   glGetBooleanv(pname, params);
   gl_error_check("glGetBooleanv");
 }
-
 //------------------------------------------------------------------------------
 void gl::get_double_v(GLenum pname, GLdouble* params) {
   if (verbose)
