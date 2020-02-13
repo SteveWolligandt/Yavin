@@ -12,6 +12,12 @@ void gl::point_size(GLfloat size) {
   gl_error_check("glPointSize");
 }
 //------------------------------------------------------------------------------
+void gl::line_width(GLfloat width) {
+  if (verbose) { *out << "glLineWidth(" << width << ")\n"; }
+  glLineWidth(width);
+  gl_error_check("glLineWidth");
+}
+//------------------------------------------------------------------------------
 void gl::get_boolean_v(GLenum pname, GLboolean* params) {
   if (verbose)
     *out << "glGetBooleanv(" << to_string(pname) << ", " << params << ")\n";
@@ -75,14 +81,6 @@ const GLubyte* gl::get_string(GLenum name) {
 //------------------------------------------------------------------------------
 GLenum gl::get_error() {
   return glGetError();
-}
-
-//------------------------------------------------------------------------------
-void gl::line_width(GLfloat width) {
-  if (verbose)
-    *out << "glLineWidth(" << width << ")\n";
-  glLineWidth(width);
-  gl_error_check("glLineWidth");
 }
 
 //==============================================================================

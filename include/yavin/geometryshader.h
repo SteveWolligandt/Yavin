@@ -12,7 +12,9 @@ namespace yavin {
 
 class geometryshader : public shaderstage {
  public:
-  DLL_API geometryshader(const std::string& filename);
+  using StringType = shaderstage::StringType;
+  DLL_API geometryshader(const std::string& filename,
+                         StringType         string_type = StringType::FILE);
   DLL_API geometryshader(geometryshader&& other);
 };
 
