@@ -70,7 +70,6 @@ class indexeddata {
     m_vbo->bind();
     vbo_t::activate_attributes();
     m_ibo.bind();
-
     m_vao.unbind();
   }
   //----------------------------------------------------------------------------
