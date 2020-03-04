@@ -1,17 +1,16 @@
-#ifndef __YAVIN_BUFFER__
-#define __YAVIN_BUFFER__
-
+#ifndef YAVIN_BUFFER
+#define YAVIN_BUFFER
+//==============================================================================
 #include <mutex>
 #include <vector>
 #include "glfunctions.h"
 #include "mutexhandler.h"
-
+#include "idholder.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
 template <GLsizei array_type, typename T>
 class buffer;
-
 //==============================================================================
 template <GLsizei ArrayType, typename T, GLbitfield Access>
 class buffer_map {
@@ -25,7 +24,7 @@ class buffer_map {
   buffer_map(const buffer_t* buffer, size_t offset, size_t length)
       : m_buffer(buffer), m_offset(offset), m_length(length) {
     m_gpu_mapping = (T*)gl::map_named_buffer_range(
-        m_buffer->gl_handle(), data_size * offset, data_size * m_length,
+        m_buffer->id(), data_size * offset, data_size * m_length,
         access);
     detail::mutex::gl_call.lock();
   }
@@ -36,7 +35,7 @@ class buffer_map {
   void unmap() {
     detail::mutex::gl_call.unlock();
     if (!m_unmapped) {
-      gl::unmap_named_buffer(m_buffer->gl_handle());
+      gl::unmap_named_buffer(m_buffer->id());
       m_unmapped = true;
     }
   }
@@ -132,7 +131,7 @@ class writeable_buffer_element : public readable_buffer_element<array_type, T> {
 
   /// for assigning single gpu data element.
   auto& operator=(T&& data) {
-    gl::named_buffer_sub_data(this->m_buffer->m_gl_handle,
+    gl::named_buffer_sub_data(this->m_buffer->id(),
                               this->m_idx * buffer_t::data_size,
                               buffer_t::data_size, &data);
     return *this;
@@ -154,69 +153,52 @@ template <GLsizei array_type, typename T>
 class buffer_iterator {
  public:
   using buffer_t = buffer<array_type, T>;
-
   //----------------------------------------------------------------------------
-
   // iterator typedefs
   using value_type        = T;
   using reference         = T&;
   using pointer           = T*;
   using difference_type   = std::ptrdiff_t;
   using iterator_category = std::bidirectional_iterator_tag;
-
   //----------------------------------------------------------------------------
-
   buffer_iterator(buffer_t* buffer, size_t idx) : m_buffer(buffer), m_idx(idx) {}
-
   //----------------------------------------------------------------------------
-
   buffer_iterator(const buffer_iterator& other)
       : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
-
   //----------------------------------------------------------------------------
-
   buffer_iterator(buffer_iterator&& other)
       : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
-
   //----------------------------------------------------------------------------
-
   auto& operator=(const buffer_iterator& other) {
     m_buffer = other.m_buffer;
     m_idx    = other.m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
-
   auto& operator=(buffer_iterator&& other) {
     m_buffer = other.m_buffer;
     m_idx    = other.m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
   /// get the buffer element the iterator refers to
   T operator*() const { return readable_buffer_element(m_buffer, m_idx); }
-
   //----------------------------------------------------------------------------
   /// are two iterators equal?
   bool operator==(const buffer_iterator& other) const {
     return (m_idx == other.m_idx);
   }
-
   //----------------------------------------------------------------------------
   /// are two iterators different?
   bool operator!=(const buffer_iterator& other) const {
     return !operator==(other);
   }
-
   //----------------------------------------------------------------------------
   /// pre-increment iterator
   auto& operator++() {
     ++m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
   /// post-increment iterator
   auto operator++(int) {
@@ -224,14 +206,12 @@ class buffer_iterator {
     ++(*this);
     return vi;
   }
-
   //----------------------------------------------------------------------------
   /// pre-decrement iterator
   auto& operator--() {
     --m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
   /// post-decrement iterator
   auto operator--(int) {
@@ -258,61 +238,46 @@ class cbuffer_iterator {
   using pointer           = T*;
   using difference_type   = std::ptrdiff_t;
   using iterator_category = std::bidirectional_iterator_tag;
-
   //----------------------------------------------------------------------------
-
   cbuffer_iterator(const buffer_t* buffer, size_t idx)
       : m_buffer(buffer), m_idx(idx) {}
-
   //----------------------------------------------------------------------------
-
   cbuffer_iterator(const cbuffer_iterator& other)
       : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
-
   //----------------------------------------------------------------------------
-
   cbuffer_iterator(cbuffer_iterator&& other)
       : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
-
   //----------------------------------------------------------------------------
-
   auto& operator=(const cbuffer_iterator& other) {
     m_buffer = other.m_buffer;
     m_idx    = other.m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
-
   auto& operator=(cbuffer_iterator&& other) {
     m_buffer = other.m_buffer;
     m_idx    = other.m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
   /// get the buffer element the iterator refers to
   T operator*() const { return readable_buffer_element(m_buffer, m_idx); }
-
   //----------------------------------------------------------------------------
   /// are two iterators equal?
   bool operator==(const cbuffer_iterator& other) const {
     return (m_idx == other.m_idx);
   }
-
   //----------------------------------------------------------------------------
   /// are two iterators different?
   bool operator!=(const cbuffer_iterator& other) const {
     return !operator==(other);
   }
-
   //----------------------------------------------------------------------------
   /// pre-increment iterator
   auto& operator++() {
     ++m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
   /// post-increment iterator
   auto operator++(int) {
@@ -320,14 +285,12 @@ class cbuffer_iterator {
     ++(*this);
     return vi;
   }
-
   //----------------------------------------------------------------------------
   /// pre-decrement iterator
   auto& operator--() {
     --m_idx;
     return *this;
   }
-
   //----------------------------------------------------------------------------
   /// post-decrement iterator
   auto operator--(int) {
@@ -345,11 +308,13 @@ class cbuffer_iterator {
 //==============================================================================
 /// buffer base class for each of the OpenGL buffer types
 template <GLsizei _array_type, typename T>
-class buffer {
+class buffer : public id_holder<GLuint> {
+ public:
+  using parent_t = id_holder<GLuint>;
+  using parent_t::id;
   friend class readable_buffer_element<_array_type, T>;
   friend class writeable_buffer_element<_array_type, T>;
 
- public:
   enum usage_t {
     STREAM_DRAW  = GL_STREAM_DRAW,
     STREAM_READ  = GL_STREAM_READ,
@@ -378,6 +343,12 @@ class buffer {
   using wmap_t  = wbuffer_map<array_type, T>;
   using rwmap_t = rwbuffer_map<array_type, T>;
 
+ protected:
+  size_t  m_size     = 0;
+  size_t  m_capacity = 0;
+  usage_t m_usage;
+
+ public:
   buffer(usage_t usage);
   buffer(const buffer& other);
   buffer(buffer&& other);
@@ -391,7 +362,6 @@ class buffer {
 
   void create_handle();
   void destroy_handle();
-  auto gl_handle() const { return m_gl_handle; }
 
   void           upload_data(const std::vector<T>& data);
   std::vector<T> download_data() const;
@@ -433,8 +403,6 @@ class buffer {
   auto begin() const { return const_iterator_t(this, 0); }
   auto end() const { return const_iterator_t(this, m_size); }
 
-  auto gl_handle() { return m_gl_handle; }
-
   auto wmap() { return wmap_t(this, 0, m_size); }
 
   auto rmap() { return rmap_t(this, 0, m_size); }
@@ -449,126 +417,94 @@ class buffer {
   auto map(size_t offset, size_t length) const {
     return rmap_t(this, offset, length);
   }
-
- protected:
-  GLuint  m_gl_handle;
-  size_t  m_size     = 0;
-  size_t  m_capacity = 0;
-  usage_t m_usage;
 };
-
 //==============================================================================
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::buffer(usage_t usage)
     : m_size{}, m_capacity{}, m_usage(usage) {
   create_handle();
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::buffer(const buffer& other) : buffer(other.m_usage) {
   m_usage = other.m_usage;
   copy(other);
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::buffer(buffer&& other)
-    : m_gl_handle(std::exchange(other.m_gl_handle, 0)),
+    : parent_t{std::move(other)},
       m_size(std::exchange(other.m_size, 0)),
       m_capacity(std::exchange(other.m_capacity, 0)),
       m_usage(other.m_usage) {}
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>& buffer<array_type, T>::operator=(const buffer& other) {
   m_usage = other.m_usage;
   copy(other);
   return *this;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>& buffer<array_type, T>::operator=(buffer&& other) {
-  std::swap(m_gl_handle, other.m_gl_handle);
+  parent_t::operator=(std::move(other));
   std::swap(m_size, other.m_size);
   std::swap(m_capacity, other.m_capacity);
   std::swap(m_usage, other.m_usage);
   return *this;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::buffer(size_t n, usage_t usage) : buffer(usage) {
   gpu_malloc(n);
   m_size = n;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::buffer(size_t n, const T& initial, usage_t usage)
     : buffer(usage) {
   gpu_malloc(n, initial);
   m_size = n;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::buffer(const std::vector<T>& data, usage_t usage)
     : buffer(usage) {
   upload_data(data);
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 buffer<array_type, T>::~buffer() {
   destroy_handle();
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::create_handle() {
-  gl::create_buffers(1, &m_gl_handle);
+  gl::create_buffers(1, &id());
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::destroy_handle() {
-  if (m_gl_handle != 0) gl::delete_buffers(1, &m_gl_handle);
-  m_gl_handle = 0;
+  if (id() != 0) gl::delete_buffers(1, &id());
+  id() = 0;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::upload_data(const std::vector<T>& data) {
   if (capacity() < data.size()) {
     // reallocate new memory
-    gl::named_buffer_data(m_gl_handle, data_size * data.size(), data.data(),
+    gl::named_buffer_data(id(), data_size * data.size(), data.data(),
                           m_usage);
     m_size = m_capacity = data.size();
 
   } else {
     // just update buffer
-    gl::named_buffer_sub_data(m_gl_handle, 0, data_size * data.size(),
+    gl::named_buffer_sub_data(id(), 0, data_size * data.size(),
                               data.data());
     m_size = data.size();
   }
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::reserve(size_t size) {
   if (capacity() < size) {
@@ -577,17 +513,13 @@ void buffer<array_type, T>::reserve(size_t size) {
     copy(tmp);
   }
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::resize(size_t size) {
-  if (capacity() < size) reserve(size);
+  if (capacity() < size) { reserve(size); }
   m_size = size;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 std::vector<T> buffer<array_type, T>::download_data() const {
   rmap_t         map(this, 0, size());
@@ -595,66 +527,50 @@ std::vector<T> buffer<array_type, T>::download_data() const {
   std::copy(map.begin(), map.end(), data.begin());
   return data;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::gpu_malloc(size_t n) {
-  gl::named_buffer_data(this->m_gl_handle, data_size * n, nullptr, m_usage);
+  gl::named_buffer_data<void>(this->id(), data_size * n, nullptr, m_usage);
   m_capacity = n;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::gpu_malloc(size_t n, const T& initial) {
   std::vector<T> data(n, initial);
-  gl::named_buffer_data(this->m_gl_handle, data_size * n, data.data(), m_usage);
+  gl::named_buffer_data(this->id(), data_size * n, data.data(), m_usage);
   m_capacity = n;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::bind() const {
-  gl::bind_buffer(array_type, m_gl_handle);
+  gl::bind_buffer(array_type, id());
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::unbind() {
   gl::bind_buffer(array_type, 0);
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::copy(const this_t& other) {
   if (capacity() < other.size()) gpu_malloc(other.size());
-  gl::copy_named_buffer_sub_data(other.m_gl_handle, m_gl_handle, 0, 0,
+  gl::copy_named_buffer_sub_data(other.id(), id(), 0, 0,
                                  data_size * other.size());
   m_size = other.size();
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::push_back(T&& t) {
   if (m_capacity < m_size + 1) reserve(m_size * 2);
   at(size()) = std::forward<T>(t);
   ++m_size;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::pop_back() {
   --m_size;
 }
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
 template <typename... Ts>
 void buffer<array_type, T>::emplace_back(Ts&&... ts) {
@@ -667,9 +583,7 @@ void buffer<array_type, T>::emplace_back(Ts&&... ts) {
   at(size()) = T(std::forward<Ts>(ts)...);
   ++m_size;
 }
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

@@ -1,5 +1,4 @@
 #include <yavin/glfunctions.h>
-#include <yavin/tostring.h>
 #include <yavin/camera.h>
 
 //==============================================================================
@@ -349,15 +348,6 @@ void* gl::map_named_buffer_range(GLuint buffer, GLintptr offset, GLsizei length,
   return result;
 }
 
-//------------------------------------------------------------------------------
-void gl::named_buffer_data(GLuint buffer, GLsizei size, const void* data,
-                           GLenum usage) {
-  if (verbose)
-    *out << "glNamedBufferData(" << buffer << ", " << size << ", " << data
-         << ", " << to_string(usage) << ")\n";
-  glNamedBufferData(buffer, size, data, usage);
-  gl_error_check("glNamedBufferData");
-}
 
 //------------------------------------------------------------------------------
 GLboolean gl::unmap_named_buffer(GLuint buffer) {

@@ -1,5 +1,5 @@
-#ifndef __YAVIN_ID_HOLDER_H__
-#define __YAVIN_ID_HOLDER_H__
+#ifndef YAVIN_ID_HOLDER_H
+#define YAVIN_ID_HOLDER_H
 
 #include <utility>
 #include "glincludes.h"

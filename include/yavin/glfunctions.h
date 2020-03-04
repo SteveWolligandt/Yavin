@@ -3,8 +3,10 @@
 
 #include <vector>
 #include "errorcheck.h"
+#include <ostream>
 #include "glincludes.h"
 #include "mutexhandler.h"
+#include "yavin/tostring.h"
 
 //==============================================================================
 namespace yavin {
@@ -164,8 +166,27 @@ struct gl {
                                               GLsizei    length,
                                               GLbitfield access);
 
-  DLL_API static void named_buffer_data(GLuint buffer, GLsizei size,
-                                        const void* data, GLenum usage);
+  template <typename T>
+  static void named_buffer_data(GLuint buffer, GLsizei size, const T* data,
+                         GLenum usage) {
+    if (verbose) {
+      if constexpr (std::is_arithmetic_v<T>) {
+        *out << "glNamedBufferData(" << buffer << ", " << size << ", "
+             << "[";
+        *out << data[0];
+        for (GLsizei i = 1; i < std::min<GLsizei>(size / sizeof(T), 3); ++i) {
+          *out << ", " << data[i];
+        }
+        if (size / sizeof(T) > 3) { *out << ", ..."; }
+        *out << "], " << to_string(usage) << ")\n";
+      } else {
+        *out << "glNamedBufferData(" << buffer << ", " << size << ", " << data
+             << ", " << to_string(usage) << ")\n";
+      }
+    }
+    glNamedBufferData(buffer, size, data, usage);
+    gl_error_check("glNamedBufferData");
+  }
 
   //------------------------------------------------------------------------------
   DLL_API static GLboolean unmap_buffer(GLenum target);

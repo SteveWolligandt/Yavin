@@ -52,15 +52,15 @@ atomiccounterbuffer::atomiccounterbuffer(
 //------------------------------------------------------------------------------
 void atomiccounterbuffer::set_all_to(unsigned int val) {
   auto gpu_data = reinterpret_cast<unsigned char*>(
-      gl::map_named_buffer(this->m_gl_handle, GL_WRITE_ONLY));
+      gl::map_named_buffer(this->id(), GL_WRITE_ONLY));
   gl_error_check("glMapNamedBuffer");
   std::memset(gpu_data, val, sizeof(unsigned int) * size());
-  gl::unmap_named_buffer(this->m_gl_handle);
+  gl::unmap_named_buffer(this->id());
 }
 
 //------------------------------------------------------------------------------
 void atomiccounterbuffer::bind(size_t i) const {
-  gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, this->m_gl_handle);
+  gl::bind_buffer_base(GL_ATOMIC_COUNTER_BUFFER, i, this->id());
 }
 
 //------------------------------------------------------------------------------

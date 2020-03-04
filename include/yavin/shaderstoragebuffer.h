@@ -50,7 +50,7 @@ class shaderstoragebuffer : public buffer<GL_SHADER_STORAGE_BUFFER, T> {
   // methods
   //----------------------------------------------------------------------------
   void bind(size_t index) const {
-    gl::bind_buffer_base(GL_SHADER_STORAGE_BUFFER, index, this->m_gl_handle);
+    gl::bind_buffer_base(GL_SHADER_STORAGE_BUFFER, index, this->id());
   }
   //----------------------------------------------------------------------------
   static void unbind(size_t index) {
