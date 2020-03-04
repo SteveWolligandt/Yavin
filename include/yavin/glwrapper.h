@@ -1,7 +1,6 @@
 #ifndef YAVIN_GL_WRAPPER_H
 #define YAVIN_GL_WRAPPER_H
 
-#include <glm/glm.hpp>
 #include "camera.h"
 #include "dllexport.h"
 #include "errorcheck.h"

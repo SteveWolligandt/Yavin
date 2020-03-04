@@ -3,6 +3,7 @@
 #define YAVIN_HAS_PNG_SUPPORT @YAVIN_HAS_PNG_SUPPORT@
 
 #include <png++/png.hpp>
+#include <cmath>
 
 #include <yavin/texcomponents.h>
 

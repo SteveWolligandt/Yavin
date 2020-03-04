@@ -60,51 +60,6 @@ GLint shader::attribute(const std::string& attributeVarName) {
   return m_attribute_locations[attributeVarName];
 }
 //------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::ivec2& value) {
-  gl::program_uniform_2iv(m_id, m_uniform_locations.at(name), 1,
-                          glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::ivec3& value) {
-  gl::program_uniform_3iv(m_id, m_uniform_locations.at(name), 1,
-                          glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::ivec4& value) {
-  gl::program_uniform_4iv(m_id, m_uniform_locations.at(name), 1,
-                          glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::vec2& value) {
-  gl::program_uniform_2fv(m_id, m_uniform_locations.at(name), 1,
-                          glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::vec3& value) {
-  gl::program_uniform_3fv(m_id, m_uniform_locations.at(name), 1,
-                          glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::vec4& value) {
-  gl::program_uniform_4fv(m_id, m_uniform_locations.at(name), 1,
-                          glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::mat2x2& value) {
-  gl::program_uniform_matrix_2fv(m_id, m_uniform_locations.at(name), 1, GL_FALSE,
-                                 glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::mat3x3& value) {
-  gl::program_uniform_matrix_3fv(m_id, m_uniform_locations.at(name), 1, GL_FALSE,
-                                 glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
-void shader::set_uniform(const std::string& name, const glm::mat4x4& value) {
-  gl::program_uniform_matrix_4fv(m_id, m_uniform_locations.at(name), 1, GL_FALSE,
-                                 glm::value_ptr(value));
-}
-//------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, float value) {
   gl::program_uniform_1f(m_id, m_uniform_locations.at(name), value);
 }
@@ -159,15 +114,15 @@ void shader::set_uniform(const std::string& name, uint32_t x, uint32_t y,
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, Scalar<float> value) {
-  gl::program_uniform_1f(m_id, m_uniform_locations.at(name), value[0]);
+  gl::program_uniform_1f(m_id, m_uniform_locations.at(name), value(0));
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, Scalar<int32_t> value) {
-  gl::program_uniform_1i(m_id, m_uniform_locations.at(name), value[0]);
+  gl::program_uniform_1i(m_id, m_uniform_locations.at(name), value(0));
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, Scalar<uint32_t> value) {
-  gl::program_uniform_1ui(m_id, m_uniform_locations.at(name), value[0]);
+  gl::program_uniform_1ui(m_id, m_uniform_locations.at(name), value(0));
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec2<float>& value) {

@@ -4,7 +4,6 @@
 #include <string>
 #include <optional>
 
-#include <glm/gtc/type_ptr.hpp>
 #include <map>
 #include <type_traits>
 #include <unordered_set>
@@ -14,7 +13,7 @@
 #include "tesselationcontrolshader.h"
 #include "tesselationevaluationshader.h"
 #include "vertexshader.h"
-#include "attribute.h"
+#include "vec.h"
 #include "dllexport.h"
 
 #include "windowsundefines.h"
@@ -44,18 +43,6 @@ class shader {
   DLL_API void         add_attribute(const std::string& attributeVarName);
   DLL_API GLint uniform(const std::string& uniformVarName);
   DLL_API GLint attribute(const std::string& attributeVarName);
-
-  DLL_API void set_uniform(const std::string&, const glm::ivec2&);
-  DLL_API void set_uniform(const std::string&, const glm::ivec3&);
-  DLL_API void set_uniform(const std::string&, const glm::ivec4&);
-
-  DLL_API void set_uniform(const std::string&, const glm::vec2&);
-  DLL_API void set_uniform(const std::string&, const glm::vec3&);
-  DLL_API void set_uniform(const std::string&, const glm::vec4&);
-
-  DLL_API void set_uniform(const std::string&, const glm::mat2x2&);
-  DLL_API void set_uniform(const std::string&, const glm::mat3x3&);
-  DLL_API void set_uniform(const std::string&, const glm::mat4x4&);
 
   DLL_API void set_uniform(const std::string&, float);
   DLL_API void set_uniform(const std::string&, int);

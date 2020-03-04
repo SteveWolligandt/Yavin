@@ -83,14 +83,12 @@ endif()
 # find misc packages
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(Boost REQUIRED)
-find_package(glm REQUIRED)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # setup yavin library target
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/atomiccounterbuffer.cpp
-  ${CMAKE_SOURCE_DIR}/src/attribute.cpp
   ${CMAKE_SOURCE_DIR}/src/computeshader.cpp
   ${CMAKE_SOURCE_DIR}/src/errorcheck.cpp
   ${CMAKE_SOURCE_DIR}/src/fragmentshader.cpp
@@ -134,10 +132,10 @@ target_compile_options(yavin PRIVATE
 target_include_directories(yavin
   PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_BINARY_DIR}/single_include
+    ${CMAKE_CURRENT_SOURCE_DIR}/single_include
     ${CMAKE_CURRENT_BINARY_DIR}/include
+    ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
-    ${GLM_INCLUDE_DIRS} 
     ${YAVIN_GLEW_INCLUDE_DIR}
 )
 
@@ -195,8 +193,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/yavin/context.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/include/yavin/context.h")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/yavin/window.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/include/yavin/window.h")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/single_include/yavin.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/single_include/yavin")
 configure_file(src/glverbose.cpp.in
                src/glverbose.cpp)
 configure_file(include/yavin/shaderincludepaths.h.in

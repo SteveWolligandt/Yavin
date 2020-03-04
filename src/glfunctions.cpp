@@ -1,5 +1,6 @@
 #include <yavin/glfunctions.h>
 #include <yavin/tostring.h>
+#include <yavin/camera.h>
 
 //==============================================================================
 namespace yavin {
@@ -131,10 +132,10 @@ void gl::viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
   glViewport(x, y, width, height);
   gl_error_check("glViewport");
 }
-
 //------------------------------------------------------------------------------
-void gl::viewport(const glm::vec4& vp) {
-  viewport(vp[1], vp[1], vp[2], vp[3]);
+void gl::viewport(const camera& cam) {
+  gl::viewport(cam.viewport_x(), cam.viewport_y(), cam.viewport_width(),
+               cam.viewport_height());
 }
 
 //------------------------------------------------------------------------------

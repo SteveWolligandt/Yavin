@@ -2,7 +2,6 @@
 #define YAVIN_GL_FUNCTIONS_WRAPPER_H
 
 #include <vector>
-#include "camera.h"
 #include "errorcheck.h"
 #include "glincludes.h"
 #include "mutexhandler.h"
@@ -10,6 +9,7 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
+class camera;
 struct gl {
   static bool verbose;
 
@@ -65,7 +65,7 @@ struct gl {
   DLL_API static void viewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
   //------------------------------------------------------------------------------
-  DLL_API static void viewport(const glm::vec4& vp);
+  DLL_API static void viewport(const camera& cam);
 
   //------------------------------------------------------------------------------
   DLL_API static void flush();

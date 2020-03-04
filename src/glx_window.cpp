@@ -7,11 +7,9 @@
 
 #include <yavin/glx_window.h>
 #include <yavin/glincludes.h>
-
 //==============================================================================
-namespace yavin::glx {
+namespace yavin {
 //==============================================================================
-
 std::list<window *> window::contexts;
 bool                 window::error_occured      = false;
 const int window::visual_attribs[23] = {
@@ -30,7 +28,7 @@ const int window::visual_attribs[23] = {
   //GLX_SAMPLES         , 4,
   None
 };
-
+//==============================================================================
 window::window(const std::string& title, int major, int minor)
     : display{XOpenDisplay(nullptr)}, ctx{} {
   contexts.push_back(this);
@@ -42,16 +40,13 @@ window::window(const std::string& title, int major, int minor)
       ((glx_major == 1) && (glx_minor < 3)) || (glx_major < 1))
     throw std::runtime_error{"Invalid GLX version"};
 
-  // std::cout << "Getting matching framebuffer configs\n";
   int          fbcount;
   GLXFBConfig *fbc = glXChooseFBConfig(display, DefaultScreen(display),
                                        visual_attribs, &fbcount);
   if (!fbc)
     throw std::runtime_error{"Failed to retrieve a framebuffer config\n"};
-  // std::cout << "Found " << fbcount << " matching FB configs.\n";
 
   // Pick the FB config/visual with the most samples per pixel
-  // std::cout << "Getting XVisualInfos\n";
   int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
 
   int i;
@@ -62,9 +57,6 @@ window::window(const std::string& title, int major, int minor)
       glXGetFBConfigAttrib(display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
       glXGetFBConfigAttrib(display, fbc[i], GLX_SAMPLES, &samples);
 
-      // std::cout << "  Matching fbconfig " << i << ", visual ID 0x"
-      //           << vi->visualid << ": SAMPLE_BUFFERS = " << samp_buf
-      //           << ", SAMPLES = " << samples << "\n";
 
       if (best_fbc < 0 || (samp_buf && samples > best_num_samp))
         best_fbc = i, best_num_samp = samples;
@@ -81,17 +73,14 @@ window::window(const std::string& title, int major, int minor)
 
   // Get a visual
   XVisualInfo *vi = glXGetVisualFromFBConfig(display, bestFbc);
-  // std::cout << "Chosen visual ID = 0x" << vi->visualid << "\n";
 
-  // std::cout << "Creating colormap\n";
   XSetWindowAttributes swa;
   swa.colormap = cmap = XCreateColormap(
       display, RootWindow(display, vi->screen), vi->visual, AllocNone);
   swa.background_pixmap = None;
   swa.border_pixel      = 0;
-  swa.event_mask        = StructureNotifyMask;
+  swa.event_mask        = StructureNotifyMask | KeyPressMask;
 
-  // std::cout << "Creating window\n";
   win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0, 1,
                       1, 0, vi->depth, InputOutput, vi->visual,
                       CWBorderPixel | CWColormap | CWEventMask, &swa);
@@ -106,7 +95,7 @@ window::window(const std::string& title, int major, int minor)
   const char *glxExts =
       glXQueryExtensionsString(display, DefaultScreen(display));
 
-  // NOTE: It is not necessary to create or make current to a glx::window before
+  // NOTE: It is not necessary to create or make current to a window before
   // calling glXGetProcAddressARB
   glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
   glXCreateContextAttribsARB =
@@ -126,8 +115,6 @@ window::window(const std::string& title, int major, int minor)
   // If either is not present, use GLX 1.3 context creation method.
   if (!extension_supported(glxExts, "GLX_ARB_create_context") ||
       !glXCreateContextAttribsARB) {
-    std::cout << "glXCreateContextAttribsARB() not found"
-                 " ... using old-style GLX context\n";
     ctx = glXCreateNewContext(display, bestFbc, GLX_RGBA_TYPE, 0, True);
   }
 
@@ -144,7 +131,7 @@ window::window(const std::string& title, int major, int minor)
     // Sync to ensure any errors generated are processed.
     XSync(display, False);
     if (!error_occured && ctx) {
-      std::cout << "Created GL " << major << "." << minor << " glx::window\n";
+      std::cerr << "Created GL " << major << "." << minor << " GLX window\n";
       make_current();
 
       glewExperimental = true;
@@ -164,7 +151,7 @@ window::window(const std::string& title, int major, int minor)
 
       error_occured = false;
 
-      std::cout << "Failed to create GL " << major << "." << minor
+      std::cerr << "Failed to create GL " << major << "." << minor
                 << " context ... using old-style GLX context\n";
       ctx = glXCreateContextAttribsARB(display, bestFbc, 0, True,
                                        context_attribs);
@@ -180,7 +167,6 @@ window::window(const std::string& title, int major, int minor)
   if (error_occured || !ctx)
     throw std::runtime_error{"Failed to create an OpenGL context"};
 }
-
 //------------------------------------------------------------------------------
 window::~window() {
   glXMakeCurrent(display, 0, 0);
@@ -191,7 +177,38 @@ window::~window() {
   XCloseDisplay(display);
   contexts.remove(this);
 }
+//------------------------------------------------------------------------------
+void window::check_keyboard() {
+  if (XCheckWindowEvent(dpy, win, KeyPressMask, &xev)) {
+    char *key_string =
+        XKeysymToString(XkbKeycodeToKeysym(display, xev.xkey.keycode, 0, 0));
 
+    if (strncmp(key_string, "Left", 4) == 0) {
+      rot_z_vel -= 200.0 * DT;
+    }
+
+    else if (strncmp(key_string, "Right", 5) == 0) {
+      rot_z_vel += 200.0 * DT;
+    }
+
+    else if (strncmp(key_string, "Up", 2) == 0) {
+      rot_y_vel -= 200.0 * DT;
+    }
+
+    else if (strncmp(key_string, "Down", 4) == 0) {
+      rot_y_vel += 200.0 * DT;
+    }
+
+    else if (strncmp(key_string, "F1", 2) == 0) {
+      rot_y_vel = 0.0;
+      rot_z_vel = 0.0;
+    }
+
+    else if (strncmp(key_string, "Escape", 5) == 0) {
+      ExitProgram();
+    }
+  }
+}
 //------------------------------------------------------------------------------
 bool window::extension_supported(const char *extList, const char *extension) {
   const char *start;
@@ -214,7 +231,6 @@ bool window::extension_supported(const char *extList, const char *extension) {
   }
   return false;
 }
-
 //------------------------------------------------------------------------------
 int window::error_handler_static(Display *display, XErrorEvent * ev) {
   for (auto ctx : contexts)
@@ -228,6 +244,6 @@ int window::error_handler(XErrorEvent * /*ev*/) {
   return 0;
 }
 //==============================================================================
-}  // namespace yavin::glx
+}  // namespace yavin
 //==============================================================================
 

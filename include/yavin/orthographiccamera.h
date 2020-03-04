@@ -20,16 +20,6 @@ class orthographiccamera : public camera {
                              float bottom, float top,
                              float near, float far,
                              size_t vp_width, size_t vp_height);
-
-  DLL_API orthographiccamera(float left, float right,
-                             float bottom, float top,
-                             float near, float far,
-                             const glm::uvec4& vp);
-
-  DLL_API orthographiccamera(float left, float right,
-                             float bottom, float top,
-                             float near, float far, glm::uvec4&& vp);
-
   DLL_API void set_projection(float left, float right,
                               float bottom, float top,
                               float near, float far);
@@ -43,7 +33,6 @@ class orthographiccamera : public camera {
                               size_t vp_x, size_t vp_y,
                               size_t vp_width, size_t vp_height);
 };
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
