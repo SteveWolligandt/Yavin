@@ -126,9 +126,10 @@ void gl::clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
 
 //------------------------------------------------------------------------------
 void gl::viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
-  if (verbose)
+  if (verbose) {
     *out << "glViewport(" << x << ", " << y << ", " << width << ", " << height
          << ")\n";
+  }
   glViewport(x, y, width, height);
   gl_error_check("glViewport");
 }

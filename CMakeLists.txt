@@ -179,8 +179,8 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # OpenGL call output
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-option(VERBOSE "verbose OpenGL calls" OFF)
-if (VERBOSE)
+option(YAVIN_VERBOSE "verbose OpenGL calls" OFF)
+if (YAVIN_VERBOSE)
   set(VERBOSE_GL "true")
 else()
   set(VERBOSE_GL "false")
@@ -211,21 +211,17 @@ add_subdirectory(test)
 # check if Doxygen is installed
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
-  # first we can indicate the documentation build as an option and set it to ON by default
-  option(BUILD_DOC "Generate documentation" OFF)
-  if (BUILD_DOC)
-    # set input and output files
-    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile)
+  # set input and output files
+  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile)
 
-    # request to configure the file
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+  # request to configure the file
+  configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
-    # note the option ALL which allows to build the docs together with the application
-    add_custom_target(doc_doxygen ALL
-      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Generating API documentation with Doxygen"
-      VERBATIM)
-  endif()
+  # note the option ALL which allows to build the docs together with the application
+  add_custom_target(doc_doxygen ALL
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen"
+    VERBATIM)
 endif ()

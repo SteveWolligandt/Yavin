@@ -12,12 +12,6 @@
 namespace yavin {
 //==============================================================================
 class transform {
- public:
-  using vec3 = vec<float, 3>;
-  using vec4 = vec<float, 4>;
-  using mat3 = mat<float, 3, 3>;
-  using mat4 = mat<float, 4, 4>;
- 
  protected:
   mat4  m_matrix;
   float m_first_person_pitch;
@@ -78,31 +72,31 @@ class transform {
   }
 
   void translate(const vec3& t) {
-    m_matrix = m_matrix * translation_matrix(t);
+    m_matrix = translation_matrix(t) * m_matrix;
   }
   void translate(const float x, const float y, const float z) {
-    m_matrix = m_matrix * translation_matrix(x,y,z);
+    m_matrix = translation_matrix(x,y,z) * m_matrix;
   }
   vec3 translation() {
     return {m_matrix(0, 3), m_matrix(1, 3), m_matrix(2, 3)};
   }
 
   void scale(const vec3& s) {
-    m_matrix = m_matrix * scale_matrix(s);
+    m_matrix = scale_matrix(s) * m_matrix;
   }
   void scale(const float x, const float y, const float z) {
-    m_matrix = m_matrix * scale_matrix(x, y, z);
+    m_matrix = scale_matrix(x, y, z) * m_matrix;
   }
   void scale(const float s) {
-    m_matrix = m_matrix * scale_matrix(s);
+    m_matrix = scale_matrix(s) * m_matrix ;
   }
 
   void rotate(const float angle, const vec3& axis) {
-    m_matrix = m_matrix * rotation_matrix(angle, axis);
+    m_matrix = rotation_matrix(angle, axis) * m_matrix;
   }
-  void rotate(const float angle, const float axisX, const float axisY,
-              const float axisZ) {
-    rotate(angle, vec3(axisX, axisY, axisZ));
+  void rotate(const float angle, const float axis_x, const float axis_y,
+              const float axis_z) {
+    m_matrix = rotation_matrix(angle, axis_x, axis_y, axis_z) * m_matrix;
   }
 
   void inc_pitch(float amount) {

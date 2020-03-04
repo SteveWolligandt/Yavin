@@ -28,7 +28,7 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
   static const usage_t default_usage = usage_t::STATIC_DRAW;
 
   static constexpr unsigned int num_attributes = sizeof...(Ts);
-  static constexpr std::array<size_t, num_attributes> num_dims{Ts::num_dims...};
+  static constexpr std::array<size_t, num_attributes> num_components{Ts::num_components()...};
   static constexpr std::array<GLenum, num_attributes> types{Ts::type...};
   static constexpr std::array<size_t, num_attributes> offsets =
       attr_offset<num_attributes, Ts...>::gen(0, 0);
@@ -64,7 +64,7 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
   static constexpr void activate_attributes() {
     for (unsigned int i = 0; i < num_attributes; i++) {
       gl::enable_vertex_attrib_array(i);
-      gl::vertex_attrib_pointer(i, num_dims[i], types[i], GL_FALSE,
+      gl::vertex_attrib_pointer(i, num_components[i], types[i], GL_FALSE,
                                 this_t::data_size, (void*)offsets[i]);
     }
   }

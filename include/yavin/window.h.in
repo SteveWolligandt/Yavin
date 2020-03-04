@@ -1,12 +1,17 @@
 #ifndef YAVIN_GLX
+
+#ifndef YAVIN_GLX
 #define YAVIN_GLX @YAVIN_USE_GLX@
 #endif
-#if YAVIN_GLX
+
 #ifndef YAVIN_EGL
 #define YAVIN_EGL @YAVIN_USE_EGL@
 #endif
-#ifndef YAVIN_EGL
-#include "yavin/glx_window.h"
-#elif YAVIN_EGL
+
+#if defined(YAVIN_EGL)
 #include "yavin/egl_window.h"
+#elif defined(YAVIN_GLX)
+#include "yavin/glx_window.h"
+#endif
+
 #endif

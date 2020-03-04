@@ -14,6 +14,7 @@
 #include "tesselationevaluationshader.h"
 #include "vertexshader.h"
 #include "vec.h"
+#include "mat.h"
 #include "dllexport.h"
 
 #include "windowsundefines.h"
@@ -69,6 +70,9 @@ class shader {
   DLL_API void set_uniform(const std::string&, const Vec2<float>&);
   DLL_API void set_uniform(const std::string&, const Vec3<float>&);
   DLL_API void set_uniform(const std::string&, const Vec4<float>&);
+  DLL_API void set_uniform(const std::string&, const Mat2<float>&);
+  DLL_API void set_uniform(const std::string&, const Mat3<float>&);
+  DLL_API void set_uniform(const std::string&, const Mat4<float>&);
 
   DLL_API void set_uniform(const std::string&, const Vec2<int32_t>&);
   DLL_API void set_uniform(const std::string&, const Vec3<int32_t>&);

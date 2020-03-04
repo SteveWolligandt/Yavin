@@ -18,12 +18,12 @@ template <typename Real, size_t R, size_t C>
 struct mat {
  public:
   //============================================================================
+  static constexpr auto num_rows() { return R; }
+  static constexpr auto num_columns() { return C; }
+  static constexpr auto num_components() { return R * C; }
   using dimension_t      = std::array<size_t, 2>;
   using data_container_t = std::vector<Real>;
-  static constexpr auto num_rows       = R;
-  static constexpr auto num_columns    = C;
-  static constexpr auto num_components = R * C;
-  using data_block_t = std::array<Real, num_components>;
+  using data_block_t     = std::array<Real, num_components()>;
 
  private:
   //============================================================================
@@ -63,7 +63,7 @@ struct mat {
 
  private:
   /// constructor that sets all components to c
-  constexpr mat(Real c) : m_data{make_array<Real, num_components>(c)} {}
+  constexpr mat(Real c) : m_data{make_array<Real, num_components()>(c)} {}
 
  public:
   //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ struct mat {
   /// creates an identity matrix
   constexpr static auto eye() {
     auto m = zeros();
-    for (size_t i = 0; i < std::min(num_rows, num_columns); ++i) m(i, i) = 1;
+    for (size_t i = 0; i < std::min(R, C); ++i) m(i, i) = 1;
     return m;
   }
   //============================================================================
@@ -110,29 +110,29 @@ struct mat {
   //----------------------------------------------------------------------------
   /// access to component at position [row, col]
   constexpr auto& at(size_t row, size_t col) {
-    assert(row < num_rows);
-    assert(col < num_columns);
-    return m_data[row + num_rows * col];
+    assert(row < R);
+    assert(col < C);
+    return m_data[row + R * col];
   }
   //----------------------------------------------------------------------------
   /// access to component at position [row, col]
   constexpr auto at(size_t row, size_t col) const {
-    assert(row < num_rows);
-    assert(col < num_columns);
-    return m_data[row + num_rows * col];
+    assert(row < R);
+    assert(col < C);
+    return m_data[row + R * col];
   }
   //----------------------------------------------------------------------------
   /// access to component at position [row, col]
   constexpr auto& operator()(size_t row, size_t col) {
-    assert(row < num_rows);
-    assert(col < num_columns);
+    assert(row < R);
+    assert(col < C);
     return at(row, col);
   }
   //----------------------------------------------------------------------------
   /// access to component at position [row, col]
   constexpr auto operator()(size_t row, size_t col) const {
-    assert(row < num_rows);
-    assert(col < num_columns);
+    assert(row < R);
+    assert(col < C);
     return at(row, col);
   }
   //----------------------------------------------------------------------------
@@ -144,7 +144,49 @@ struct mat {
   //----------------------------------------------------------------------------
   /// returns reference to data block
   constexpr auto& data() { return m_data; }
+  //----------------------------------------------------------------------------
+  constexpr Real* data_ptr() { return m_data.data(); }
+  constexpr const Real* data_ptr() const { return m_data.data(); }
 };
+//==============================================================================
+template <typename Real>
+using Mat2 = mat<Real, 2, 2>;
+template <typename Real>
+using Mat3 = mat<Real, 3, 3>;
+template <typename Real>
+using Mat4 = mat<Real, 4, 4>;
+//------------------------------------------------------------------------------ 
+using mat2   = Mat2<float>;
+using mat3   = Mat3<float>;
+using mat4   = Mat4<float>;
+//------------------------------------------------------------------------------
+using dmat2   = Mat2<double>;
+using dmat3   = Mat3<double>;
+using dmat4   = Mat4<double>;
+//------------------------------------------------------------------------------
+using i32mat2   = Mat2<int32_t>;
+using i32mat3   = Mat3<int32_t>;
+using i32mat4   = Mat4<int32_t>;
+//------------------------------------------------------------------------------
+using ui32mat2   = Mat2<uint32_t>;
+using ui32mat3   = Mat3<uint32_t>;
+using ui32mat4   = Mat4<uint32_t>;
+//------------------------------------------------------------------------------
+using i16mat2   = Mat2<int16_t>;
+using i16mat3   = Mat3<int16_t>;
+using i16mat4   = Mat4<int16_t>;
+//------------------------------------------------------------------------------
+using ui16mat2   = Mat2<uint16_t>;
+using ui16mat3   = Mat3<uint16_t>;
+using ui16mat4   = Mat4<uint16_t>;
+//------------------------------------------------------------------------------
+using i8mat2   = Mat2<int8_t>;
+using i8mat3   = Mat3<int8_t>;
+using i8mat4   = Mat4<int8_t>;
+//------------------------------------------------------------------------------
+using ui8mat2   = Mat2<uint8_t>;
+using ui8mat3   = Mat3<uint8_t>;
+using ui8mat4   = Mat4<uint8_t>;
 //==============================================================================
 /// deduction guide gets matrix dimensions when creating object
 template <size_t C, typename... Ts>
@@ -210,8 +252,8 @@ constexpr auto operator*(const mat<Real, R, C>& lhs, const vec<Real, N>& rhs) {
                 "size of vector does not match number of columns of matrix");
   vec<Real, R> multiplicated;
 
-  for (size_t m_row = 0; m_row < lhs.num_rows; ++m_row) {
-    for (size_t i = 0; i < lhs.num_columns; ++i) {
+  for (size_t m_row = 0; m_row < R; ++m_row) {
+    for (size_t i = 0; i < C; ++i) {
       multiplicated(m_row) += lhs(m_row, i) * rhs(i);
     }
   }
@@ -226,9 +268,9 @@ constexpr auto operator*(const mat<Real, R0, C0>& lhs,
                 "left number of columns does not match right number of rows");
   auto m = mat<Real, R0, C1>::zeros() ;
 
-  for (size_t lhs_row = 0; lhs_row < lhs.num_rows; ++lhs_row) {
-    for (size_t rhs_col = 0; rhs_col < rhs.num_columns; ++rhs_col) {
-      for (size_t i = 0; i < lhs.num_columns; ++i) {
+  for (size_t lhs_row = 0; lhs_row < R0; ++lhs_row) {
+    for (size_t rhs_col = 0; rhs_col < C1; ++rhs_col) {
+      for (size_t i = 0; i < C0; ++i) {
         m(lhs_row, rhs_col) += lhs(lhs_row, i) * rhs(i, rhs_col);
       }
     }
@@ -249,11 +291,11 @@ constexpr auto transpose(const mat<Real, R,C>& m) {
 /// Inverse of a 2x2 matrix.
 /// Returns nothing if determinant is 0.
 template <typename Real>
-inline std::optional<mat<Real, 2, 2>> inverse(const mat<Real, 2, 2>& m) {
+inline std::optional<Mat2<Real>> inverse(const Mat2<Real>& m) {
   auto det = (m(0, 0) * m(1, 1) - m(1, 0) * m(0, 1));
   if (std::abs(det) < 1e-7) { return {}; }
 
-  mat<Real, 2, 2> inv{{m(1, 1), -m(0, 1)}, {-m(1, 0), m(0, 0)}};
+  Mat2<Real> inv{{m(1, 1), -m(0, 1)}, {-m(1, 0), m(0, 0)}};
 
   return inv / det;
 }
@@ -261,12 +303,12 @@ inline std::optional<mat<Real, 2, 2>> inverse(const mat<Real, 2, 2>& m) {
 /// Inverse of a 3x3 matrix.
 /// Returns nothing if determinant is 0.
 template <typename Real>
-inline std::optional<mat<Real, 3, 3>> inverse(const mat<Real, 3, 3>& m) {
+inline std::optional<Mat3<Real>> inverse(const Mat3<Real>& m) {
   auto det = m(0, 0) * (m(1, 1) * m(2, 2) - m(2, 1) * m(1, 2)) -
              m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
              m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0));
   if (std::abs(det) < 1e-7) { return {}; }
-  mat<Real, 3, 3> inv{{(m(1, 1) * m(2, 2) - m(2, 1) * m(1, 2)),
+  Mat3<Real> inv{{(m(1, 1) * m(2, 2) - m(2, 1) * m(1, 2)),
                        -(m(0, 1) * m(2, 2) - m(0, 2) * m(2, 1)),
                        (m(0, 1) * m(1, 2) - m(0, 2) * m(1, 1))},
                       {-(m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)),
@@ -281,8 +323,8 @@ inline std::optional<mat<Real, 3, 3>> inverse(const mat<Real, 3, 3>& m) {
 /// Inverse of a 4x4 matrix.
 /// Returns nothing if determinant is 0.
 template <typename Real>
-inline std::optional<mat<Real, 4, 4>> inverse(const mat<Real, 4, 4>& m) {
-  auto inv = mat<Real, 4, 4>::zeros();
+inline std::optional<Mat4<Real>> inverse(const Mat4<Real>& m) {
+  auto inv = Mat4<Real>::zeros();
 
   inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] +
            m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
@@ -338,29 +380,29 @@ inline std::optional<mat<Real, 4, 4>> inverse(const mat<Real, 4, 4>& m) {
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> translation_matrix(Real x, Real y, Real z) {
-  auto m  = mat<Real, 4, 4>::eye();
+constexpr auto translation_matrix(Real x, Real y, Real z) {
+  auto m  = Mat4<Real>::eye();
   m(0, 3) = x; m(1, 3) = y; m(2, 3) = z;
   return m;
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> translation_matrix(vec<Real, 3> t) {
-  auto m  = mat<Real, 4, 4>::eye();
+constexpr auto translation_matrix(vec<Real, 3> t) {
+  auto m  = Mat4<Real>::eye();
   m(0, 3) = t(0); m(1, 3) = t(1); m(2, 3) = t(2);
   return m;
 }
 //------------------------------------------------------------------------------
 template <typename Real>
 constexpr auto scale_matrix(Real s) {
-  auto m  = mat<Real, 4, 4>::zeros();
+  auto m  = Mat4<Real>::zeros();
   m(0, 0) = s; m(1, 1) = s; m(2, 2) = s; m(3, 3) = 1;
   return m;
 }
 //------------------------------------------------------------------------------
 template <typename Real>
 constexpr auto scale_matrix(Real x, Real y, Real z) {
-  auto m  = mat<Real, 4, 4>::zeros();
+  auto m  = Mat4<Real>::zeros();
   m(0, 0) = x;
   m(1, 1) = y;
   m(2, 2) = z;
@@ -369,8 +411,8 @@ constexpr auto scale_matrix(Real x, Real y, Real z) {
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> scale_matrix(const vec<Real, 3>& s) {
-  auto m  = mat<Real, 4, 4>::zeros();
+constexpr auto scale_matrix(const vec<Real, 3>& s) {
+  auto m  = Mat4<Real>::zeros();
   m(0, 0) = s(0);
   m(1, 1) = s(1);
   m(2, 2) = s(2);
@@ -379,7 +421,7 @@ constexpr mat<Real, 4, 4> scale_matrix(const vec<Real, 3>& s) {
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> rotation_matrix(Real angle, Real u, Real v, Real w) {
+constexpr Mat4<Real> rotation_matrix(Real angle, Real u, Real v, Real w) {
   const Real s = std::sin(angle);
   const Real c = std::cos(angle);
   return {{u * u + (v * v + w * w) * c,
@@ -398,28 +440,32 @@ constexpr mat<Real, 4, 4> rotation_matrix(Real angle, Real u, Real v, Real w) {
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> rotation_matrix(Real angle, const vec<Real, 3>& axis) {
+constexpr auto rotation_matrix(Real angle, const vec<Real, 3>& axis) {
   return rotation_matrix(angle, axis(0), axis(1), axis(2));
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> orthographic_matrix(const Real b, const Real t,
-                                              const Real l, const Real r,
-                                              const Real n, const Real f) {
-  return {{2 / (r - l), Real(0), Real(0), -(r + l) / (r - l)},
-          {Real(0), 2 / (t - b), Real(0), -(t + b) / (t - b)},
-          {Real(0), Real(0), -2 / (f - n), -(f + n) / (f - n)},
-          {Real(0), Real(0), Real(0), Real(1)}};
+constexpr Mat4<Real> orthographic_matrix(const Real l, const Real r,
+                                         const Real b, const Real t,
+                                         const Real n, const Real f) {
+  return {
+    {2 / (r - l),     Real(0),      Real(0), -(r + l) / (r - l)},
+    {    Real(0), 2 / (t - b),      Real(0), -(t + b) / (t - b)},
+    {    Real(0),     Real(0), -2 / (f - n), -(f + n) / (f - n)},
+    {    Real(0),     Real(0),      Real(0),            Real(1)}
+  };
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr mat<Real, 4, 4> perspective_matrix(const Real b, const Real t,
-                                             const Real l, const Real r,
-                                             const Real n, const Real f) {
-  return {{2 * n / (r - l), Real(0), (r + l) / (r - l), Real(0)},
-          {Real(0), 2 * n / (t - b), (t + b) / (t - b), Real(0)},
-          {Real(0), Real(0), -(f + n) / (f - n), -2 * f * n / (f - n)},
-          {Real(0), Real(0), Real(-1), Real(0)}};
+constexpr Mat4<Real> perspective_matrix(const Real l, const Real r,
+                                        const Real b, const Real t,
+                                        const Real n, const Real f) {
+  return {
+   {2 * n / (r - l),         Real(0),  (r + l) / (r - l),              Real(0)},
+   {        Real(0), 2 * n / (t - b),  (t + b) / (t - b),              Real(0)},
+   {        Real(0),         Real(0), -(f + n) / (f - n), -2 * f * n / (f - n)},
+   {        Real(0),         Real(0),           Real(-1),              Real(0)}
+  };
 }
 //------------------------------------------------------------------------------
 template <typename Real>
@@ -431,19 +477,20 @@ constexpr auto perspective_matrix(const Real angleOfView,
   const Real l     = -r;
   const Real t     = scale;
   const Real b     = -t;
-  return perspective_matrix(b, t, l, r, n, f);
+  return perspective_matrix(l, r, b, t, n, f);
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-auto look_at_matrix(const vec<Real, 3>& eye, const vec<Real, 3>& center,
-                    const vec<Real, 3>& up) {
+Mat4<Real> look_at_matrix(const vec<Real, 3>& eye,
+                          const vec<Real, 3>& center,
+                          const vec<Real, 3>& up) {
   const auto z = normalize(eye - center);
   const auto y = cross(up, z);
   const auto x = cross(z, y);
-  return mat<Real, 4, 4>{{x(0), y(0), z(0), eye(0)},
-                         {x(1), y(1), z(1), eye(1)},
-                         {x(2), y(2), z(2), eye(2)},
-                         {0, 0, 0, 1}};
+  return {{x(0), y(0), z(0), eye(0)},
+          {x(1), y(1), z(1), eye(1)},
+          {x(2), y(2), z(2), eye(2)},
+          {   0,    0,    0,      1}};
 }
 //==============================================================================
 // I/O
@@ -451,7 +498,7 @@ auto look_at_matrix(const vec<Real, 3>& eye, const vec<Real, 3>& center,
 /// printing a matrix into a stream
 template <typename Real, size_t R, size_t C>
 constexpr auto& operator<<(std::ostream& str, const mat<Real, R, C>& m) {
-  for (size_t row = 0; row != m.num_rows; ++row) {
+  for (size_t row = 0; row != m.R; ++row) {
     str << "[ ";
     for (size_t col = 0; col != m.num_columns; ++col) {
       str << m(row, col) << ' ';

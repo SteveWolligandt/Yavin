@@ -1,6 +1,5 @@
-#include <yavin/shader.h>
-
 #include <yavin/glfunctions.h>
+#include <yavin/shader.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -127,52 +126,67 @@ void shader::set_uniform(const std::string& name, Scalar<uint32_t> value) {
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec2<float>& value) {
   gl::program_uniform_2fv(m_id, m_uniform_locations.at(name), 1,
-                          reinterpret_cast<const float*>(&value));
+                          value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec3<float>& value) {
   gl::program_uniform_3fv(m_id, m_uniform_locations.at(name), 1,
-                          reinterpret_cast<const float*>(&value));
+                          value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec4<float>& value) {
   gl::program_uniform_4fv(m_id, m_uniform_locations.at(name), 1,
-                          reinterpret_cast<const float*>(&value));
+                          value.data_ptr());
+}
+//------------------------------------------------------------------------------
+void shader::set_uniform(const std::string& name, const Mat2<float>& value) {
+  gl::program_uniform_matrix_2fv(m_id, m_uniform_locations.at(name), 1,
+                                 GL_FALSE, value.data_ptr());
+}
+//------------------------------------------------------------------------------
+void shader::set_uniform(const std::string& name, const Mat3<float>& value) {
+  gl::program_uniform_matrix_3fv(m_id, m_uniform_locations.at(name), 1,
+                                 GL_FALSE, value.data_ptr());
+}
+//------------------------------------------------------------------------------
+void shader::set_uniform(const std::string& name, const Mat4<float>& value) {
+  gl::program_uniform_matrix_4fv(m_id, m_uniform_locations.at(name), 1,
+                                 GL_FALSE, value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec2<int32_t>& value) {
   gl::program_uniform_2iv(m_id, m_uniform_locations.at(name), 1,
-                          reinterpret_cast<const int32_t*>(&value));
+                          value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec3<int32_t>& value) {
   gl::program_uniform_3iv(m_id, m_uniform_locations.at(name), 1,
-                          reinterpret_cast<const int32_t*>(&value));
+                          value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec4<int32_t>& value) {
   gl::program_uniform_4iv(m_id, m_uniform_locations.at(name), 1,
-                          reinterpret_cast<const int32_t*>(&value));
+                          value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec2<uint32_t>& value) {
   gl::program_uniform_2uiv(m_id, m_uniform_locations.at(name), 1,
-                           reinterpret_cast<const uint32_t*>(&value));
+                           value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec3<uint32_t>& value) {
   gl::program_uniform_3uiv(m_id, m_uniform_locations.at(name), 1,
-                           reinterpret_cast<const uint32_t*>(&value));
+                           value.data_ptr());
 }
 //------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, const Vec4<uint32_t>& value) {
   gl::program_uniform_4uiv(m_id, m_uniform_locations.at(name), 1,
-                           reinterpret_cast<const uint32_t*>(&value));
+                           value.data_ptr());
 }
 //------------------------------------------------------------------------------
 std::optional<std::string> shader::info_log() {
   GLint   info_log_length = 0;
-  GLsizei chars_written  = 0;
+  GLsizei chars_written   = 0;
 
   gl::get_program_iv(m_id, GL_INFO_LOG_LENGTH, &info_log_length);
   if (info_log_length == 0) { return {}; }

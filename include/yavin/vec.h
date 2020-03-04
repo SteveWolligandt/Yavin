@@ -154,6 +154,12 @@ struct vec {
   constexpr auto begin() const { return m_data.begin(); }
   constexpr auto end() { return m_data.end(); }
   constexpr auto end() const { return m_data.end(); }
+  //----------------------------------------------------------------------------
+  /// returns reference to data block
+  constexpr auto& data() { return m_data; }
+  //----------------------------------------------------------------------------
+  constexpr Real* data_ptr() { return m_data.data(); }
+  constexpr const Real* data_ptr() const { return m_data.data(); }
 };
 //==============================================================================
 /// deduction guide gets matrix dimensions when creating object
