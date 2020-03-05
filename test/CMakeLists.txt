@@ -158,15 +158,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND (
         -fno-inline-small-functions -fno-default-inline
         -Wno-missing-braces -Wno-unused-lambda-capture)
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    target_link_libraries(coverage.gcov
-      ${YAVIN_UNITTEST_LIBRARIES} gcov -fprofile-instr-generate -fcoverage-mapping)
-    target_compile_options(coverage.gcov
-      PUBLIC
-        -Wall -Wextra -pedantic
-        -fprofile-arcs -ftest-coverage -fno-inline
-        -Wno-missing-braces -Wno-unused-lambda-capture)
+      target_link_libraries(coverage.gcov
+        ${YAVIN_UNITTEST_LIBRARIES} gcov -fprofile-instr-generate -fcoverage-mapping)
+      target_compile_options(coverage.gcov
+        PUBLIC
+          -Wall -Wextra -pedantic
+          -fprofile-arcs -ftest-coverage -fno-inline
+          -Wno-missing-braces -Wno-unused-lambda-capture)
     # LLVM Sanitizer
     add_executable (coverage.llvm ${YAVIN_UNITTEST_SOURCES})
+    target_compile_features(coverage.llvm PUBLIC cxx_std_17)
+    target_include_directories(coverage.llvm PUBLIC ${YAVIN_UNITTEST_INCLUDE_DIRECTORIES})
     target_link_libraries(coverage.llvm
       ${YAVIN_UNITTEST_LIBRARIES} -fprofile-instr-generate -fcoverage-mapping)
     target_compile_options(coverage.llvm

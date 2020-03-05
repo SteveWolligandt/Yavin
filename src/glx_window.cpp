@@ -92,9 +92,6 @@ window::window(const std::string &title, unsigned int width,
   m_window = XCreateWindow(m_display, RootWindow(m_display, vi->screen), 0, 0,
                            width, height, 0, vi->depth, InputOutput, vi->visual,
                            CWBorderPixel | CWColormap | CWEventMask, &swa);
-  //m_window = XCreateSimpleWindow(m_display, RootWindowOfScreen(m_screen), 0, 0,
-  //                               width, height, 1, BlackPixel(m_display, m_screen_id),
-  //                               WhitePixel(m_display, m_screen_id));
   if (!m_window) { throw std::runtime_error{"Failed to create window."}; }
 
   // Done with the visual info data
@@ -117,7 +114,6 @@ window::window(const std::string &title, unsigned int width,
 
   // Install an X error handler so the application won't exit if GL 3.0
   // window allocation fails.
-  //
   // Note this error handler is global.  All display connections in all threads
   // of a process use the same error handler, so be sure to guard against other
   // threads issuing X commands while this code is running.
