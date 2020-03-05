@@ -2,6 +2,15 @@ enable_testing()
 include(CTest)
 include(Catch)
 #-------------------------------------------------------------------------------
+if(YAVIN_USE_GLX)
+  add_executable (glx_window.test ${CMAKE_CURRENT_SOURCE_DIR}/glx_window.cpp)
+  target_link_libraries(glx_window.test yavin Catch2::Catch2)
+  target_compile_features(glx_window.test PUBLIC cxx_std_17)
+  target_compile_options(glx_window.test PUBLIC
+    -Wall -Wextra -pedantic -Wno-missing-braces -Wno-unused-lambda-capture)
+  add_custom_target (glx_window.test.run COMMAND ./glx_window.test DEPENDS glx_window.test)
+endif()
+#-------------------------------------------------------------------------------
 set(YAVIN_TEST_CPPS main.cpp)
 macro(create_test NAME)
   list(APPEND YAVIN_TEST_CPPS "${NAME}.cpp")
@@ -36,6 +45,7 @@ file(GLOB YAVIN_TEST_FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 list(REMOVE_ITEM YAVIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+list(REMOVE_ITEM YAVIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/glx_window.cpp")
 foreach(FILE ${YAVIN_TEST_FILES})
   get_filename_component(FILENAME ${FILE} NAME_WE)
   create_test(${FILENAME})

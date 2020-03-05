@@ -5,8 +5,11 @@
 #include <GL/glx.h>
 #include "x11.h"
 
+#include "keyboard.h"
+
 #include <list>
 #include <string>
+#include <vector>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -15,19 +18,25 @@ class window {
                                                        GLXContext, Bool,
                                                        const int *);
   static std::list<window *> contexts;
-  static bool                error_occured;
-  static const int           visual_attribs[23];
-  Display *                  display;
-  Window                     win;
-  GLXContext                 ctx;
-  Colormap                   cmap;
-  XEvent                     xevent;
+
+  std::vector<keyboard_listener *> m_keyboard_listeners;
+  static bool                      m_error_occured;
+  static const int                 m_visual_attribs[23];
+  Display *                        m_display;
+  Screen *                         m_screen;
+  int                              m_screen_id;
+  Window                           m_window;
+  GLXContext                       m_context;
+  Colormap                         m_colormap;
+  XEvent                           m_xevent;
 
  public:
-  window(const std::string &title, int major = 3, int minor = 0);
+  window(const std::string &title, unsigned int width, unsigned int height,
+         int major = 4, int minor = 5);
   ~window();
-  void make_current() { glXMakeCurrent(display, win, ctx); }
-  void check_keyboard();
+  void make_current() { glXMakeCurrent(m_display, m_window, m_context); }
+  void check_events();
+  void add_listener(keyboard_listener &l);
 
   /// Helper to check for extension string presence. Adapted from:
   /// http://www.opengl.org/resources/features/OGLextensions/
