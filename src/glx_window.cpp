@@ -8,6 +8,7 @@ static constexpr auto glx_context_minor_version_arb = 0x2092;
 #define YAVIN_X11_CONTEXT_DONT_DELETE
 #include <yavin/glx_window.h>
 #include <yavin/x11keys.h>
+#include <yavin/x11buttons.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -84,7 +85,11 @@ window::window(const std::string &title, unsigned int width,
   swa.background_pixmap = None;
   swa.border_pixel      = 0;
   swa.event_mask =
-      StructureNotifyMask | KeyPressMask | KeyReleaseMask;
+
+      ExposureMask | KeyPressMask | ButtonPress | StructureNotifyMask |
+      ButtonReleaseMask | KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
+      PointerMotionMask | Button1MotionMask | VisibilityChangeMask |
+      ColormapChangeMask;
 
   m_window = XCreateWindow(m_display, RootWindow(m_display, vi->screen), 0, 0,
                            width, height, 0, vi->depth, InputOutput, vi->visual,
@@ -190,28 +195,47 @@ window::~window() {
 }
 //------------------------------------------------------------------------------
 void window::check_events() {
-  if (XCheckWindowEvent(m_display, m_window, KeyPressMask | KeyReleaseMask,
-                        &m_xevent)) {
-
+  while (XCheckWindowEvent(m_display, m_window,
+                           ExposureMask | KeyPressMask | ButtonPress |
+                               ButtonReleaseMask | KeyReleaseMask |
+                               EnterWindowMask | LeaveWindowMask |
+                               PointerMotionMask | Button1MotionMask |
+                               VisibilityChangeMask | ColormapChangeMask,
+                           &m_xevent)) {
     switch (m_xevent.type) {
-    case KeyPress:
-      for (auto l : m_keyboard_listeners) {
-        l->on_key_pressed(x11_keysym_to_key(
-            XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
-      }
-      break;
-    case KeyRelease:
-      for (auto l : m_keyboard_listeners) {
-        l->on_key_released(x11_keysym_to_key(
-            XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
-      }
-      break;
+      case KeyPress:
+        for (auto l : m_listeners) {
+          l->on_key_pressed(x11_keysym_to_key(
+              XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
+        }
+        break;
+      case KeyRelease:
+        for (auto l : m_listeners) {
+          l->on_key_released(x11_keysym_to_key(
+              XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
+        }
+        break;
+      case ButtonPress:
+        for (auto l : m_listeners) {
+          l->on_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
+        }
+        break;
+      case ButtonRelease:
+        for (auto l : m_listeners) {
+          l->on_button_released(x11_button_to_button(m_xevent.xbutton.button));
+        }
+        break;
+      case MotionNotify:
+        for (auto l : m_listeners) {
+          l->on_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
+        }
+        break;
     }
   }
 }
 //------------------------------------------------------------------------------
-void window::add_listener(keyboard_listener &l) {
-  m_keyboard_listeners.push_back(&l);
+void window::add_listener(window_listener &l) {
+  m_listeners.push_back(&l);
 }
 //------------------------------------------------------------------------------
 bool window::extension_supported(const char *extList, const char *extension) {

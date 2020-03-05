@@ -6,6 +6,7 @@
 #include "x11.h"
 
 #include "keyboard.h"
+#include "mouse.h"
 
 #include <list>
 #include <string>
@@ -13,13 +14,17 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
+struct window_listener : keyboard_listener, button_listener {
+  virtual void on_mouse_motion(int /*x*/, int /*y*/) {}
+};
+//==============================================================================
 class window {
   typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig,
                                                        GLXContext, Bool,
                                                        const int *);
   static std::list<window *> contexts;
 
-  std::vector<keyboard_listener *> m_keyboard_listeners;
+  std::vector<window_listener *>   m_listeners;
   static bool                      m_error_occured;
   static const int                 m_visual_attribs[23];
   Display *                        m_display;
@@ -36,7 +41,7 @@ class window {
   ~window();
   void make_current() { glXMakeCurrent(m_display, m_window, m_context); }
   void check_events();
-  void add_listener(keyboard_listener &l);
+  void add_listener(window_listener &l);
 
   /// Helper to check for extension string presence. Adapted from:
   /// http://www.opengl.org/resources/features/OGLextensions/
