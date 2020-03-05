@@ -1,10 +1,6 @@
 [submodule "external/catch2"]
 	path = external/catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "external/doxygen-bootstrapped"]
-	path = external/doxygen-bootstrapped
-	url = https://github.com/Velron/doxygen-bootstrapped.git
-	branch = feature/support-doxygen-1.1.12+
 [submodule "external/glew"]
 	path = external/glew
 	url = https://github.com/nigels-com/glew
