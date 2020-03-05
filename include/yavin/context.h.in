@@ -1,11 +1,13 @@
-#ifndef YAVIN_GLX
-#define YAVIN_GLX @YAVIN_USE_GLX@
+#if !defined(YAVIN_GLX)
+#  define YAVIN_GLX @YAVIN_USE_GLX@
 #endif
-#ifndef YAVIN_EGL
-#define YAVIN_EGL @YAVIN_USE_EGL@
+
+#if !defined(YAVIN_EGL)
+#  define YAVIN_EGL @YAVIN_USE_EGL@
 #endif
+
 #if YAVIN_GLX
-#include "yavin/glx_context.h"
+#  include "yavin/glx_context.h"
 #elif YAVIN_EGL
-#include "yavin/egl_context.h"
+#  include "yavin/egl_context.h"
 #endif

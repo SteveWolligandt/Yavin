@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(yavin)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/catch2/contrib/")
-add_subdirectory(external/catch2)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # for color with ninja
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -119,7 +118,6 @@ if(YAVIN_USE_GLX)
 elseif(YAVIN_USE_EGL)
   list(APPEND YAVIN_SOURCES 
     ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
-    ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
   )
 endif()
 add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES})
@@ -154,10 +152,6 @@ elseif(YAVIN_USE_EGL)
     yavin PRIVATE
     OpenGL::EGL)
 endif()
-
-# target export
-export(TARGETS yavin FILE yavinConfig.cmake)
-export(PACKAGE yavin)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # setup png library
@@ -200,28 +194,16 @@ configure_file(include/yavin/shaderincludepaths.h.in
 configure_file(include/yavin/texpng.h.in
                include/yavin/texpng.h)
 
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # subdirectories
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+add_subdirectory(external/catch2)
 add_subdirectory(test)
+add_subdirectory(doc)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# Doxygen
+# target export
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# check if Doxygen is installed
-find_package(Doxygen)
-if (DOXYGEN_FOUND)
-  # set input and output files
-  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile)
-
-  # request to configure the file
-  configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-  # note the option ALL which allows to build the docs together with the application
-  add_custom_target(doc_doxygen ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen"
-    VERBATIM)
-endif ()
+export(TARGETS yavin FILE yavinConfig.cmake)
+export(PACKAGE yavin)

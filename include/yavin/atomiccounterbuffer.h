@@ -1,17 +1,15 @@
 #ifndef YAVIN_ATOMIC_COUNTER_BUFFER_H
 #define YAVIN_ATOMIC_COUNTER_BUFFER_H
-
+//==============================================================================
 #include <initializer_list>
 #include <iostream>
 #include <vector>
 #include "buffer.h"
 #include "dllexport.h"
 #include "errorcheck.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 class atomiccounterbuffer
     : public buffer<GL_ATOMIC_COUNTER_BUFFER, unsigned int> {
  public:
@@ -37,9 +35,7 @@ class atomiccounterbuffer
   DLL_API void        bind(size_t i) const;
   DLL_API static void unbind(size_t i);
 };
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

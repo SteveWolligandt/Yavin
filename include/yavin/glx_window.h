@@ -1,13 +1,12 @@
 #ifndef YAVIN_GLX_WINDOW_H
 #define YAVIN_GLX_WINDOW_H
 //==============================================================================
-#include <GL/glx.h>
 #include <yavin/glincludes.h>
+#include <GL/glx.h>
+#include "x11.h"
 
 #include <list>
 #include <string>
-
-#include "x11.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -22,6 +21,7 @@ class window {
   Window                     win;
   GLXContext                 ctx;
   Colormap                   cmap;
+  XEvent                     xevent;
 
  public:
   window(const std::string &title, int major = 3, int minor = 0);

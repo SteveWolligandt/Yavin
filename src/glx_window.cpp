@@ -1,12 +1,12 @@
 #include <iostream>
 #include <cstring>
 
-#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
-#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
-#define YAVIN_X11_CONTEXT_DONT_DELETE
+static constexpr auto glx_context_major_version_arb = 0x2091;
+static constexpr auto glx_context_minor_version_arb = 0x2092;
 
-#include <yavin/glx_window.h>
 #include <yavin/glincludes.h>
+#define YAVIN_X11_CONTEXT_DONT_DELETE
+#include <yavin/glx_window.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -119,8 +119,8 @@ window::window(const std::string& title, int major, int minor)
   }
 
   else {
-    int context_attribs[] = {GLX_CONTEXT_MAJOR_VERSION_ARB, major,
-                             GLX_CONTEXT_MINOR_VERSION_ARB, minor,
+    int context_attribs[] = {glx_context_major_version_arb, major,
+                             glx_context_minor_version_arb, minor,
                              // GLX_CONTEXT_FLAGS_ARB        ,
                              // GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
                              None};
@@ -144,9 +144,9 @@ window::window(const std::string& title, int major, int minor)
       // When a context version below 3.0+ is requested, implementations will
       // return the newest context version compatible with OpenGL versions less
       // than version 3.0+.
-      // GLX_CONTEXT_MAJOR_VERSION_ARB = 1
+      // glx_context_major_version_arb = 1
       context_attribs[1] = 1;
-      // GLX_CONTEXT_MINOR_VERSION_ARB = 0
+      // glx_context_minor_version_arb = 0
       context_attribs[3] = 0;
 
       error_occured = false;
@@ -179,33 +179,11 @@ window::~window() {
 }
 //------------------------------------------------------------------------------
 void window::check_keyboard() {
-  if (XCheckWindowEvent(dpy, win, KeyPressMask, &xev)) {
-    char *key_string =
-        XKeysymToString(XkbKeycodeToKeysym(display, xev.xkey.keycode, 0, 0));
-
-    if (strncmp(key_string, "Left", 4) == 0) {
-      rot_z_vel -= 200.0 * DT;
-    }
-
-    else if (strncmp(key_string, "Right", 5) == 0) {
-      rot_z_vel += 200.0 * DT;
-    }
-
-    else if (strncmp(key_string, "Up", 2) == 0) {
-      rot_y_vel -= 200.0 * DT;
-    }
-
-    else if (strncmp(key_string, "Down", 4) == 0) {
-      rot_y_vel += 200.0 * DT;
-    }
-
-    else if (strncmp(key_string, "F1", 2) == 0) {
-      rot_y_vel = 0.0;
-      rot_z_vel = 0.0;
-    }
-
-    else if (strncmp(key_string, "Escape", 5) == 0) {
-      ExitProgram();
+  if (XCheckWindowEvent(display, win, KeyPressMask, &xevent)) {
+    if (xevent.type == KeyPress) {
+      std::cerr << "keydown\n";
+    } else if (xevent.type == KeyRelease) {
+      std::cerr << "keydown\n";
     }
   }
 }
@@ -238,7 +216,7 @@ int window::error_handler_static(Display *display, XErrorEvent * ev) {
       return ctx->error_handler(ev);
   return 0;
 }
-
+//------------------------------------------------------------------------------
 int window::error_handler(XErrorEvent * /*ev*/) {
   error_occured = true;
   return 0;

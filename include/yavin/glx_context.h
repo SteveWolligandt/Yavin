@@ -1,13 +1,12 @@
 #ifndef YAVIN_GLX_CONTEXT_H
 #define YAVIN_GLX_CONTEXT_H
 //==============================================================================
-#include <GL/glx.h>
 #include <yavin/glincludes.h>
+#include <GL/glx.h>
+#include "x11.h"
 
 #include <list>
 #include <string>
-
-#include "x11.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -30,7 +29,7 @@ class context {
 
   /// Helper to check for extension string presence. Adapted from:
   /// http://www.opengl.org/resources/features/OGLextensions/
-  static bool extension_supported(const char *extList, const char *extension);
+  static bool extension_supported(const char *ext_list, const char *extension);
 
   static int error_handler_static(Display *dpy, XErrorEvent *ev);
   int        error_handler(XErrorEvent *ev);
