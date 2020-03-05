@@ -26,6 +26,10 @@ struct listener : yavin::window_listener {
   void on_mouse_motion(int x, int y) override {
     std::cerr << "mouse moved " << x << ", " << y << "\n";
   }
+  //----------------------------------------------------------------------------
+  void on_resize(int w, int h) override {
+    std::cerr << "resized " << w << ", " << h << "\n";
+  }
 };
 //==============================================================================
 int main() {

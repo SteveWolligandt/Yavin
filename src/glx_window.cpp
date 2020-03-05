@@ -84,12 +84,10 @@ window::window(const std::string &title, unsigned int width,
       m_display, RootWindow(m_display, vi->screen), vi->visual, AllocNone);
   swa.background_pixmap = None;
   swa.border_pixel      = 0;
-  swa.event_mask =
-
-      ExposureMask | KeyPressMask | ButtonPress | StructureNotifyMask |
-      ButtonReleaseMask | KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
-      PointerMotionMask | Button1MotionMask | VisibilityChangeMask |
-      ColormapChangeMask;
+  swa.event_mask        = ExposureMask | KeyPressMask | ButtonPress |
+                   StructureNotifyMask | ButtonReleaseMask | KeyReleaseMask |
+                   EnterWindowMask | LeaveWindowMask | PointerMotionMask |
+                   Button1MotionMask | VisibilityChangeMask;
 
   m_window = XCreateWindow(m_display, RootWindow(m_display, vi->screen), 0, 0,
                            width, height, 0, vi->depth, InputOutput, vi->visual,
@@ -197,10 +195,10 @@ window::~window() {
 void window::check_events() {
   while (XCheckWindowEvent(m_display, m_window,
                            ExposureMask | KeyPressMask | ButtonPress |
-                               ButtonReleaseMask | KeyReleaseMask |
-                               EnterWindowMask | LeaveWindowMask |
-                               PointerMotionMask | Button1MotionMask |
-                               VisibilityChangeMask | ColormapChangeMask,
+                               StructureNotifyMask | ButtonReleaseMask |
+                               KeyReleaseMask | EnterWindowMask |
+                               LeaveWindowMask | PointerMotionMask |
+                               Button1MotionMask | VisibilityChangeMask,
                            &m_xevent)) {
     switch (m_xevent.type) {
       case KeyPress:
@@ -228,6 +226,11 @@ void window::check_events() {
       case MotionNotify:
         for (auto l : m_listeners) {
           l->on_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
+        }
+        break;
+      case ConfigureNotify:
+        for (auto l : m_listeners) {
+          l->on_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
         }
         break;
     }
