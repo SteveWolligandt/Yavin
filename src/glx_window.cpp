@@ -176,7 +176,7 @@ window::window(const std::string &title, unsigned int width,
   if (m_error_occured || !m_context) {
     throw std::runtime_error{"Failed to create an OpenGL context"};
   }
-  init_imgui(major, minor);
+  init_imgui();
 }
 //------------------------------------------------------------------------------
 window::~window() {
@@ -220,7 +220,7 @@ void window::check_events() {
             XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
         break;
       case ButtonPress:
-          notify_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
+        notify_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
         break;
       case ButtonRelease:
           notify_button_released(x11_button_to_button(m_xevent.xbutton.button));
@@ -273,7 +273,7 @@ void window::swap_buffers() {
   glXSwapBuffers(m_display, m_window);
 }
 //------------------------------------------------------------------------------
-void window::init_imgui(int major, int minor) {
+void window::init_imgui() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   add_listener(imgui::instance());

@@ -15,64 +15,46 @@ imgui::imgui() {
 
   // Glut has 1 function for characters and one for "special keys". We map the
   // characters in the 0..255 range and the keys above.
-  io.KeyMap[ImGuiKey_Tab]         = '\t';  // == 9 == CTRL+I
-  io.KeyMap[ImGuiKey_LeftArrow]   = key::KEY_LEFT;
-  io.KeyMap[ImGuiKey_RightArrow]  = key::KEY_RIGHT;
-  io.KeyMap[ImGuiKey_UpArrow]     = key::KEY_UP;
-  io.KeyMap[ImGuiKey_DownArrow]   = key::KEY_DOWN;
-  io.KeyMap[ImGuiKey_PageUp]      = key::KEY_PAGE_UP;
-  io.KeyMap[ImGuiKey_PageDown]    = key::KEY_PAGE_DOWN;
-  io.KeyMap[ImGuiKey_Home]        = key::KEY_HOME;
-  io.KeyMap[ImGuiKey_End]         = key::KEY_END;
-  io.KeyMap[ImGuiKey_Insert]      = key::KEY_INSERT;
-  io.KeyMap[ImGuiKey_Delete]      = key::KEY_DELETE;
-  io.KeyMap[ImGuiKey_Backspace]   = key::KEY_BACKSPACE;
-  io.KeyMap[ImGuiKey_Space]       = key::KEY_SPACE;
-  io.KeyMap[ImGuiKey_Enter]       = key::KEY_ENTER;
-  io.KeyMap[ImGuiKey_Escape]      = key::KEY_ESCAPE;
-  io.KeyMap[ImGuiKey_KeyPadEnter] = key::KEY_KP_ENTER;
-  io.KeyMap[ImGuiKey_A]           = key::KEY_A;
-  io.KeyMap[ImGuiKey_C]           = key::KEY_C;
-  io.KeyMap[ImGuiKey_V]           = key::KEY_V;
-  io.KeyMap[ImGuiKey_X]           = key::KEY_X;
-  io.KeyMap[ImGuiKey_Y]           = key::KEY_Y;
-  io.KeyMap[ImGuiKey_Z]           = key::KEY_Z;
+  io.KeyMap[ImGuiKey_Tab]         = KEY_TAB;
+  io.KeyMap[ImGuiKey_LeftArrow]   = KEY_LEFT;
+  io.KeyMap[ImGuiKey_RightArrow]  = KEY_RIGHT;
+  io.KeyMap[ImGuiKey_UpArrow]     = KEY_UP;
+  io.KeyMap[ImGuiKey_DownArrow]   = KEY_DOWN;
+  io.KeyMap[ImGuiKey_PageUp]      = KEY_PAGE_UP;
+  io.KeyMap[ImGuiKey_PageDown]    = KEY_PAGE_DOWN;
+  io.KeyMap[ImGuiKey_Home]        = KEY_HOME;
+  io.KeyMap[ImGuiKey_End]         = KEY_END;
+  io.KeyMap[ImGuiKey_Insert]      = KEY_INSERT;
+  io.KeyMap[ImGuiKey_Delete]      = KEY_DELETE;
+  io.KeyMap[ImGuiKey_Backspace]   = KEY_BACKSPACE;
+  io.KeyMap[ImGuiKey_Space]       = KEY_SPACE;
+  io.KeyMap[ImGuiKey_Enter]       = KEY_ENTER;
+  io.KeyMap[ImGuiKey_Escape]      = KEY_ESCAPE;
+  io.KeyMap[ImGuiKey_KeyPadEnter] = KEY_KP_ENTER;
+  io.KeyMap[ImGuiKey_A]           = KEY_A;
+  io.KeyMap[ImGuiKey_C]           = KEY_C;
+  io.KeyMap[ImGuiKey_V]           = KEY_V;
+  io.KeyMap[ImGuiKey_X]           = KEY_X;
+  io.KeyMap[ImGuiKey_Y]           = KEY_Y;
+  io.KeyMap[ImGuiKey_Z]           = KEY_Z;
 }
 //------------------------------------------------------------------------------
 imgui::~imgui() {}
 //------------------------------------------------------------------------------
 void imgui::on_key_pressed(key k) {
-  //// Send character to imgui
-  //// printf("char_down_func %d '%c'\n", c, c);
-  //ImGuiIO& io = ImGui::GetIO();
-  //if (c >= 32) io.AddInputCharacter((unsigned int)c);
-  //
-  //// Store letters in KeysDown[] array as both uppercase and lowercase + Handle
-  //// GLUT translating CTRL+A..CTRL+Z as 1..26. This is a hacky mess but GLUT is
-  //// unable to distinguish e.g. a TAB key from CTRL+I so this is probably the
-  //// best we can do here.
-  //if (c >= 1 && c <= 26)
-  //  io.KeysDown[c] = io.KeysDown[c - 1 + 'a'] = io.KeysDown[c - 1 + 'A'] = true;
-  //else if (c >= 'a' && c <= 'z')
-  //  io.KeysDown[c] = io.KeysDown[c - 'a' + 'A'] = true;
-  //else if (c >= 'A' && c <= 'Z')
-  //  io.KeysDown[c] = io.KeysDown[c - 'A' + 'a'] = true;
-  //else
-  //  io.KeysDown[c] = true;
+  ImGuiIO& io = ImGui::GetIO();
+  io.KeysDown[k]         = true;
+  io.KeyCtrl             = io.KeysDown[KEY_CTRL_L] || io.KeysDown[KEY_CTRL_R];
+  io.KeyShift = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
+  io.KeyAlt = io.KeysDown[KEY_ALT_L] || io.KeysDown[KEY_ALT_R];
 }
 //------------------------------------------------------------------------------
 void imgui::on_key_released(key k) {
-  //// printf("char_up_func %d '%c'\n", c, c);
-  //ImGuiIO& io = ImGui::GetIO();
-  //if (c >= 1 && c <= 26)
-  //  io.KeysDown[c] = io.KeysDown[c - 1 + 'a'] = io.KeysDown[c - 1 + 'A'] =
-  //      false;
-  //else if (c >= 'a' && c <= 'z')
-  //  io.KeysDown[c] = io.KeysDown[c - 'a' + 'A'] = false;
-  //else if (c >= 'A' && c <= 'Z')
-  //  io.KeysDown[c] = io.KeysDown[c - 'A' + 'a'] = false;
-  //else
-  //  io.KeysDown[c] = false;
+  ImGuiIO&   io = ImGui::GetIO();
+  io.KeysDown[k]         = true;
+  io.KeyCtrl             = io.KeysDown[KEY_CTRL_L] || io.KeysDown[KEY_CTRL_R];
+  io.KeyShift = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
+  io.KeyAlt = io.KeysDown[KEY_ALT_L] || io.KeysDown[KEY_ALT_R];
 }
 //------------------------------------------------------------------------------
 void imgui::on_button_pressed(button b) {

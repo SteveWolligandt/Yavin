@@ -33,6 +33,7 @@ class window : public window_notifier{
   Colormap                         m_colormap;
   XEvent                           m_xevent;
   std::unique_ptr<imguigl>         m_imguigl;
+  bool                             m_shift_down, m_ctrl_down, m_alt_down;
 
  public:
   window(const std::string &title, unsigned int width, unsigned int height,
@@ -50,9 +51,12 @@ class window : public window_notifier{
   static int error_handler_static(Display *dpy, XErrorEvent *ev);
   int        error_handler(XErrorEvent *ev);
   void       swap_buffers();
+  bool       shift_down() const { return m_shift_down; }
+  bool       ctrl_down() const { return m_ctrl_down; }
+  bool       alt_down() const { return m_alt_down; }
 
  private:
-  void init_imgui(int major, int minor);
+  void init_imgui();
   void deinit_imgui();
 };
 //==============================================================================

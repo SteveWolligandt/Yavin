@@ -1,19 +1,17 @@
-#include <yavin>
 #include <iostream>
+#include <yavin>
 //==============================================================================
 struct listener : yavin::window_listener {
-  bool& m_run;
-  unsigned int& m_width, m_height;
+  bool&         m_run;
+  unsigned int &m_width, m_height;
   //----------------------------------------------------------------------------
   listener(bool& run, unsigned int& width, unsigned int& height)
       : m_run{run}, m_width{width}, m_height{height} {}
   //----------------------------------------------------------------------------
   void on_key_pressed(yavin::key k) override {
-    std::cerr << "key pressed " << to_string(k) << "\n";
   }
   //----------------------------------------------------------------------------
   void on_key_released(yavin::key k) override {
-    std::cerr << "key released " << to_string(k) << "\n";
     if (k == yavin::KEY_ESCAPE) { m_run = false; }
   }
   //----------------------------------------------------------------------------
@@ -31,24 +29,30 @@ struct listener : yavin::window_listener {
   //----------------------------------------------------------------------------
   void on_resize(int w, int h) override {
     std::cerr << "resized " << w << ", " << h << "\n";
-    m_width = w; m_height = h;
+    m_width  = w;
+    m_height = h;
   }
 };
+void imgui () {
+  static float f = 0.0f;
+  ImGui::Text("Hello, world %d", 123);
+  ImGui::SliderFloat("float", &f, 0.0f, 255.0f);
+}
 //==============================================================================
 int main() {
-  bool run = true;
-  unsigned int w=1000, h=1000;
-  bool show_demo_window = true;
+  bool          run = true;
+  unsigned int  w = 1000, h = 1000;
+
   yavin::window window{"glx window test", w, h};
   listener      l{run, w, h};
   window.add_listener(l);
   while (run) {
-    yavin::gl::clear_color(0, 0, 0, 0);
+    yavin::gl::clear_color(255, 255, 255, 255);
     yavin::clear_color_buffer();
     window.refresh();
     yavin::gl::viewport(0, 0, w, h);
 
-    if (show_demo_window) { ImGui::ShowDemoWindow(&show_demo_window); }
+    imgui();
 
     window.render_imgui();
     window.swap_buffers();
