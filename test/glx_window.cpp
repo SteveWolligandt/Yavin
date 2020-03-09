@@ -9,6 +9,7 @@ struct listener : yavin::window_listener {
       : m_run{run}, m_width{width}, m_height{height} {}
   //----------------------------------------------------------------------------
   void on_key_pressed(yavin::key k) override {
+    std::cerr << "key pressed " << to_string(k) << "\n";
   }
   //----------------------------------------------------------------------------
   void on_key_released(yavin::key k) override {
@@ -33,21 +34,27 @@ struct listener : yavin::window_listener {
     m_height = h;
   }
 };
+//==============================================================================
 void imgui () {
-  static float f = 0.0f;
+  static bool  my_tool_active = true;
+  static float f              = 0.0f;
+  static float col[3];
+  ImGui::Begin("My First Tool", &my_tool_active);
   ImGui::Text("Hello, world %d", 123);
   ImGui::SliderFloat("float", &f, 0.0f, 255.0f);
+  ImGui::ColorEdit3("Color", col);
+  ImGui::End();
 }
-//==============================================================================
+//------------------------------------------------------------------------------
 int main() {
-  bool          run = true;
-  unsigned int  w = 1000, h = 1000;
+  bool         run = true;
+  unsigned int w = 1000, h = 1000;
 
   yavin::window window{"glx window test", w, h};
   listener      l{run, w, h};
   window.add_listener(l);
+  yavin::gl::clear_color(255, 255, 255, 255);
   while (run) {
-    yavin::gl::clear_color(255, 255, 255, 255);
     yavin::clear_color_buffer();
     window.refresh();
     yavin::gl::viewport(0, 0, w, h);

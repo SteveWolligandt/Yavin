@@ -12,7 +12,7 @@ imguigl::imguigl() {
 
   // Setup back-end capabilities flags
   ImGuiIO& io            = ImGui::GetIO();
-  io.BackendRendererName = "imgui_impl_opengl3";
+  io.BackendRendererName = "yavin";
 
   if (m_gl_version >= 3200) {
     io.BackendFlags |=
@@ -311,9 +311,6 @@ bool imguigl::create_fonts_texture() {
   glBindTexture(GL_TEXTURE_2D, m_font_texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#ifdef GL_UNPACK_ROW_LENGTH
-  glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#endif
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, pixels);
 
