@@ -1,16 +1,17 @@
 #ifndef YAVIN_GLX_WINDOW_H
 #define YAVIN_GLX_WINDOW_H
 //==============================================================================
-#include <yavin/glincludes.h>
 #include <GL/glx.h>
-#include "x11.h"
-
-#include "keyboard.h"
-#include "mouse.h"
+#include <imgui/imgui.h>
+#include <yavin/glincludes.h>
 
 #include <list>
 #include <string>
 #include <vector>
+
+#include "keyboard.h"
+#include "mouse.h"
+#include "x11.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -35,6 +36,7 @@ class window {
   GLXContext                       m_context;
   Colormap                         m_colormap;
   XEvent                           m_xevent;
+  ImGuiIO &                        m_imgui_io;
 
  public:
   window(const std::string &title, unsigned int width, unsigned int height,
@@ -50,6 +52,10 @@ class window {
 
   static int error_handler_static(Display *dpy, XErrorEvent *ev);
   int        error_handler(XErrorEvent *ev);
+
+ private:
+  ImGuiIO &init_imgui() const;
+  void deinit_imgui() const;
 };
 //==============================================================================
 }  // namespace yavin

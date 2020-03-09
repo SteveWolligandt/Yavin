@@ -31,7 +31,7 @@ const int window::m_visual_attribs[23] = {
 //==============================================================================
 window::window(const std::string &title, unsigned int width,
                unsigned int height, int major, int minor)
-    : m_display{XOpenDisplay(nullptr)}, m_context{0} {
+    : m_display{XOpenDisplay(nullptr)}, m_context{0}, m_imgui_io{init_imgui()} {
   contexts.push_back(this);
   if (!m_display) { throw std::runtime_error{"Failed to open X m_display"}; }
   m_screen   = DefaultScreenOfDisplay(m_display);
@@ -269,6 +269,16 @@ int window::error_handler_static(Display *m_display, XErrorEvent * ev) {
 int window::error_handler(XErrorEvent * /*ev*/) {
   m_error_occured = true;
   return 0;
+}
+//------------------------------------------------------------------------------
+ImGuiIO &window::init_imgui() const {
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  return ImGui::GetIO();
+}
+//------------------------------------------------------------------------------
+void window::deinit_imgui() const {
+  ImGui::DestroyContext();
 }
 //==============================================================================
 }  // namespace yavin

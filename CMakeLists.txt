@@ -30,8 +30,8 @@ endif()
 set(YAVIN_CONTEXT_SYSTEM "GLX" CACHE STRING "GLX or EGL")
 set_property(CACHE YAVIN_CONTEXT_SYSTEM PROPERTY STRINGS GLX EGL)
 set(YAVIN_GLEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
-set(YAVIN_GLEW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/include)
-set(YAVIN_GLEW_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/glew/lib/libGLEW.a)
+set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_DIR}/include)
+set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_DIR}/lib/libGLEW.a)
 
 if(YAVIN_CONTEXT_SYSTEM STREQUAL "GLX")
   set(YAVIN_USE_EGL 0)
@@ -66,6 +66,13 @@ endif()
 add_custom_target(glew.build
                   DEPENDS ${YAVIN_GLEW_LIBRARY}
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# build imgui
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+set(YAVIN_IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
+set(YAVIN_IMGUI_INCLUDE_DIR ${YAVIN_IMGUI_DIR})
+file(GLOB YAVIN_IMGUI_FILES "${YAVIN_IMGUI_DIR}/*.cpp")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # find OpenGL packages
@@ -120,7 +127,7 @@ elseif(YAVIN_USE_EGL)
     ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
   )
 endif()
-add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES})
+add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES} ${YAVIN_IMGUI_FILES})
 target_compile_features(yavin PUBLIC cxx_std_17)
 
 target_compile_definitions(yavin PRIVATE DLL_EXPORT)
@@ -135,6 +142,10 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
+)
+target_include_directories(yavin
+  PRIVATE 
+  ${CMAKE_SOURCE_DIR}/external
 )
 
 target_link_libraries(
