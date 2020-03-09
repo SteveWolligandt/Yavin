@@ -71,7 +71,7 @@ add_custom_target(glew.build
 # build imgui
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
-set(YAVIN_IMGUI_INCLUDE_DIR ${YAVIN_IMGUI_DIR})
+set(YAVIN_IMGUI_INCLUDE_DIR ${YAVIN_IMGUI_DIR}/..)
 file(GLOB YAVIN_IMGUI_FILES "${YAVIN_IMGUI_DIR}/*.cpp")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -115,6 +115,11 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
   ${CMAKE_SOURCE_DIR}/src/vertexarray.cpp
   ${CMAKE_SOURCE_DIR}/src/vertexshader.cpp
+  ${CMAKE_SOURCE_DIR}/src/window_notifier.cpp
+  ${CMAKE_SOURCE_DIR}/src/keyboard.cpp
+  ${CMAKE_SOURCE_DIR}/src/mouse.cpp
+  ${CMAKE_SOURCE_DIR}/src/imgui.cpp
+  ${CMAKE_SOURCE_DIR}/src/imguigl.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
 if(YAVIN_USE_GLX)
@@ -142,11 +147,7 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
-)
-target_include_directories(yavin
-  PRIVATE 
-  ${CMAKE_SOURCE_DIR}/external
-)
+    ${YAVIN_IMGUI_INCLUDE_DIR})
 
 target_link_libraries(
   yavin PRIVATE
@@ -155,9 +156,7 @@ if(YAVIN_USE_GLX)
   target_link_libraries(
     yavin PRIVATE
     OpenGL::GLX ${X11_LIBRARIES})
-  target_include_directories(
-    yavin PRIVATE
-    ${X11_INCLUDE_DIR})
+  target_include_directories(yavin PRIVATE ${X11_INCLUDE_DIR})
 elseif(YAVIN_USE_EGL)
   target_link_libraries(
     yavin PRIVATE

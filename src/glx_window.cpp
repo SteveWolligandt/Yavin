@@ -31,7 +31,7 @@ const int window::m_visual_attribs[23] = {
 //==============================================================================
 window::window(const std::string &title, unsigned int width,
                unsigned int height, int major, int minor)
-    : m_display{XOpenDisplay(nullptr)}, m_context{0}, m_imgui_io{init_imgui()} {
+    : m_display{XOpenDisplay(nullptr)}, m_context{0} {
   contexts.push_back(this);
   if (!m_display) { throw std::runtime_error{"Failed to open X m_display"}; }
   m_screen   = DefaultScreenOfDisplay(m_display);
@@ -176,9 +176,11 @@ window::window(const std::string &title, unsigned int width,
   if (m_error_occured || !m_context) {
     throw std::runtime_error{"Failed to create an OpenGL context"};
   }
+  init_imgui(major, minor);
 }
 //------------------------------------------------------------------------------
 window::~window() {
+  deinit_imgui();
   glXMakeCurrent(m_display, 0, 0);
   glXDestroyContext(m_display, m_context);
 
@@ -186,6 +188,18 @@ window::~window() {
   XFreeColormap(m_display, m_colormap);
   XCloseDisplay(m_display);
   contexts.remove(this);
+
+}
+//------------------------------------------------------------------------------
+void window::refresh() {
+  check_events();
+  m_imguigl->new_frame();
+  imgui::instance().new_frame();
+}
+//------------------------------------------------------------------------------
+void window::render_imgui () {
+  ImGui::Render();
+  m_imguigl->render_draw_data(ImGui::GetDrawData());
 }
 //------------------------------------------------------------------------------
 void window::check_events() {
@@ -198,43 +212,27 @@ void window::check_events() {
                            &m_xevent)) {
     switch (m_xevent.type) {
       case KeyPress:
-        for (auto l : m_listeners) {
-          l->on_key_pressed(x11_keysym_to_key(
-              XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
-        }
+        notify_key_pressed(x11_keysym_to_key(
+            XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
         break;
       case KeyRelease:
-        for (auto l : m_listeners) {
-          l->on_key_released(x11_keysym_to_key(
-              XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
-        }
+        notify_key_released(x11_keysym_to_key(
+            XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
         break;
       case ButtonPress:
-        for (auto l : m_listeners) {
-          l->on_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
-        }
+          notify_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
         break;
       case ButtonRelease:
-        for (auto l : m_listeners) {
-          l->on_button_released(x11_button_to_button(m_xevent.xbutton.button));
-        }
+          notify_button_released(x11_button_to_button(m_xevent.xbutton.button));
         break;
       case MotionNotify:
-        for (auto l : m_listeners) {
-          l->on_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
-        }
+          notify_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
         break;
       case ConfigureNotify:
-        for (auto l : m_listeners) {
-          l->on_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
-        }
+          notify_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
         break;
     }
   }
-}
-//------------------------------------------------------------------------------
-void window::add_listener(window_listener &l) {
-  m_listeners.push_back(&l);
 }
 //------------------------------------------------------------------------------
 bool window::extension_supported(const char *extList, const char *extension) {
@@ -271,13 +269,18 @@ int window::error_handler(XErrorEvent * /*ev*/) {
   return 0;
 }
 //------------------------------------------------------------------------------
-ImGuiIO &window::init_imgui() const {
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  return ImGui::GetIO();
+void window::swap_buffers() {
+  glXSwapBuffers(m_display, m_window);
 }
 //------------------------------------------------------------------------------
-void window::deinit_imgui() const {
+void window::init_imgui(int major, int minor) {
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  add_listener(imgui::instance());
+  m_imguigl = std::make_unique<imguigl>();
+}
+//------------------------------------------------------------------------------
+void window::deinit_imgui() {
   ImGui::DestroyContext();
 }
 //==============================================================================

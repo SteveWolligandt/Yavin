@@ -77,11 +77,28 @@ auto x11_keysym_to_key(KeySym keysym) {
     case XK_x: return key::KEY_X;
     case XK_y: return key::KEY_Y;
     case XK_z: return key::KEY_Z;
+    case XK_BackSpace: return key::KEY_BACKSPACE;
+    case XK_Insert: return key::KEY_INSERT;
+    case XK_Home: return key::KEY_HOME;
+    case XK_Page_Up: return key::KEY_PAGE_UP;
+    case XK_Page_Down: return key::KEY_PAGE_DOWN;
+    case XK_Delete: return key::KEY_DELETE;
+    case XK_End: return key::KEY_END;
+    case XK_Tab: return key::KEY_TAB;
+    case XK_Return: return key::KEY_ENTER;
+    case XK_KP_Enter: return key::KEY_KP_ENTER;
+    case XK_space: return key::KEY_SPACE;
     case XK_Left: return key::KEY_LEFT;
     case XK_Up: return key::KEY_UP;
     case XK_Right: return key::KEY_RIGHT;
     case XK_Down: return key::KEY_DOWN;
     case XK_Escape: return key::KEY_ESCAPE;
+    case XK_Alt_R: return KEY_ALT_R;
+    case XK_Alt_L: return KEY_ALT_L;
+    case XK_Shift_R: return KEY_SHIFT_R;
+    case XK_Shift_L: return KEY_SHIFT_L;
+    case XK_Control_R: return KEY_CTRL_R;
+    case XK_Control_L: return KEY_CTRL_L;
     default: return key::KEY_UNKNOWN;
   }
 }

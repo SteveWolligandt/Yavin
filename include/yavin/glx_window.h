@@ -1,32 +1,28 @@
 #ifndef YAVIN_GLX_WINDOW_H
 #define YAVIN_GLX_WINDOW_H
 //==============================================================================
-#include <GL/glx.h>
-#include <imgui/imgui.h>
 #include <yavin/glincludes.h>
+#include <GL/glx.h>
 
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "keyboard.h"
-#include "mouse.h"
+#include "imgui.h"
+#include "imguigl.h"
+#include "window_listener.h"
+#include "window_notifier.h"
 #include "x11.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
-struct window_listener : keyboard_listener, button_listener {
-  virtual void on_mouse_motion(int /*x*/, int /*y*/) {}
-  virtual void on_resize(int /*width*/, int /*height*/) {}
-};
-//==============================================================================
-class window {
+class window : public window_notifier{
   typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig,
                                                        GLXContext, Bool,
                                                        const int *);
   static std::list<window *> contexts;
 
-  std::vector<window_listener *>   m_listeners;
   static bool                      m_error_occured;
   static const int                 m_visual_attribs[23];
   Display *                        m_display;
@@ -36,15 +32,16 @@ class window {
   GLXContext                       m_context;
   Colormap                         m_colormap;
   XEvent                           m_xevent;
-  ImGuiIO &                        m_imgui_io;
+  std::unique_ptr<imguigl>         m_imguigl;
 
  public:
   window(const std::string &title, unsigned int width, unsigned int height,
          int major = 4, int minor = 5);
   ~window();
   void make_current() { glXMakeCurrent(m_display, m_window, m_context); }
+  void refresh();
+  void render_imgui();
   void check_events();
-  void add_listener(window_listener &l);
 
   /// Helper to check for extension string presence. Adapted from:
   /// http://www.opengl.org/resources/features/OGLextensions/
@@ -52,10 +49,11 @@ class window {
 
   static int error_handler_static(Display *dpy, XErrorEvent *ev);
   int        error_handler(XErrorEvent *ev);
+  void       swap_buffers();
 
  private:
-  ImGuiIO &init_imgui() const;
-  void deinit_imgui() const;
+  void init_imgui(int major, int minor);
+  void deinit_imgui();
 };
 //==============================================================================
 }  // namespace yavin

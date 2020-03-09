@@ -41,16 +41,13 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
       ((glx_major == 1) && (glx_minor < 3)) || (glx_major < 1))
     throw std::runtime_error{"Invalid GLX version"};
 
-  // std::cerr << "Getting matching framebuffer configs\n";
   int          fbcount;
   GLXFBConfig *fbc = glXChooseFBConfig(display, DefaultScreen(display),
                                        visual_attribs, &fbcount);
   if (!fbc)
     throw std::runtime_error{"Failed to retrieve a framebuffer config\n"};
-  // std::cerr << "Found " << fbcount << " matching FB configs.\n";
 
   // Pick the FB config/visual with the most samples per pixel
-  // std::cerr << "Getting XVisualInfos\n";
   int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
 
   int i;
@@ -60,10 +57,6 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
       int samp_buf, samples;
       glXGetFBConfigAttrib(display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
       glXGetFBConfigAttrib(display, fbc[i], GLX_SAMPLES, &samples);
-
-      // std::cerr << "  Matching fbconfig " << i << ", visual ID 0x"
-      //           << vi->visualid << ": SAMPLE_BUFFERS = " << samp_buf
-      //           << ", SAMPLES = " << samples << "\n";
 
       if (best_fbc < 0 || (samp_buf && samples > best_num_samp))
         best_fbc = i, best_num_samp = samples;
@@ -80,9 +73,7 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
 
   // Get a visual
   XVisualInfo *vi = glXGetVisualFromFBConfig(display, bestFbc);
-  // std::cerr << "Chosen visual ID = 0x" << vi->visualid << "\n";
 
-  // std::cerr << "Creating colormap\n";
   XSetWindowAttributes swa;
   swa.colormap = cmap = XCreateColormap(
       display, RootWindow(display, vi->screen), vi->visual, AllocNone);
@@ -90,7 +81,6 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   swa.border_pixel      = 0;
   swa.event_mask        = StructureNotifyMask;
 
-  // std::cerr << "Creating window\n";
   win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0, 1,
                       1, 0, vi->depth, InputOutput, vi->visual,
                       CWBorderPixel | CWColormap | CWEventMask, &swa);
@@ -104,7 +94,6 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   // Get the default screen's GLX extension list
   const char *glxExts =
       glXQueryExtensionsString(display, DefaultScreen(display));
-  std::cerr << glxExts << '\n';
 
   // NOTE: It is not necessary to create or make current to a glx::context before
   // calling glXGetProcAddressARB
@@ -126,8 +115,8 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   // If either is not present, use GLX 1.3 context creation method.
   if (!extension_supported(glxExts, "GLX_ARB_create_context") ||
       !glXCreateContextAttribsARB) {
-    //std::cerr << "glXCreateContextAttribsARB() not found"
-    //             " ... using old-style GLX context\n";
+    std::cerr << "glXCreateContextAttribsARB() not found"
+                 " ... using old-style GLX context\n";
     ctx = glXCreateNewContext(display, bestFbc, GLX_RGBA_TYPE, 0, True);
   }
 
@@ -144,7 +133,7 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
     // Sync to ensure any errors generated are processed.
     XSync(display, False);
     if (!error_occured && ctx) {
-      //std::cerr << "Created GL " << major << "." << minor << " glx::context\n";
+      std::cerr << "Created GL " << major << "." << minor << " glx::context\n";
       make_current();
 
       glewExperimental = true;

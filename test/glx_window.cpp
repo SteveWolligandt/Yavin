@@ -1,10 +1,12 @@
-#include <yavin/window.h>
+#include <yavin>
 #include <iostream>
 //==============================================================================
 struct listener : yavin::window_listener {
-  bool& run;
+  bool& m_run;
+  unsigned int& m_width, m_height;
   //----------------------------------------------------------------------------
-  listener(bool& _run) : run{_run} {}
+  listener(bool& run, unsigned int& width, unsigned int& height)
+      : m_run{run}, m_width{width}, m_height{height} {}
   //----------------------------------------------------------------------------
   void on_key_pressed(yavin::key k) override {
     std::cerr << "key pressed " << to_string(k) << "\n";
@@ -12,7 +14,7 @@ struct listener : yavin::window_listener {
   //----------------------------------------------------------------------------
   void on_key_released(yavin::key k) override {
     std::cerr << "key released " << to_string(k) << "\n";
-    if (k == yavin::KEY_ESCAPE) { run = false; }
+    if (k == yavin::KEY_ESCAPE) { m_run = false; }
   }
   //----------------------------------------------------------------------------
   void on_button_pressed(yavin::button b) override {
@@ -29,13 +31,26 @@ struct listener : yavin::window_listener {
   //----------------------------------------------------------------------------
   void on_resize(int w, int h) override {
     std::cerr << "resized " << w << ", " << h << "\n";
+    m_width = w; m_height = h;
   }
 };
 //==============================================================================
 int main() {
-  yavin::window w{"glx window test", 600, 600};
-  bool          run = true;
-  listener      l{run};
-  w.add_listener(l);
-  while (run) { w.check_events(); }
+  bool run = true;
+  unsigned int w=1000, h=1000;
+  bool show_demo_window = true;
+  yavin::window window{"glx window test", w, h};
+  listener      l{run, w, h};
+  window.add_listener(l);
+  while (run) {
+    yavin::gl::clear_color(0, 0, 0, 0);
+    yavin::clear_color_buffer();
+    window.refresh();
+    yavin::gl::viewport(0, 0, w, h);
+
+    if (show_demo_window) { ImGui::ShowDemoWindow(&show_demo_window); }
+
+    window.render_imgui();
+    window.swap_buffers();
+  }
 }

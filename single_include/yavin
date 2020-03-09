@@ -1,32 +1,32 @@
 #include <yavin/glincludes.h>
-#include <yavin/context.h>
+#include <yavin/window.h>
 #include <yavin/context.h>
 
 #include <yavin/atomiccounterbuffer.h>
-// #include <yavin/computeshader.h>
-// #include <yavin/errorcheck.h>
-// #include <yavin/fragmentshader.h>
-// #include <yavin/framebuffer.h>
-// #include <yavin/geometryshader.h>
-// #include <yavin/glslvar.h>
-// #include <yavin/glwrapper.h>
-// #include <yavin/indexbuffer.h>
-// #include <yavin/indexeddata.h>
-// #include <yavin/movable.h>
-// #include <yavin/orthographiccamera.h>
-// #include <yavin/perspectivecamera.h>
-// #include <yavin/pixelunpackbuffer.h>
-// #include <yavin/primitive.h>
-// #include <yavin/shader.h>
-// #include <yavin/shaderincludepaths.h>
-// #include <yavin/shaderstage.h>
-// #include <yavin/shaderstageparser.h>
-// #include <yavin/shaderstoragebuffer.h>
-// #include <yavin/tesselationcontrolshader.h>
-// #include <yavin/tesselationevaluationshader.h>
-// #include <yavin/texture.h>
-// #include <yavin/type.h>
-// #include <yavin/vbohelpers.h>
-// #include <yavin/vertexarray.h>
-// #include <yavin/vertexbuffer.h>
-// #include <yavin/vertexshader.h>
+#include <yavin/computeshader.h>
+#include <yavin/errorcheck.h>
+#include <yavin/fragmentshader.h>
+#include <yavin/framebuffer.h>
+#include <yavin/geometryshader.h>
+#include <yavin/glslvar.h>
+#include <yavin/glwrapper.h>
+#include <yavin/indexbuffer.h>
+#include <yavin/indexeddata.h>
+#include <yavin/movable.h>
+#include <yavin/orthographiccamera.h>
+#include <yavin/perspectivecamera.h>
+#include <yavin/pixelunpackbuffer.h>
+#include <yavin/primitive.h>
+#include <yavin/shader.h>
+#include <yavin/shaderincludepaths.h>
+#include <yavin/shaderstage.h>
+#include <yavin/shaderstageparser.h>
+#include <yavin/shaderstoragebuffer.h>
+#include <yavin/tesselationcontrolshader.h>
+#include <yavin/tesselationevaluationshader.h>
+#include <yavin/texture.h>
+#include <yavin/type.h>
+#include <yavin/vbohelpers.h>
+#include <yavin/vertexarray.h>
+#include <yavin/vertexbuffer.h>
+#include <yavin/vertexshader.h>
