@@ -1,16 +1,16 @@
 #ifndef YAVIN_GLX_WINDOW_H
 #define YAVIN_GLX_WINDOW_H
 //==============================================================================
-#include <yavin/glincludes.h>
 #include <GL/glx.h>
+#include <yavin/glincludes.h>
 
 #include <list>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "imgui.h"
-#include "imguigl.h"
+#include "imgui_api_backend.h"
+#include "imgui_render_backend.h"
 #include "window_listener.h"
 #include "window_notifier.h"
 #include "x11.h"
@@ -32,7 +32,7 @@ class window : public window_notifier{
   GLXContext                       m_context;
   Colormap                         m_colormap;
   XEvent                           m_xevent;
-  std::unique_ptr<imguigl>         m_imguigl;
+  std::unique_ptr<imgui_render_backend>         m_imgui_render_backend;
   bool                             m_shift_down, m_ctrl_down, m_alt_down;
 
  public:

@@ -480,13 +480,13 @@ buffer<array_type, T>::~buffer() {
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::create_handle() {
-  gl::create_buffers(1, &id());
+  gl::create_buffers(1, &id_ref());
 }
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::destroy_handle() {
-  if (id() != 0) gl::delete_buffers(1, &id());
-  id() = 0;
+  if (id() != 0) gl::delete_buffers(1, &id_ref());
+  set_id(0);
 }
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>

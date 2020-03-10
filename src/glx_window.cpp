@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 static constexpr auto glx_context_major_version_arb = 0x2091;
 static constexpr auto glx_context_minor_version_arb = 0x2092;
@@ -7,34 +7,43 @@ static constexpr auto glx_context_minor_version_arb = 0x2092;
 #include <yavin/glincludes.h>
 #define YAVIN_X11_CONTEXT_DONT_DELETE
 #include <yavin/glx_window.h>
-#include <yavin/x11keys.h>
 #include <yavin/x11buttons.h>
+#include <yavin/x11keys.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
 std::list<window *> window::contexts;
-bool                 window::m_error_occured      = false;
-const int window::m_visual_attribs[23] = {
-  GLX_X_RENDERABLE    , GL_TRUE,
-  GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
-  GLX_RENDER_TYPE     , GLX_RGBA_BIT,
-  GLX_X_VISUAL_TYPE   , GLX_TRUE_COLOR,
-  GLX_RED_SIZE        , 8,
-  GLX_GREEN_SIZE      , 8,
-  GLX_BLUE_SIZE       , 8,
-  GLX_ALPHA_SIZE      , 8,
-  GLX_DEPTH_SIZE      , 24,
-  GLX_STENCIL_SIZE    , 8,
-  GLX_DOUBLEBUFFER    , GL_TRUE,
-  None
-};
+bool                window::m_error_occured      = false;
+const int           window::m_visual_attribs[23] = {GLX_X_RENDERABLE,
+                                          GL_TRUE,
+                                          GLX_DRAWABLE_TYPE,
+                                          GLX_WINDOW_BIT,
+                                          GLX_RENDER_TYPE,
+                                          GLX_RGBA_BIT,
+                                          GLX_X_VISUAL_TYPE,
+                                          GLX_TRUE_COLOR,
+                                          GLX_RED_SIZE,
+                                          8,
+                                          GLX_GREEN_SIZE,
+                                          8,
+                                          GLX_BLUE_SIZE,
+                                          8,
+                                          GLX_ALPHA_SIZE,
+                                          8,
+                                          GLX_DEPTH_SIZE,
+                                          24,
+                                          GLX_STENCIL_SIZE,
+                                          8,
+                                          GLX_DOUBLEBUFFER,
+                                          GL_TRUE,
+                                          None};
 //==============================================================================
 window::window(const std::string &title, unsigned int width,
                unsigned int height, int major, int minor)
     : m_display{XOpenDisplay(nullptr)}, m_context{0} {
   contexts.push_back(this);
   if (!m_display) { throw std::runtime_error{"Failed to open X m_display"}; }
-  m_screen   = DefaultScreenOfDisplay(m_display);
+  m_screen    = DefaultScreenOfDisplay(m_display);
   m_screen_id = DefaultScreen(m_display);
 
   // FBConfigs were added in GLX version 1.3.
@@ -124,7 +133,8 @@ window::window(const std::string &title, unsigned int width,
   // If either is not present, use GLX 1.3 context creation method.
   if (!extension_supported(glxExts, "GLX_ARB_create_context") ||
       !glXCreateContextAttribsARB) {
-    m_context = glXCreateNewContext(m_display, bestFbc, GLX_RGBA_TYPE, 0, GL_TRUE);
+    m_context =
+        glXCreateNewContext(m_display, bestFbc, GLX_RGBA_TYPE, 0, GL_TRUE);
   } else {
     int context_attribs[] = {glx_context_major_version_arb, major,
                              glx_context_minor_version_arb, minor,
@@ -132,8 +142,8 @@ window::window(const std::string &title, unsigned int width,
                              // GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
                              None};
 
-    m_context =
-        glXCreateContextAttribsARB(m_display, bestFbc, 0, GL_TRUE, context_attribs);
+    m_context = glXCreateContextAttribsARB(m_display, bestFbc, 0, GL_TRUE,
+                                           context_attribs);
 
     // Sync to ensure any errors generated are processed.
     XSync(m_display, GL_FALSE);
@@ -141,7 +151,7 @@ window::window(const std::string &title, unsigned int width,
       std::cerr << "Created GL " << major << "." << minor << " GLX window\n";
       make_current();
 
-      glewExperimental = true;
+      glewExperimental  = true;
       GLenum glew_error = glewInit();
       if (GLEW_OK != glew_error) {
         throw std::runtime_error{
@@ -163,7 +173,7 @@ window::window(const std::string &title, unsigned int width,
       std::cerr << "Failed to create GL " << major << "." << minor
                 << " context ... using old-style GLX context\n";
       m_context = glXCreateContextAttribsARB(m_display, bestFbc, 0, GL_TRUE,
-                                       context_attribs);
+                                             context_attribs);
     }
   }
 
@@ -188,18 +198,16 @@ window::~window() {
   XFreeColormap(m_display, m_colormap);
   XCloseDisplay(m_display);
   contexts.remove(this);
-
 }
 //------------------------------------------------------------------------------
 void window::refresh() {
   check_events();
-  m_imguigl->new_frame();
-  imgui::instance().new_frame();
+  imgui_api_backend::instance().new_frame();
 }
 //------------------------------------------------------------------------------
-void window::render_imgui () {
+void window::render_imgui() {
   ImGui::Render();
-  m_imguigl->render_draw_data(ImGui::GetDrawData());
+  m_imgui_render_backend->render_draw_data(ImGui::GetDrawData());
 }
 //------------------------------------------------------------------------------
 void window::check_events() {
@@ -223,13 +231,13 @@ void window::check_events() {
         notify_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
         break;
       case ButtonRelease:
-          notify_button_released(x11_button_to_button(m_xevent.xbutton.button));
+        notify_button_released(x11_button_to_button(m_xevent.xbutton.button));
         break;
       case MotionNotify:
-          notify_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
+        notify_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
         break;
       case ConfigureNotify:
-          notify_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
+        notify_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
         break;
     }
   }
@@ -241,12 +249,11 @@ bool window::extension_supported(const char *extList, const char *extension) {
 
   // Extension names should not have spaces.
   where = strchr(extension, ' ');
-  if (where || *extension == '\0')
-    return false;
+  if (where || *extension == '\0') return false;
 
   // It takes a bit of care to be fool-proof about parsing the OpenGL extensions
   // string. Don't be fooled by sub-strings, etc.
-  for (start=extList;;) {
+  for (start = extList;;) {
     where = strstr(start, extension);
     if (!where) break;
     terminator = where + strlen(extension);
@@ -257,10 +264,9 @@ bool window::extension_supported(const char *extList, const char *extension) {
   return false;
 }
 //------------------------------------------------------------------------------
-int window::error_handler_static(Display *m_display, XErrorEvent * ev) {
+int window::error_handler_static(Display *m_display, XErrorEvent *ev) {
   for (auto m_context : contexts)
-    if (m_context->m_display == m_display)
-      return m_context->error_handler(ev);
+    if (m_context->m_display == m_display) return m_context->error_handler(ev);
   return 0;
 }
 //------------------------------------------------------------------------------
@@ -276,8 +282,8 @@ void window::swap_buffers() {
 void window::init_imgui() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  add_listener(imgui::instance());
-  m_imguigl = std::make_unique<imguigl>();
+  add_listener(imgui_api_backend::instance());
+  m_imgui_render_backend = std::make_unique<imgui_render_backend>();
 }
 //------------------------------------------------------------------------------
 void window::deinit_imgui() {

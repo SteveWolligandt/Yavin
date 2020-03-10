@@ -39,7 +39,6 @@ template <> struct is_color_component<RGB> : std::true_type {};
 template <> struct is_color_component<RGBA> : std::true_type {};
 template <> struct is_color_component<BGR> : std::true_type {};
 template <> struct is_color_component<BGRA> : std::true_type {};
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

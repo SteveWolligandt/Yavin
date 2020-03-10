@@ -1,33 +1,31 @@
 #ifndef YAVIN_TEXTURE_H
 #define YAVIN_TEXTURE_H
 
-#include <yavin/errorcheck.h>
-#include <yavin/glfunctions.h>
-#include <yavin/idholder.h>
-#include <yavin/pixelunpackbuffer.h>
-#include <yavin/texcomponents.h>
+#include "errorcheck.h"
+#include "glfunctions.h"
+#include "idholder.h"
+#include "pixelunpackbuffer.h"
+#include "texcomponents.h"
 #include <yavin/texpng.h>
-#include <yavin/texsettings.h>
-#include <yavin/textarget.h>
-#include <yavin/type.h>
+#include "texsettings.h"
+#include "textarget.h"
+#include "type.h"
+#include "glwrapper.h"
 
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <iostream>
 #include <type_traits>
 #include <utility>
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 enum WrapMode {
   CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER,
   CLAMP_TO_EDGE   = GL_CLAMP_TO_EDGE,
   REPEAT          = GL_REPEAT,
   MIRRORED_REPEAT = GL_MIRRORED_REPEAT
 };
-
 //==============================================================================
 enum InterpolationMode {
   NEAREST                = GL_NEAREST,
@@ -37,7 +35,6 @@ enum InterpolationMode {
   NEAREST_MIPMAP_LINEAR  = GL_NEAREST_MIPMAP_LINEAR,
   LINEAR_MIPMAP_LINEAR   = GL_LINEAR_MIPMAP_LINEAR
 };
-
 //==============================================================================
 enum CompareFunc {
   NEVER    = GL_NEVER,
@@ -48,13 +45,11 @@ enum CompareFunc {
   GEQUAL   = GL_GEQUAL,
   ALWAYS   = GL_ALWAYS
 };
-
 //==============================================================================
 enum CompareMode {
   COMPARE_R_TO_TEXTURE = GL_COMPARE_R_TO_TEXTURE,
   NONE                 = GL_NONE
 };
-
 //==============================================================================
 template <unsigned int D, typename T, typename C>
 class texture : public id_holder<GLuint> {
@@ -66,6 +61,7 @@ class texture : public id_holder<GLuint> {
   using type                                  = T;
   using components                            = C;
   static constexpr auto target                = tex::target_v<D>;
+  static constexpr auto target_binding        = tex::target_binding<D>;
   static constexpr auto default_interpolation = LINEAR;
   static constexpr auto default_wrap_mode     = REPEAT;
   static constexpr auto num_components        = components::num_components;
@@ -121,7 +117,7 @@ class texture : public id_holder<GLuint> {
   }
   //----------------------------------------------------------------------------
   ~texture() {
-    if (id()) { gl::delete_textures(1, &id()); }
+    if (id()) { gl::delete_textures(1, &id_ref()); }
   }
   //----------------------------------------------------------------------------
   template <typename... Sizes,
@@ -179,7 +175,6 @@ class texture : public id_holder<GLuint> {
     set_wrap_mode(wrap_mode);
     resize(sizes...);
   }
-
   //----------------------------------------------------------------------------
   template <typename S, typename... Sizes,
             typename = std::enable_if_t<sizeof...(Sizes) == D>,
@@ -210,14 +205,16 @@ class texture : public id_holder<GLuint> {
 
  private:
   //----------------------------------------------------------------------------
-  void create_id() { gl::create_textures(target, 1, &id()); }
+  void create_id() { gl::create_textures(target, 1, &id_ref()); }
 
  public:
   //----------------------------------------------------------------------------
-  void bind(GLuint unit = 0) const {
+  auto bind(GLuint unit = 0) const {
     assert(unit < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
     gl::active_texture(GL_TEXTURE0 + unit);
+    auto last_tex = bound_texture(target_binding);
     gl::bind_texture(target, id());
+    return last_tex;
   }
 
   //----------------------------------------------------------------------------
@@ -307,7 +304,7 @@ class texture : public id_holder<GLuint> {
   void resize(Sizes... sizes) {
     static_assert(sizeof...(Sizes) == D);
     static_assert((std::is_integral_v<Sizes> && ...));
-    bind();
+    auto last_tex = bind();
     m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
     if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
@@ -319,6 +316,7 @@ class texture : public id_holder<GLuint> {
       gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
                        depth(), 0, gl_format, gl_type, nullptr);
     }
+    if (last_tex > 0) { gl::bind_texture(target, last_tex); }
   }
 
  private:
@@ -328,22 +326,43 @@ class texture : public id_holder<GLuint> {
     upload_data(std::vector<type>(begin(data), end(data)));
   }
   //------------------------------------------------------------------------------
-  void upload_data(const std::vector<type>& data) {
-    assert(data.size() == num_texels() * num_components);
-    bind();
+  void upload_data(const type* data) {
+    auto last_tex = bind();
     if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
-                       gl_type, data.data());
+                       gl_type, data);
     } else if constexpr (D == 2) {
       gl::tex_image_2d(target, 0, gl_internal_format, width(), height(), 0,
-                       gl_format, gl_type, data.data());
+                       gl_format, gl_type, data);
     } else if constexpr (D == 3) {
       gl::tex_image_3d(target, 0, gl_internal_format, width(), height(),
-                       depth(), 0, gl_format, gl_type, data.data());
+                       depth(), 0, gl_format, gl_type, data);
     }
+    if (last_tex > 0) { gl::bind_texture(target, last_tex); }
+  }
+  //------------------------------------------------------------------------------
+  void upload_data(const std::vector<type>& data) {
+    assert(data.size() == num_texels() * num_components);
+    upload_data(data.data());
   }
 
  public:
+  //------------------------------------------------------------------------------
+  template <typename... Sizes>
+  void upload_data(const std::vector<type>& data, Sizes... sizes) {
+    static_assert(sizeof...(Sizes) == D);
+    static_assert((std::is_integral_v<Sizes> && ...));
+    m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
+    upload_data(data);
+  }
+  //------------------------------------------------------------------------------
+  template <typename... Sizes>
+  void upload_data(const type* data, Sizes... sizes) {
+    static_assert(sizeof...(Sizes) == D);
+    static_assert((std::is_integral_v<Sizes> && ...));
+    m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
+    upload_data(data);
+  }
   //------------------------------------------------------------------------------
   template <typename S, typename... Sizes>
   void upload_data(const std::vector<S>& data, Sizes... sizes) {
@@ -352,7 +371,14 @@ class texture : public id_holder<GLuint> {
     m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
     upload_data(data);
   }
-
+  //------------------------------------------------------------------------------
+  template <typename S, typename... Sizes>
+  void upload_data(const S* data, Sizes... sizes) {
+    static_assert(sizeof...(Sizes) == D);
+    static_assert((std::is_integral_v<Sizes> && ...));
+    m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
+    upload_data(data);
+  }
   //------------------------------------------------------------------------------
   auto download_data() const {
     std::vector<type> data(num_components * num_texels());
@@ -484,9 +510,10 @@ class texture : public id_holder<GLuint> {
   template <unsigned int D_ = D, typename = std::enable_if_t<D_ == 2>>
   void set_data(const pixelunpackbuffer<type>& pbo) {
     pbo.bind();
-    bind();
+    auto last_tex = bind();
     gl::tex_sub_image_2d(GL_TEXTURE_2D, 0, 0, 0, width(), height(), gl_format,
                          gl_type, 0);
+    if (last_tex > 0) { gl::bind_texture(target, last_tex); }
   }
   //------------------------------------------------------------------------------
   void read(const std::string filepath) {

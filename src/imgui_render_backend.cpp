@@ -1,9 +1,9 @@
-#include <yavin/imguigl.h>
+#include <yavin/imgui_render_backend.h>
 #include <iostream>
 //==============================================================================
 namespace yavin {
 //==============================================================================
-imguigl::imguigl() {
+imgui_render_backend::imgui_render_backend() {
   // Query for GL version
   GLint major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -24,22 +24,19 @@ imguigl::imguigl() {
   // Store GLSL version string so we can refer to it later in case we recreate
   // shaders. Note: GLSL version is NOT the same as GL version. Leave this to
   // NULL if unsure.
-  const char* glsl_version = "#version 330";
+  const char* glsl_version = "#version 410";
   IM_ASSERT((int)strlen(glsl_version) + 2 <
             IM_ARRAYSIZE(m_glsl_version_string));
   strcpy(m_glsl_version_string, glsl_version);
   strcat(m_glsl_version_string, "\n");
+   create_device_objects();
 }
 //------------------------------------------------------------------------------
-imguigl::~imguigl() {
+imgui_render_backend::~imgui_render_backend() {
   destroy_device_objects();
 }
 //------------------------------------------------------------------------------
-void imguigl::new_frame() {
-  if (!m_shader_handle) { create_device_objects(); }
-}
-//------------------------------------------------------------------------------
-void imguigl::setup_render_state(ImDrawData* draw_data, int fb_width,
+void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_width,
                                  int fb_height, GLuint vertex_array_object) {
   // Setup render state: alpha-blending enabled, no face culling, no depth
   // testing, scissor enabled, polygon fill
@@ -62,16 +59,15 @@ void imguigl::setup_render_state(ImDrawData* draw_data, int fb_width,
   float       R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
   float       T = draw_data->DisplayPos.y;
   float       B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
-  const float ortho_projection[4][4] = {
-      {2.0f / (R - L), 0.0f, 0.0f, 0.0f},
-      {0.0f, 2.0f / (T - B), 0.0f, 0.0f},
+  const mat4  ortho_projection = {
+      {2.0f / (R - L), 0.0f, 0.0f, (R + L) / (L - R)},
+      {0.0f, 2.0f / (T - B), 0.0f, (T + B) / (B - T)},
       {0.0f, 0.0f, -1.0f, 0.0f},
-      {(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f},
+      {0.0f, 0.0f, 0.0f, 1.0f},
   };
-  glUseProgram(m_shader_handle);
-  glUniform1i(m_attrib_location_tex, 0);
-  glUniformMatrix4fv(m_attrib_location_proj_mtx, 1, GL_FALSE,
-                     &ortho_projection[0][0]);
+  m_shader.bind();
+  m_shader.set_texture_slot(0);
+  m_shader.set_projection_matrix(ortho_projection);
 #ifdef GL_SAMPLER_BINDING
   glBindSampler(0, 0);  // We use combined texture/sampler state. Applications
                         // using GL 3.3 may set that otherwise.
@@ -85,16 +81,16 @@ void imguigl::setup_render_state(ImDrawData* draw_data, int fb_width,
   // Bind vertex/index buffers and setup attributes for ImDrawVert
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo_handle);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elements_handle);
-  glEnableVertexAttribArray(m_attrib_location_vtx_pos);
-  glEnableVertexAttribArray(m_attrib_location_vtx_uv);
-  glEnableVertexAttribArray(m_attrib_location_vtx_color);
-  glVertexAttribPointer(m_attrib_location_vtx_pos, 2, GL_FLOAT, GL_FALSE,
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
                         sizeof(ImDrawVert),
                         (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
-  glVertexAttribPointer(m_attrib_location_vtx_uv, 2, GL_FLOAT, GL_FALSE,
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
                         sizeof(ImDrawVert),
                         (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
-  glVertexAttribPointer(m_attrib_location_vtx_color, 4, GL_UNSIGNED_BYTE,
+  glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE,
                         GL_TRUE, sizeof(ImDrawVert),
                         (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
 }
@@ -105,7 +101,7 @@ void imguigl::setup_render_state(ImDrawData* draw_data, int fb_width,
 // implementation is little overcomplicated because we are saving/setting
 // up/restoring every OpenGL state explicitly, in order to be able to run
 // within any OpenGL engine that doesn't do so.
-void imguigl::render_draw_data(ImDrawData* draw_data) {
+void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
   // Avoid rendering when minimized, scale coordinates for retina displays
   // (screen coordinates != framebuffer coordinates)
   int fb_width =
@@ -290,10 +286,10 @@ void imguigl::render_draw_data(ImDrawData* draw_data) {
             (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
 //------------------------------------------------------------------------------
-bool imguigl::create_fonts_texture() {
+bool imgui_render_backend::create_fonts_texture() {
   // Build texture atlas
   ImGuiIO&       io = ImGui::GetIO();
-  unsigned char* pixels;
+  std::uint8_t* pixels;
   int            width, height;
   io.Fonts->GetTexDataAsRGBA32(
       &pixels, &width,
@@ -305,42 +301,21 @@ bool imguigl::create_fonts_texture() {
                  // instead to save on GPU memory.
 
   // Upload texture to graphics system
-  GLint last_texture;
-  glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-  glGenTextures(1, &m_font_texture);
-  glBindTexture(GL_TEXTURE_2D, m_font_texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, pixels);
-
+  m_font_texture.upload_data(pixels, width, height);
   // Store our identifier
-  io.Fonts->TexID = (ImTextureID)(intptr_t)m_font_texture;
-
-  // Restore state
-  glBindTexture(GL_TEXTURE_2D, last_texture);
-
+  io.Fonts->TexID = (ImTextureID)(intptr_t)m_font_texture.id();
   return true;
-}
-//------------------------------------------------------------------------------
-void imguigl::destroy_fonts_texture() {
-  if (m_font_texture) {
-    ImGuiIO& io = ImGui::GetIO();
-    glDeleteTextures(1, &m_font_texture);
-    io.Fonts->TexID = 0;
-    m_font_texture  = 0;
-  }
 }
 //------------------------------------------------------------------------------
 // If you get an error please report on github. You may try different GL
 // context version or GLSL version. See GL<>GLSL version table at the top of
 // this file.
-bool imguigl::check_shader(GLuint handle, const char* desc) {
+bool imgui_render_backend::check_shader(GLuint handle, const char* desc) {
   GLint status = 0, log_length = 0;
   glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
   glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
   if ((GLboolean)status == GL_FALSE)
-    std::cerr << "ERROR: imguigl::create_device_objects: failed to compile "
+    std::cerr << "ERROR: imgui_render_backend::create_device_objects: failed to compile "
               << desc << "!\n";
   if (log_length > 1) {
     ImVector<char> buf;
@@ -353,7 +328,7 @@ bool imguigl::check_shader(GLuint handle, const char* desc) {
 //------------------------------------------------------------------------------
 // If you get an error please report on GitHub. You may try different GL
 // context version or GLSL version.
-bool imguigl::check_program(GLuint handle, const char* desc) {
+bool imgui_render_backend::check_program(GLuint handle, const char* desc) {
   GLint status = 0, log_length = 0;
   glGetProgramiv(handle, GL_LINK_STATUS, &status);
   glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
@@ -373,7 +348,7 @@ bool imguigl::check_program(GLuint handle, const char* desc) {
   return (GLboolean)status == GL_TRUE;
 }
 //------------------------------------------------------------------------------
-bool imguigl::create_device_objects() {
+bool imgui_render_backend::create_device_objects() {
   // Backup GL state
   GLint last_texture, last_array_buffer;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
@@ -383,154 +358,8 @@ bool imguigl::create_device_objects() {
   glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
 #endif
 
-  // Parse GLSL version string
-  int glsl_version = 130;
-  sscanf(m_glsl_version_string, "#version %d", &glsl_version);
 
-  const GLchar* vertex_shader_glsl_120 =
-      "uniform mat4 ProjMtx;\n"
-      "attribute vec2 Position;\n"
-      "attribute vec2 UV;\n"
-      "attribute vec4 Color;\n"
-      "varying vec2 Frag_UV;\n"
-      "varying vec4 Frag_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Frag_UV = UV;\n"
-      "    Frag_Color = Color;\n"
-      "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
-      "}\n";
 
-  const GLchar* vertex_shader_glsl_130 =
-      "uniform mat4 ProjMtx;\n"
-      "in vec2 Position;\n"
-      "in vec2 UV;\n"
-      "in vec4 Color;\n"
-      "out vec2 Frag_UV;\n"
-      "out vec4 Frag_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Frag_UV = UV;\n"
-      "    Frag_Color = Color;\n"
-      "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
-      "}\n";
-
-  const GLchar* vertex_shader_glsl_300_es =
-      "precision mediump float;\n"
-      "layout (location = 0) in vec2 Position;\n"
-      "layout (location = 1) in vec2 UV;\n"
-      "layout (location = 2) in vec4 Color;\n"
-      "uniform mat4 ProjMtx;\n"
-      "out vec2 Frag_UV;\n"
-      "out vec4 Frag_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Frag_UV = UV;\n"
-      "    Frag_Color = Color;\n"
-      "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
-      "}\n";
-
-  const GLchar* vertex_shader_glsl_410_core =
-      "layout (location = 0) in vec2 Position;\n"
-      "layout (location = 1) in vec2 UV;\n"
-      "layout (location = 2) in vec4 Color;\n"
-      "uniform mat4 ProjMtx;\n"
-      "out vec2 Frag_UV;\n"
-      "out vec4 Frag_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Frag_UV = UV;\n"
-      "    Frag_Color = Color;\n"
-      "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
-      "}\n";
-
-  const GLchar* fragment_shader_glsl_120 =
-      "#ifdef GL_ES\n"
-      "    precision mediump float;\n"
-      "#endif\n"
-      "uniform sampler2D Texture;\n"
-      "varying vec2 Frag_UV;\n"
-      "varying vec4 Frag_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
-      "}\n";
-
-  const GLchar* fragment_shader_glsl_130 =
-      "uniform sampler2D Texture;\n"
-      "in vec2 Frag_UV;\n"
-      "in vec4 Frag_Color;\n"
-      "out vec4 Out_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
-      "}\n";
-
-  const GLchar* fragment_shader_glsl_300_es =
-      "precision mediump float;\n"
-      "uniform sampler2D Texture;\n"
-      "in vec2 Frag_UV;\n"
-      "in vec4 Frag_Color;\n"
-      "layout (location = 0) out vec4 Out_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
-      "}\n";
-
-  const GLchar* fragment_shader_glsl_410_core =
-      "in vec2 Frag_UV;\n"
-      "in vec4 Frag_Color;\n"
-      "uniform sampler2D Texture;\n"
-      "layout (location = 0) out vec4 Out_Color;\n"
-      "void main()\n"
-      "{\n"
-      "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
-      "}\n";
-
-  // Select shaders matching our GLSL versions
-  const GLchar* vertex_shader   = NULL;
-  const GLchar* fragment_shader = NULL;
-  if (glsl_version < 130) {
-    vertex_shader   = vertex_shader_glsl_120;
-    fragment_shader = fragment_shader_glsl_120;
-  } else if (glsl_version >= 410) {
-    vertex_shader   = vertex_shader_glsl_410_core;
-    fragment_shader = fragment_shader_glsl_410_core;
-  } else if (glsl_version == 300) {
-    vertex_shader   = vertex_shader_glsl_300_es;
-    fragment_shader = fragment_shader_glsl_300_es;
-  } else {
-    vertex_shader   = vertex_shader_glsl_130;
-    fragment_shader = fragment_shader_glsl_130;
-  }
-
-  // Create shaders
-  const GLchar* vertex_shader_with_version[2] = {m_glsl_version_string,
-                                                 vertex_shader};
-  m_vert_handle = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(m_vert_handle, 2, vertex_shader_with_version, NULL);
-  glCompileShader(m_vert_handle);
-  check_shader(m_vert_handle, "vertex shader");
-
-  const GLchar* fragment_shader_with_version[2] = {m_glsl_version_string,
-                                                   fragment_shader};
-  m_frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(m_frag_handle, 2, fragment_shader_with_version, NULL);
-  glCompileShader(m_frag_handle);
-  check_shader(m_frag_handle, "fragment shader");
-
-  m_shader_handle = glCreateProgram();
-  glAttachShader(m_shader_handle, m_vert_handle);
-  glAttachShader(m_shader_handle, m_frag_handle);
-  glLinkProgram(m_shader_handle);
-  check_program(m_shader_handle, "shader program");
-
-  m_attrib_location_tex = glGetUniformLocation(m_shader_handle, "Texture");
-  m_attrib_location_proj_mtx =
-      glGetUniformLocation(m_shader_handle, "ProjMtx");
-  m_attrib_location_vtx_pos = glGetAttribLocation(m_shader_handle, "Position");
-  m_attrib_location_vtx_uv  = glGetAttribLocation(m_shader_handle, "UV");
-  m_attrib_location_vtx_color = glGetAttribLocation(m_shader_handle, "Color");
 
   // Create buffers
   glGenBuffers(1, &m_vbo_handle);
@@ -548,7 +377,7 @@ bool imguigl::create_device_objects() {
   return true;
 }
 //------------------------------------------------------------------------------
-void imguigl::destroy_device_objects() {
+void imgui_render_backend::destroy_device_objects() {
   if (m_vbo_handle) {
     glDeleteBuffers(1, &m_vbo_handle);
     m_vbo_handle = 0;
@@ -557,26 +386,6 @@ void imguigl::destroy_device_objects() {
     glDeleteBuffers(1, &m_elements_handle);
     m_elements_handle = 0;
   }
-  if (m_shader_handle && m_vert_handle) {
-    glDetachShader(m_shader_handle, m_vert_handle);
-  }
-  if (m_shader_handle && m_frag_handle) {
-    glDetachShader(m_shader_handle, m_frag_handle);
-  }
-  if (m_vert_handle) {
-    glDeleteShader(m_vert_handle);
-    m_vert_handle = 0;
-  }
-  if (m_frag_handle) {
-    glDeleteShader(m_frag_handle);
-    m_frag_handle = 0;
-  }
-  if (m_shader_handle) {
-    glDeleteProgram(m_shader_handle);
-    m_shader_handle = 0;
-  }
-
-  destroy_fonts_texture();
 }
 //==============================================================================
 }  // namespace yavin

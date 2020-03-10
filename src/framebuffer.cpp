@@ -3,11 +3,11 @@
 namespace yavin {
 //==============================================================================
 framebuffer::framebuffer() {
-  gl::create_framebuffers(1, &id());
+  gl::create_framebuffers(1, &id_ref());
 }
 //------------------------------------------------------------------------------
 framebuffer::~framebuffer() {
-  gl::delete_framebuffers(1, &id());
+  gl::delete_framebuffers(1, &id_ref());
 }
 //------------------------------------------------------------------------------
 template <typename T, typename Components>

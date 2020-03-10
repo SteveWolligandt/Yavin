@@ -1,31 +1,27 @@
-#ifndef YAVIN_IMGUIGL_H
-#define YAVIN_IMGUIGL_H
+#ifndef YAVIN_IMGUI_RENDER_BACKEND_H
+#define YAVIN_IMGUI_RENDER_BACKEND_H
 //==============================================================================
 #include "glincludes.h"
 #include <imgui/imgui.h>
 #include <iostream>
+#include "texture.h"
+#include "imgui_shader.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
-struct imguigl {
+struct imgui_render_backend {
   // OpenGL Data
   GLuint m_gl_version = 0;  // Extracted at runtime using GL_MAJOR_VERSION,
                             // GL_MINOR_VERSION queries.
   char m_glsl_version_string[32] =
       "";  // Specified by user or detected based on compile time GL settings.
-  GLuint m_font_texture  = 0;
-  GLuint m_shader_handle = 0, m_vert_handle = 0, m_frag_handle = 0;
-  int    m_attrib_location_tex   = 0,
-      m_attrib_location_proj_mtx = 0;  // Uniforms location
-  int m_attrib_location_vtx_pos = 0, m_attrib_location_vtx_uv = 0,
-      m_attrib_location_vtx_color = 0;  // Vertex attributes location
+  tex2rgba8ui  m_font_texture;
+  imgui_shader m_shader;
   unsigned int m_vbo_handle = 0, m_elements_handle = 0;
 
-  imguigl();
+  imgui_render_backend();
 
-  ~imguigl();
-
-  void new_frame();
+  ~imgui_render_backend();
 
   void setup_render_state(ImDrawData* draw_data, int fb_width, int fb_height,
                           GLuint vertex_array_object);

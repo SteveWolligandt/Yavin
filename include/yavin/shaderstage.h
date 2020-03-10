@@ -1,5 +1,5 @@
-#ifndef __YAVIN_SHADERSTAGE_H__
-#define __YAVIN_SHADERSTAGE_H__
+#ifndef YAVIN_SHADERSTAGE_H
+#define YAVIN_SHADERSTAGE_H
 
 #include <fstream>
 #include <iostream>
@@ -11,40 +11,26 @@
 #include "errorcheck.h"
 #include "glincludes.h"
 #include "shaderstageparser.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 class shaderstage {
  public:
   using StringType = shaderstageparser::StringType;
   DLL_API static std::string type_to_string(GLenum shader_type);
-
   //----------------------------------------------------------------------------
-
   DLL_API shaderstage(GLenum shader_type, const std::string& shaderfilepath,
                       StringType string_type    = StringType::FILE);
-
   //----------------------------------------------------------------------------
-
   DLL_API shaderstage(shaderstage&& other);
-
   //----------------------------------------------------------------------------
-
   DLL_API ~shaderstage();
-
   //----------------------------------------------------------------------------
-
   DLL_API void compile(bool use_ansi_color = true);
   DLL_API void delete_stage();
-
   //----------------------------------------------------------------------------
-
   const auto& glsl_vars() const { return m_glsl_vars; }
-
   //----------------------------------------------------------------------------
-
   auto id() const { return m_id; }
   auto stage_name() const { return type_to_string(m_shader_type); }
   auto stage_type() const { return m_shader_type; }

@@ -118,8 +118,9 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/window_notifier.cpp
   ${CMAKE_SOURCE_DIR}/src/keyboard.cpp
   ${CMAKE_SOURCE_DIR}/src/mouse.cpp
-  ${CMAKE_SOURCE_DIR}/src/imgui.cpp
-  ${CMAKE_SOURCE_DIR}/src/imguigl.cpp
+  ${CMAKE_SOURCE_DIR}/src/imgui_api_backend.cpp
+  ${CMAKE_SOURCE_DIR}/src/imgui_shader.cpp
+  ${CMAKE_SOURCE_DIR}/src/imgui_render_backend.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
 )
 if(YAVIN_USE_GLX)
