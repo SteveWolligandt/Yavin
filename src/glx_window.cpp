@@ -218,25 +218,36 @@ void window::check_events() {
                                LeaveWindowMask | PointerMotionMask |
                                Button1MotionMask | VisibilityChangeMask,
                            &m_xevent)) {
+    const auto k = x11_keysym_to_key(
+        XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0));
+    const auto b = x11_button_to_button(m_xevent.xbutton.button);
     switch (m_xevent.type) {
       case KeyPress:
-        notify_key_pressed(x11_keysym_to_key(
-            XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
+        imgui_api_backend::instance().on_key_pressed(k);
+        if (!ImGui::GetIO().WantCaptureKeyboard) { notify_key_pressed(k); }
         break;
       case KeyRelease:
-        notify_key_released(x11_keysym_to_key(
-            XkbKeycodeToKeysym(m_display, m_xevent.xkey.keycode, 0, 0)));
+        imgui_api_backend::instance().on_key_released(k);
+        if (!ImGui::GetIO().WantCaptureKeyboard) { notify_key_released(k); }
         break;
       case ButtonPress:
-        notify_button_pressed(x11_button_to_button(m_xevent.xbutton.button));
+        imgui_api_backend::instance().on_button_pressed(b);
+        if (!ImGui::GetIO().WantCaptureMouse) {notify_button_pressed(b);}
         break;
       case ButtonRelease:
-        notify_button_released(x11_button_to_button(m_xevent.xbutton.button));
+        imgui_api_backend::instance().on_button_released(b);
+        if (!ImGui::GetIO().WantCaptureMouse) { notify_button_released(b); }
         break;
       case MotionNotify:
-        notify_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
+        imgui_api_backend::instance().on_mouse_motion(m_xevent.xmotion.x,
+                                                      m_xevent.xmotion.y);
+        if (!ImGui::GetIO().WantCaptureMouse) {
+          notify_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);
+        }
         break;
       case ConfigureNotify:
+        imgui_api_backend::instance().on_resize(m_xevent.xconfigure.width,
+                                                m_xevent.xconfigure.height);
         notify_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
         break;
     }
@@ -282,7 +293,6 @@ void window::swap_buffers() {
 void window::init_imgui() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  add_listener(imgui_api_backend::instance());
   m_imgui_render_backend = std::make_unique<imgui_render_backend>();
 }
 //------------------------------------------------------------------------------

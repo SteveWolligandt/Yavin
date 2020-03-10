@@ -63,6 +63,10 @@ void shader::set_uniform(const std::string& name, float value) {
   gl::program_uniform_1f(m_id, m_uniform_locations.at(name), value);
 }
 //------------------------------------------------------------------------------
+void shader::set_uniform(const std::string& name, GLboolean value) {
+  gl::program_uniform_1i(m_id, m_uniform_locations.at(name), value);
+}
+//------------------------------------------------------------------------------
 void shader::set_uniform(const std::string& name, float x, float y) {
   gl::program_uniform_2f(m_id, m_uniform_locations.at(name), x, y);
 }

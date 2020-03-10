@@ -48,6 +48,7 @@ class shader {
   DLL_API void set_uniform(const std::string&, float);
   DLL_API void set_uniform(const std::string&, int);
   DLL_API void set_uniform(const std::string&, unsigned int);
+  DLL_API void set_uniform(const std::string&, GLboolean);
 
   DLL_API void set_uniform(const std::string&, float, float);
   DLL_API void set_uniform(const std::string&, float, float, float);
