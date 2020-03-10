@@ -6,6 +6,8 @@
 #include <iostream>
 #include "texture.h"
 #include "imgui_shader.h"
+#include "indexbuffer.h"
+#include "vertexbuffer.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -17,11 +19,12 @@ struct imgui_render_backend {
       "";  // Specified by user or detected based on compile time GL settings.
   tex2rgba8ui  m_font_texture;
   imgui_shader m_shader;
-  unsigned int m_vbo_handle = 0, m_elements_handle = 0;
+  vertexbuffer<vec2, vec2, ui8vec4> m_vbo;
+  indexbuffer m_ibo;
 
   imgui_render_backend();
-
   ~imgui_render_backend();
+
 
   void setup_render_state(ImDrawData* draw_data, int fb_width, int fb_height,
                           GLuint vertex_array_object);
@@ -35,8 +38,6 @@ struct imgui_render_backend {
   void render_draw_data(ImDrawData* draw_data);
 
   bool create_fonts_texture();
-
-  void destroy_fonts_texture();
 
   // If you get an error please report on github. You may try different GL
   // context version or GLSL version. See GL<>GLSL version table at the top of

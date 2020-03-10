@@ -79,20 +79,9 @@ void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_widt
 #endif
 
   // Bind vertex/index buffers and setup attributes for ImDrawVert
-  glBindBuffer(GL_ARRAY_BUFFER, m_vbo_handle);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elements_handle);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                        sizeof(ImDrawVert),
-                        (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                        sizeof(ImDrawVert),
-                        (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
-  glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE,
-                        GL_TRUE, sizeof(ImDrawVert),
-                        (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
+  m_vbo.bind();
+  m_ibo.bind();
+  m_vbo.activate_attributes(GL_FALSE, GL_FALSE, GL_TRUE);
 }
 //------------------------------------------------------------------------------
 // OpenGL3 Render function.
@@ -362,9 +351,6 @@ bool imgui_render_backend::create_device_objects() {
 
 
   // Create buffers
-  glGenBuffers(1, &m_vbo_handle);
-  glGenBuffers(1, &m_elements_handle);
-
   create_fonts_texture();
 
   // Restore modified GL state
@@ -378,14 +364,6 @@ bool imgui_render_backend::create_device_objects() {
 }
 //------------------------------------------------------------------------------
 void imgui_render_backend::destroy_device_objects() {
-  if (m_vbo_handle) {
-    glDeleteBuffers(1, &m_vbo_handle);
-    m_vbo_handle = 0;
-  }
-  if (m_elements_handle) {
-    glDeleteBuffers(1, &m_elements_handle);
-    m_elements_handle = 0;
-  }
 }
 //==============================================================================
 }  // namespace yavin

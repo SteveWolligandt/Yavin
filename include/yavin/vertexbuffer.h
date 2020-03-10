@@ -1,5 +1,5 @@
-#ifndef __YAVIN_VERTEXBUFFER_H__
-#define __YAVIN_VERTEXBUFFER_H__
+#ifndef YAVIN_VERTEXBUFFER_H
+#define YAVIN_VERTEXBUFFER_H
 
 #include <initializer_list>
 #include <iostream>
@@ -61,6 +61,7 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
     parent_t::push_back(make_tuple(std::forward<Ts>(ts)...));
   }
 
+  //============================================================================
   static constexpr void activate_attributes() {
     for (unsigned int i = 0; i < num_attributes; i++) {
       gl::enable_vertex_attrib_array(i);
@@ -68,7 +69,30 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
                                 this_t::data_size, (void*)offsets[i]);
     }
   }
-
+  //----------------------------------------------------------------------------
+ private:
+  template <typename... Normalized, size_t... Is>
+  static constexpr void activate_attributes(std::index_sequence<Is...>,
+                                            Normalized... normalized) {
+    static_assert(sizeof...(Normalized) == sizeof...(Is));
+    static_assert(sizeof...(Normalized) == num_attributes);
+    //static_assert((std::is_same_v<GLboolean, std::decay_t<Normalized>> && ...));
+    (
+        [&](auto i, auto normalized) {
+          gl::enable_vertex_attrib_array(i);
+          gl::vertex_attrib_pointer(i, num_components[i], types[i], normalized,
+                                    this_t::data_size, (void*)offsets[i]);
+        }(Is, normalized),
+        ...);
+  }
+  //----------------------------------------------------------------------------
+ public:
+  template <typename... Normalized>
+  static constexpr void activate_attributes(Normalized... normalized) {
+    activate_attributes(std::make_index_sequence<num_attributes>{},
+                        normalized...);
+  }
+  //----------------------------------------------------------------------------
   static constexpr void deactivate_attributes() {
     for (unsigned int i = 0; i < num_attributes; i++)
       gl::disable_vertex_attrib_array(i);
