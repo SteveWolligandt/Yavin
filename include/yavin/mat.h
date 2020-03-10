@@ -481,16 +481,15 @@ constexpr auto perspective_matrix(const Real angleOfView,
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-Mat4<Real> look_at_matrix(const vec<Real, 3>& eye,
-                          const vec<Real, 3>& center,
-                          const vec<Real, 3>& up) {
-  const auto z = normalize(eye - center);
-  const auto y = cross(up, z);
-  const auto x = cross(z, y);
-  return {{x(0), y(0), z(0), eye(0)},
-          {x(1), y(1), z(1), eye(1)},
-          {x(2), y(2), z(2), eye(2)},
-          {   0,    0,    0,      1}};
+Mat4<Real> look_at_matrix(const vec<Real, 3>& eye, const vec<Real, 3>& center,
+                          const vec<Real, 3>& up = {0, 1, 0}) {
+  const auto D = normalize(eye - center);
+  const auto R = cross(up, D);
+  const auto U = cross(D, R);
+  return {{R(0), U(0), D(0), eye(0)},
+          {R(1), U(1), D(1), eye(1)},
+          {R(2), U(2), D(2), eye(2)},
+          {Real(0), Real(0), Real(0), Real(1)}};
 }
 //==============================================================================
 // I/O
@@ -498,9 +497,9 @@ Mat4<Real> look_at_matrix(const vec<Real, 3>& eye,
 /// printing a matrix into a stream
 template <typename Real, size_t R, size_t C>
 constexpr auto& operator<<(std::ostream& str, const mat<Real, R, C>& m) {
-  for (size_t row = 0; row != m.R; ++row) {
+  for (size_t row = 0; row != m.num_rows(); ++row) {
     str << "[ ";
-    for (size_t col = 0; col != m.num_columns; ++col) {
+    for (size_t col = 0; col != m.num_columns(); ++col) {
       str << m(row, col) << ' ';
     }
     str << "]\n";

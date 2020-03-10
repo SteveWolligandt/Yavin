@@ -34,7 +34,6 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
       attr_offset<num_attributes, Ts...>::gen(0, 0);
 
   //----------------------------------------------------------------------------
-
   vertexbuffer(usage_t usage = default_usage) : parent_t(usage) {}
   vertexbuffer(const vertexbuffer& other) : parent_t(other) {}
   vertexbuffer(vertexbuffer&& other) : parent_t(other) {}

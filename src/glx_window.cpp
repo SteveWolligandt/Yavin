@@ -38,8 +38,8 @@ const int           window::m_visual_attribs[23] = {GLX_X_RENDERABLE,
                                           GL_TRUE,
                                           None};
 //==============================================================================
-window::window(const std::string &title, unsigned int width,
-               unsigned int height, int major, int minor)
+window::window(const std::string &title, GLsizei width,
+               GLsizei height, int major, int minor)
     : m_display{XOpenDisplay(nullptr)}, m_context{0} {
   contexts.push_back(this);
   if (!m_display) { throw std::runtime_error{"Failed to open X m_display"}; }

@@ -29,6 +29,11 @@ class camera : public movable {
   const auto& projection_matrix() const { return m_projection_matrix; }
   auto        view_matrix() const { return *inverse(m_transform.matrix()); }
 
+  void look_at(const vec3& eye, const vec3& center,
+               const vec3& up = {0, 1, 0}) {
+    m_transform.look_at(eye, center, up);
+  }
+
   void set_viewport(size_t vp_x, size_t vp_y, size_t vp_w, size_t vp_h) {
     m_vp_x = vp_x;
     m_vp_y = vp_y;

@@ -144,7 +144,7 @@ struct vec {
   //----------------------------------------------------------------------------
   constexpr Real sqr_length() const {
     Real l = 0.0;
-    for (auto c : m_data){l += c * c;}
+    for (auto c : m_data) { l += c * c; }
     return l;
   }
   //----------------------------------------------------------------------------
@@ -183,7 +183,8 @@ constexpr auto distance(const vec<Real, N>& v0, const vec<Real, N>& v1) {
 //------------------------------------------------------------------------------
 /// cross product of two vectors
 template <typename Real>
-constexpr inline vec<Real, 3> cross(const vec<Real, 3>& v0, const vec<Real, 3>& v1) {
+constexpr inline vec<Real, 3> cross(const vec<Real, 3>& v0,
+                                    const vec<Real, 3>& v1) {
   return {v0(1) * v1(2) - v0(2) * v1(1),
           v0(2) * v1(0) - v0(0) * v1(2),
           v0(0) * v1(1) - v0(1) * v1(0)};
@@ -192,9 +193,9 @@ constexpr inline vec<Real, 3> cross(const vec<Real, 3>& v0, const vec<Real, 3>& 
 /// returns a normalized copy of v
 template <typename Real, size_t N>
 constexpr auto normalize(const vec<Real, N>& v) {
-  vec<Real, N>  n{v};
-  auto l = n.length();
-  for (auto& c : n) c /= l;
+  auto n = v;
+  const auto l = n.length();
+  for (auto& c : n) { c /= l; }
   return n;
 }
 //------------------------------------------------------------------------------

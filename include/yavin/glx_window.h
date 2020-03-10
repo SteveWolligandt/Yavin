@@ -1,8 +1,8 @@
 #ifndef YAVIN_GLX_WINDOW_H
 #define YAVIN_GLX_WINDOW_H
 //==============================================================================
-#include <GL/glx.h>
 #include <yavin/glincludes.h>
+#include <GL/glx.h>
 
 #include <list>
 #include <memory>
@@ -36,7 +36,7 @@ class window : public window_notifier{
   bool                             m_shift_down, m_ctrl_down, m_alt_down;
 
  public:
-  window(const std::string &title, unsigned int width, unsigned int height,
+  window(const std::string &title, GLsizei width, GLsizei height,
          int major = 4, int minor = 5);
   ~window();
   void make_current() { glXMakeCurrent(m_display, m_window, m_context); }

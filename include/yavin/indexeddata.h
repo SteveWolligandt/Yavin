@@ -42,7 +42,7 @@ class indexeddata {
   }
   //----------------------------------------------------------------------------
   indexeddata(const indexeddata& other)
-      : m_vbo{std::shared_ptr<vbo_t>{new vbo_t(*other.m_vbo.get())}},
+      : m_vbo{std::make_shared<vbo_t>(other.vertex_buffer())},
         m_ibo{other.m_ibo} {
     setup_vao();
   }
@@ -53,9 +53,10 @@ class indexeddata {
         m_ibo{std::move(other.m_ibo)} {}
   //----------------------------------------------------------------------------
   auto& operator=(const indexeddata& other) {
-    m_vbo = std::make_shared<vbo_t>(new vbo_t{*other.m_vbo.get()});
+    m_vbo = std::make_shared<vbo_t>(other.vertex_buffer());
     m_ibo = other.m_ibo;
     setup_vao();
+    return *this;
   }
   //----------------------------------------------------------------------------
   auto& operator=(indexeddata&& other) {
@@ -63,6 +64,7 @@ class indexeddata {
     m_vbo = std::move(other.m_vbo);
     m_ibo = std::move(other.m_ibo);
     setup_vao();
+    return *this;
   }
   //----------------------------------------------------------------------------
   void setup_vao() {
