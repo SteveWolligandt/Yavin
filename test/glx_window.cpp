@@ -39,8 +39,10 @@ void imgui () {
   static bool  my_tool_active = true;
   static float f              = 0.0f;
   static float col[3];
-  ImGui::Begin("My First Tool", &my_tool_active);
+  static char  str0[128] = "Hello, world!";
+  ImGui::Begin("foo", &my_tool_active);
   ImGui::Text("Hello, world %d", 123);
+  ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
   ImGui::SliderFloat("float", &f, 0.0f, 255.0f);
   ImGui::ColorEdit3("Color", col);
   ImGui::End();

@@ -13,8 +13,6 @@ imgui_api_backend::imgui_api_backend() {
   ImGuiIO& io = ImGui::GetIO();
   io.BackendPlatformName = "imgui_impl_yavin";
 
-  // Glut has 1 function for characters and one for "special keys". We map the
-  // characters in the 0..255 range and the keys above.
   io.KeyMap[ImGuiKey_Tab]         = KEY_TAB;
   io.KeyMap[ImGuiKey_LeftArrow]   = KEY_LEFT;
   io.KeyMap[ImGuiKey_RightArrow]  = KEY_RIGHT;
@@ -43,18 +41,18 @@ imgui_api_backend::~imgui_api_backend() {}
 //------------------------------------------------------------------------------
 void imgui_api_backend::on_key_pressed(key k) {
   ImGuiIO& io = ImGui::GetIO();
-  io.KeysDown[k]         = true;
-  io.KeyCtrl             = io.KeysDown[KEY_CTRL_L] || io.KeysDown[KEY_CTRL_R];
-  io.KeyShift = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
-  io.KeyAlt = io.KeysDown[KEY_ALT_L] || io.KeysDown[KEY_ALT_R];
+  io.KeysDown[k] = true;
+  io.KeyCtrl     = io.KeysDown[KEY_CTRL_L]  || io.KeysDown[KEY_CTRL_R];
+  io.KeyShift    = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
+  io.KeyAlt      = io.KeysDown[KEY_ALT_L]   || io.KeysDown[KEY_ALT_R];
 }
 //------------------------------------------------------------------------------
 void imgui_api_backend::on_key_released(key k) {
-  ImGuiIO&   io = ImGui::GetIO();
-  io.KeysDown[k]         = true;
-  io.KeyCtrl             = io.KeysDown[KEY_CTRL_L] || io.KeysDown[KEY_CTRL_R];
-  io.KeyShift = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
-  io.KeyAlt = io.KeysDown[KEY_ALT_L] || io.KeysDown[KEY_ALT_R];
+  ImGuiIO& io    = ImGui::GetIO();
+  io.KeysDown[k] = false;
+  io.KeyCtrl     = io.KeysDown[KEY_CTRL_L]  || io.KeysDown[KEY_CTRL_R];
+  io.KeyShift    = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
+  io.KeyAlt      = io.KeysDown[KEY_ALT_L]   || io.KeysDown[KEY_ALT_R];
 }
 //------------------------------------------------------------------------------
 void imgui_api_backend::on_button_pressed(button b) {
