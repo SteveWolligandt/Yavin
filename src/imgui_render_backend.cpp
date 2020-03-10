@@ -32,12 +32,8 @@ imgui_render_backend::imgui_render_backend() {
    create_device_objects();
 }
 //------------------------------------------------------------------------------
-imgui_render_backend::~imgui_render_backend() {
-  destroy_device_objects();
-}
-//------------------------------------------------------------------------------
 void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_width,
-                                 int fb_height, GLuint vertex_array_object) {
+                                 int fb_height, vertexarray& vao) {
   // Setup render state: alpha-blending enabled, no face culling, no depth
   // testing, scissor enabled, polygon fill
   glEnable(GL_BLEND);
@@ -73,23 +69,13 @@ void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_widt
                         // using GL 3.3 may set that otherwise.
 #endif
 
-  (void)vertex_array_object;
-#ifndef IMGUI_IMPL_OPENGL_ES2
-  glBindVertexArray(vertex_array_object);
-#endif
 
-  // Bind vertex/index buffers and setup attributes for ImDrawVert
+  vao.bind();
   m_vbo.bind();
   m_ibo.bind();
   m_vbo.activate_attributes(GL_FALSE, GL_FALSE, GL_TRUE);
 }
 //------------------------------------------------------------------------------
-// OpenGL3 Render function.
-// (this used to be set in io.RenderDrawListsFn and called by ImGui::Render(),
-// but you can now call this directly from your main loop) Note that this
-// implementation is little overcomplicated because we are saving/setting
-// up/restoring every OpenGL state explicitly, in order to be able to run
-// within any OpenGL engine that doesn't do so.
 void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
   // Avoid rendering when minimized, scale coordinates for retina displays
   // (screen coordinates != framebuffer coordinates)
@@ -113,10 +99,8 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
 #endif
   GLint last_array_buffer;
   glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
-#ifndef IMGUI_IMPL_OPENGL_ES2
   GLint last_vertex_array_object;
   glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array_object);
-#endif
 #ifdef GL_POLYGON_MODE
   GLint last_polygon_mode[2];
   glGetIntegerv(GL_POLYGON_MODE, last_polygon_mode);
@@ -155,11 +139,8 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
   // to be rendered to. VAO are not shared among GL contexts) The renderer
   // would actually work without any VAO bound, but then our VertexAttrib
   // calls would overwrite the default one currently bound.
-  GLuint vertex_array_object = 0;
-#ifndef IMGUI_IMPL_OPENGL_ES2
-  glGenVertexArrays(1, &vertex_array_object);
-#endif
-  setup_render_state(draw_data, fb_width, fb_height, vertex_array_object);
+  vertexarray vao;
+  setup_render_state(draw_data, fb_width, fb_height, vao);
 
   // Will project scissor/clipping rectangles into framebuffer space
   ImVec2 clip_off =
@@ -188,7 +169,7 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
         // by the user to request the renderer to reset render state.)
         if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
           setup_render_state(draw_data, fb_width, fb_height,
-                             vertex_array_object);
+                             vao);
         else
           pcmd->UserCallback(cmd_list, pcmd);
       } else {
@@ -230,11 +211,6 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
       }
     }
   }
-
-  // Destroy the temporary VAO
-#ifndef IMGUI_IMPL_OPENGL_ES2
-  glDeleteVertexArrays(1, &vertex_array_object);
-#endif
 
   // Restore modified GL state
   glUseProgram(last_program);
@@ -296,9 +272,6 @@ bool imgui_render_backend::create_fonts_texture() {
   return true;
 }
 //------------------------------------------------------------------------------
-// If you get an error please report on github. You may try different GL
-// context version or GLSL version. See GL<>GLSL version table at the top of
-// this file.
 bool imgui_render_backend::check_shader(GLuint handle, const char* desc) {
   GLint status = 0, log_length = 0;
   glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
@@ -315,8 +288,6 @@ bool imgui_render_backend::check_shader(GLuint handle, const char* desc) {
   return (GLboolean)status == GL_TRUE;
 }
 //------------------------------------------------------------------------------
-// If you get an error please report on GitHub. You may try different GL
-// context version or GLSL version.
 bool imgui_render_backend::check_program(GLuint handle, const char* desc) {
   GLint status = 0, log_length = 0;
   glGetProgramiv(handle, GL_LINK_STATUS, &status);
@@ -342,10 +313,8 @@ bool imgui_render_backend::create_device_objects() {
   GLint last_texture, last_array_buffer;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
   glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
-#ifndef IMGUI_IMPL_OPENGL_ES2
   GLint last_vertex_array;
   glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
-#endif
 
 
 
@@ -356,14 +325,9 @@ bool imgui_render_backend::create_device_objects() {
   // Restore modified GL state
   glBindTexture(GL_TEXTURE_2D, last_texture);
   glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
-#ifndef IMGUI_IMPL_OPENGL_ES2
   glBindVertexArray(last_vertex_array);
-#endif
 
   return true;
-}
-//------------------------------------------------------------------------------
-void imgui_render_backend::destroy_device_objects() {
 }
 //==============================================================================
 }  // namespace yavin
