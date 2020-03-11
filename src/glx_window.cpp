@@ -13,30 +13,20 @@ static constexpr auto glx_context_minor_version_arb = 0x2092;
 namespace yavin {
 //==============================================================================
 std::list<window *> window::contexts;
-bool                window::m_error_occured      = false;
-const int           window::m_visual_attribs[23] = {GLX_X_RENDERABLE,
-                                          GL_TRUE,
-                                          GLX_DRAWABLE_TYPE,
-                                          GLX_WINDOW_BIT,
-                                          GLX_RENDER_TYPE,
-                                          GLX_RGBA_BIT,
-                                          GLX_X_VISUAL_TYPE,
-                                          GLX_TRUE_COLOR,
-                                          GLX_RED_SIZE,
-                                          8,
-                                          GLX_GREEN_SIZE,
-                                          8,
-                                          GLX_BLUE_SIZE,
-                                          8,
-                                          GLX_ALPHA_SIZE,
-                                          8,
-                                          GLX_DEPTH_SIZE,
-                                          24,
-                                          GLX_STENCIL_SIZE,
-                                          8,
-                                          GLX_DOUBLEBUFFER,
-                                          GL_TRUE,
-                                          None};
+bool      window::m_error_occured      = false;
+const int window::m_visual_attribs[23] = {
+  GLX_X_RENDERABLE, GL_TRUE,
+  GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+  GLX_RENDER_TYPE, GLX_RGBA_BIT,
+  GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
+  GLX_RED_SIZE, 8,
+  GLX_GREEN_SIZE, 8,
+  GLX_BLUE_SIZE, 8,
+  GLX_ALPHA_SIZE, 8,
+  GLX_DEPTH_SIZE, 24,
+  GLX_STENCIL_SIZE, 8,
+  GLX_DOUBLEBUFFER, GL_TRUE,
+  None};
 //==============================================================================
 window::window(const std::string &title, GLsizei width,
                GLsizei height, int major, int minor)
