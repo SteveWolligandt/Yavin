@@ -99,7 +99,7 @@ class texture : public id_holder<GLuint> {
     set_interpolation_mode(default_interpolation);
   }
   //----------------------------------------------------------------------------
-  //! TODO: copy wrap and interpolation modes
+  /// TODO: copy wrap and interpolation modes
   texture(const texture& other) : texture{} { copy_data(other); }
   //----------------------------------------------------------------------------
   texture(texture&& other)
@@ -415,7 +415,7 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  //! setting all wrapmodes to same mode
+  /// setting all wrapmodes to same mode
   template <unsigned int D_ = D, typename = std::enable_if_t<(D_ > 1)>>
   void set_wrap_mode(WrapMode mode) {
     set_wrap_mode_s(mode);
@@ -424,7 +424,7 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  //! setting all wrapmodes individual modes
+  /// setting all wrapmodes individual modes
   template <
       size_t... Is, typename... Modes,
       typename = std::enable_if_t<(std::is_same_v<Modes, WrapMode> && ...)>>
@@ -435,7 +435,7 @@ class texture : public id_holder<GLuint> {
     (void)discard{((void)set_wrap_mode(Is, modes), 0)...};
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  //! setting all wrapmodes individual modes
+  /// setting all wrapmodes individual modes
   template <typename... Modes, typename = std::enable_if_t<
                                    (std::is_same_v<Modes, WrapMode> && ...)>>
   void set_wrap_mode(Modes... modes) {
@@ -444,11 +444,16 @@ class texture : public id_holder<GLuint> {
   }
 
   //----------------------------------------------------------------------------
-  //! setting wrapmode with index i to modes
+  /// setting wrapmode with index i to modes
   void set_wrap_mode(size_t i, WrapMode mode) {
     gl::texture_parameter_i(id(), wrapmode_indices[i], mode);
   }
 
+  //----------------------------------------------------------------------------
+  /// setting all wrapmodes to repeat
+  void set_repeat() {
+    set_wrap_mode(REPEAT);
+  }
   //----------------------------------------------------------------------------
   void set_wrap_mode_s(WrapMode mode) { set_wrap_mode(0, mode); }
 
@@ -543,7 +548,6 @@ class texture : public id_holder<GLuint> {
     }
     throw std::runtime_error("could not write fileformat ." + ext);
   }
-
 //------------------------------------------------------------------------------
 #if YAVIN_HAS_PNG_SUPPORT
 template <unsigned int D_ = D, bool _PNG = has_png_support(),
@@ -569,7 +573,6 @@ void read_png(const std::string& filepath) {
 
   upload_data(data);
 }
-
 //------------------------------------------------------------------------------
 template <unsigned int D_ = D, bool _PNG = has_png_support(),
           std::enable_if_t<_PNG, bool>                   = true,
