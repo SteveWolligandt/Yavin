@@ -1,8 +1,9 @@
 #include <yavin/glincludes.h>
-#include <stdexcept>
+
 #include <cstring>
 #include <iostream>
-
+#include <stdexcept>
+//==============================================================================
 #define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
 
@@ -11,47 +12,48 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 std::list<context *> context::contexts;
 bool                 context::error_occured      = false;
-const int context::visual_attribs[23] = {
-  GLX_X_RENDERABLE    , True,
-  GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
-  GLX_RENDER_TYPE     , GLX_RGBA_BIT,
-  GLX_X_VISUAL_TYPE   , GLX_TRUE_COLOR,
-  GLX_RED_SIZE        , 8,
-  GLX_GREEN_SIZE      , 8,
-  GLX_BLUE_SIZE       , 8,
-  GLX_ALPHA_SIZE      , 8,
-  GLX_DEPTH_SIZE      , 24,
-  GLX_STENCIL_SIZE    , 8,
-  GLX_DOUBLEBUFFER    , True,
-  //GLX_SAMPLE_BUFFERS  , 1,
-  //GLX_SAMPLES         , 4,
-  None
-};
-
+const int            context::visual_attribs[23] = {
+    GLX_X_RENDERABLE, True, GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, GLX_RENDER_TYPE,
+    GLX_RGBA_BIT, GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR, GLX_RED_SIZE, 8,
+    GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 24,
+    GLX_STENCIL_SIZE, 8, GLX_DOUBLEBUFFER, True,
+    // GLX_SAMPLE_BUFFERS  , 1,
+    // GLX_SAMPLES         , 4,
+    None};
+//==============================================================================
 context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
+  setup(major, minor, 0, true);
+}
+//------------------------------------------------------------------------------
+context::context(int major, int minor, const context &parent)
+    : display{XOpenDisplay(nullptr)}, ctx{} {
+  setup(major, minor, parent.ctx, false);
+}
+//------------------------------------------------------------------------------
+void context::setup(int major, int minor, GLXContext parent, bool cur) {
   contexts.push_back(this);
-  if (!display) throw std::runtime_error{"Failed to open X display"};
+  if (!display) { throw std::runtime_error{"Failed to open X display"}; }
 
   // FBConfigs were added in GLX version 1.3.
   int glx_major, glx_minor;
   if (!glXQueryVersion(display, &glx_major, &glx_minor) ||
-      ((glx_major == 1) && (glx_minor < 3)) || (glx_major < 1))
+      ((glx_major == 1) && (glx_minor < 3)) || (glx_major < 1)) {
     throw std::runtime_error{"Invalid GLX version"};
+  }
 
   int          fbcount;
   GLXFBConfig *fbc = glXChooseFBConfig(display, DefaultScreen(display),
                                        visual_attribs, &fbcount);
-  if (!fbc)
+  if (!fbc) {
     throw std::runtime_error{"Failed to retrieve a framebuffer config\n"};
+  }
 
   // Pick the FB config/visual with the most samples per pixel
   int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
 
-  int i;
-  for (i = 0; i < fbcount; ++i) {
+  for (int i = 0; i < fbcount; ++i) {
     XVisualInfo *vi = glXGetVisualFromFBConfig(display, fbc[i]);
     if (vi) {
       int samp_buf, samples;
@@ -81,8 +83,8 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   swa.border_pixel      = 0;
   swa.event_mask        = StructureNotifyMask;
 
-  win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0, 1,
-                      1, 0, vi->depth, InputOutput, vi->visual,
+  win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0, 1, 1, 0,
+                      vi->depth, InputOutput, vi->visual,
                       CWBorderPixel | CWColormap | CWEventMask, &swa);
   if (!win) throw std::runtime_error{"Failed to create window."};
 
@@ -95,8 +97,8 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   const char *glxExts =
       glXQueryExtensionsString(display, DefaultScreen(display));
 
-  // NOTE: It is not necessary to create or make current to a glx::context before
-  // calling glXGetProcAddressARB
+  // NOTE: It is not necessary to create or make current to a glx::context
+  // before calling glXGetProcAddressARB
   glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
   glXCreateContextAttribsARB =
       (glXCreateContextAttribsARBProc)glXGetProcAddressARB(
@@ -117,30 +119,21 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
       !glXCreateContextAttribsARB) {
     std::cerr << "glXCreateContextAttribsARB() not found"
                  " ... using old-style GLX context\n";
-    ctx = glXCreateNewContext(display, bestFbc, GLX_RGBA_TYPE, 0, True);
-  }
-
-  else {
+    ctx = glXCreateNewContext(display, bestFbc, GLX_RGBA_TYPE, parent, True);
+    if (cur) { make_current(); }
+  } else {
     int context_attribs[] = {GLX_CONTEXT_MAJOR_VERSION_ARB, major,
                              GLX_CONTEXT_MINOR_VERSION_ARB, minor,
                              // GLX_CONTEXT_FLAGS_ARB        ,
                              // GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
                              None};
 
-    ctx =
-        glXCreateContextAttribsARB(display, bestFbc, 0, True, context_attribs);
+    ctx = glXCreateContextAttribsARB(display, bestFbc, parent, True,
+                                     context_attribs);
 
-    // Sync to ensure any errors generated are processed.
-    XSync(display, False);
     if (!error_occured && ctx) {
       std::cerr << "Created GL " << major << "." << minor << " glx::context\n";
-      make_current();
-
-      glewExperimental = true;
-      GLenum err       = glewInit();
-      if (GLEW_OK != err)
-        throw std::runtime_error{std::string("cannot initialize GLEW: ") +
-                                 std::string((char *)glewGetErrorString(err))};
+      if (cur) { make_current(); }
     } else {
       // Couldn't create GL 3.0+ context.  Fall back to old-style 2.x context.
       // When a context version below 3.0+ is requested, implementations will
@@ -153,10 +146,11 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
 
       error_occured = false;
 
-      //std::cerr << "Failed to create GL " << major << "." << minor
+      // std::cerr << "Failed to create GL " << major << "." << minor
       //          << " context ... using old-style GLX context\n";
       ctx = glXCreateContextAttribsARB(display, bestFbc, 0, True,
                                        context_attribs);
+      if (cur) { make_current(); }
     }
   }
 
@@ -169,7 +163,6 @@ context::context(int major, int minor) : display{XOpenDisplay(nullptr)}, ctx{} {
   if (error_occured || !ctx)
     throw std::runtime_error{"Failed to create an OpenGL context"};
 }
-
 //------------------------------------------------------------------------------
 context::~context() {
   glXMakeCurrent(display, 0, 0);
@@ -180,7 +173,29 @@ context::~context() {
   XCloseDisplay(display);
   contexts.remove(this);
 }
-
+//------------------------------------------------------------------------------
+void context::make_current() {
+  glXMakeCurrent(display, win, ctx);
+  if (!glew_initialized) { init_glew(); }
+}
+//------------------------------------------------------------------------------
+void context::init_glew() {
+  glewExperimental = true;
+  auto err         = glewInit();
+  if (GLEW_OK != err) {
+    throw std::runtime_error{std::string("cannot initialize GLEW: ") +
+                             std::string((char *)glewGetErrorString(err))};
+  }
+  glew_initialized = true;
+}
+//------------------------------------------------------------------------------
+void context::release() {
+  glXMakeCurrent(display, None, 0);
+}
+//------------------------------------------------------------------------------
+context context::create_shared_context(int major, int minor) const {
+  return context{major, minor, *this};
+}
 //------------------------------------------------------------------------------
 bool context::extension_supported(const char *extList, const char *extension) {
   const char *start;
@@ -188,12 +203,11 @@ bool context::extension_supported(const char *extList, const char *extension) {
 
   // Extension names should not have spaces.
   where = strchr(extension, ' ');
-  if (where || *extension == '\0')
-    return false;
+  if (where || *extension == '\0') return false;
 
-  // It takes a bit of care to be fool-proof about parsing the OpenGL extensions
-  // string. Don't be fooled by sub-strings, etc.
-  for (start=extList;;) {
+  // It takes a bit of care to be fool-proof about parsing the OpenGL
+  // extensions string. Don't be fooled by sub-strings, etc.
+  for (start = extList;;) {
     where = strstr(start, extension);
     if (!where) break;
     terminator = where + strlen(extension);
@@ -205,10 +219,9 @@ bool context::extension_supported(const char *extList, const char *extension) {
 }
 
 //------------------------------------------------------------------------------
-int context::error_handler_static(Display *display, XErrorEvent * ev) {
+int context::error_handler_static(Display *display, XErrorEvent *ev) {
   for (auto ctx : contexts)
-    if (ctx->display == display)
-      return ctx->error_handler(ev);
+    if (ctx->display == display) return ctx->error_handler(ev);
   return 0;
 }
 

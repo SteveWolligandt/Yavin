@@ -21,12 +21,23 @@ class context {
   Window                      win;
   GLXContext                  ctx;
   Colormap                    cmap;
+  bool                        glew_initialized = false;
 
  public:
-  context(int major = 3, int minor = 0);
+  context(int major = 3, int minor = 3);
+ private:
+  context(int major, int minor, const context &parent);
+ public:
   ~context();
-  void make_current() { glXMakeCurrent(display, win, ctx); }
+  void    make_current();
+  void    release();
+  void    init_glew();
+  context create_shared_context(int major = 3, int minor = 3) const;
 
+ private:
+  void setup(int major, int minor, GLXContext parent, bool cur);
+
+ public:
   /// Helper to check for extension string presence. Adapted from:
   /// http://www.opengl.org/resources/features/OGLextensions/
   static bool extension_supported(const char *ext_list, const char *extension);

@@ -3,9 +3,9 @@
 //==============================================================================
 struct listener : yavin::window_listener {
   bool&         m_run;
-  unsigned int &m_width, m_height;
+  GLsizei &m_width, m_height;
   //----------------------------------------------------------------------------
-  listener(bool& run, unsigned int& width, unsigned int& height)
+  listener(bool& run, GLsizei& width, GLsizei& height)
       : m_run{run}, m_width{width}, m_height{height} {}
   //----------------------------------------------------------------------------
   void on_key_pressed(yavin::key k) override {
@@ -50,7 +50,7 @@ void imgui () {
 //------------------------------------------------------------------------------
 int main() {
   bool         run = true;
-  unsigned int w = 1000, h = 1000;
+  GLsizei w = 1000, h = 1000;
 
   yavin::window window{"glx window test", w, h};
   listener      l{run, w, h};
