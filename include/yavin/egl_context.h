@@ -26,15 +26,33 @@ class context {
   };
 
   //============================================================================
-  // fields
+  // members
   //============================================================================
   EGLDisplay m_egl_display;
   EGLContext m_egl_context;
+  bool m_glew_initialized;
+
   //============================================================================
   // ctors / dtor
   //============================================================================
+ public:
   context(EGLint major = 4, EGLint minor = 5);
   ~context();
+
+ private:
+  context(EGLint major, EGLint minor, const context& parent);
+
+  //============================================================================
+  // methods
+  //============================================================================
+ public:
+  context create_shared_context(int major = 3, int minor = 3) const;
+  void           make_current();
+  void           release();
+
+ private:
+  void setup(EGLint major, EGLint minor, EGLContext parent, bool cur);
+  void init_glew();
 };
 //==============================================================================
 }  // namespace yavin

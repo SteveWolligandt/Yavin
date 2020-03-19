@@ -160,8 +160,9 @@ void context::setup(int major, int minor, GLXContext parent, bool cur) {
   // Restore the original error handler
   XSetErrorHandler(oldHandler);
 
-  if (error_occured || !ctx)
+  if (error_occured || !ctx) {
     throw std::runtime_error{"Failed to create an OpenGL context"};
+  }
 }
 //------------------------------------------------------------------------------
 context::~context() {
