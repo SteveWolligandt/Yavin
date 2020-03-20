@@ -30,7 +30,7 @@ class context {
   //============================================================================
   EGLDisplay m_egl_display;
   EGLContext m_egl_context;
-  bool m_glew_initialized;
+  bool m_glew_initialized = false;
 
   //============================================================================
   // ctors / dtor

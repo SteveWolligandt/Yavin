@@ -54,14 +54,21 @@ endforeach()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # create one executable with all tests
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set(YAVIN_UNITTEST_SOURCES main.cpp ${YAVIN_TEST_FILES} ${YAVIN_SOURCES} ${ARGN})
+set(YAVIN_UNITTEST_SOURCES
+      main.cpp
+      ${YAVIN_TEST_FILES}
+      ${YAVIN_SOURCES}
+      ${YAVIN_IMGUI_FILES}
+      ${ARGN})
+
 set(YAVIN_UNITTEST_INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/single_include
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
-    ${YAVIN_GLEW_INCLUDE_DIR})
+    ${YAVIN_GLEW_INCLUDE_DIR}
+    ${YAVIN_IMGUI_INCLUDE_DIR})
 set(YAVIN_UNITTEST_LIBRARIES
   OpenGL::OpenGL
   OpenGL::GLU

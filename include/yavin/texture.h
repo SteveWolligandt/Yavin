@@ -100,12 +100,16 @@ class texture : public id_holder<GLuint> {
   }
   //----------------------------------------------------------------------------
   /// TODO: copy wrap and interpolation modes
-  texture(const texture& other) : texture{} { copy_data(other); }
+  texture(const texture& other) : texture{} {
+    std::cerr << "copy constructor\n";
+    copy_data(other);
+  }
   //----------------------------------------------------------------------------
   texture(texture&& other)
       : id_holder{std::move(other)}, m_size{std::move(other.m_size)} {}
   //----------------------------------------------------------------------------
   auto& operator=(const texture& other) {
+    std::cerr << "copy constructor\n";
     copy_data(other);
     return *this;
   }
@@ -285,20 +289,17 @@ class texture : public id_holder<GLuint> {
   void copy_data(const texture& other) {
     m_size = other.m_size;
     if constexpr (D == 1) {
-      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
-                              GL_TEXTURE_1D, 0, 0, 0, 0, m_size[0], 1, 1);
+      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(), target, 0,
+                              0, 0, 0, m_size[0], 1, 1);
     } else if (D == 2) {
-      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
-                              GL_TEXTURE_1D, 0, 0, 0, 0, m_size[0], m_size[1],
-                              1);
+      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(), target, 0,
+                              0, 0, 0, m_size[0], m_size[1], 1);
 
     } else {
-      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(),
-                              GL_TEXTURE_1D, 0, 0, 0, 0, m_size[0], m_size[1],
-                              m_size[2]);
+      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(), target, 0,
+                              0, 0, 0, m_size[0], m_size[1], m_size[2]);
     }
   }
-
   //------------------------------------------------------------------------------
   template <typename... Sizes>
   void resize(Sizes... sizes) {

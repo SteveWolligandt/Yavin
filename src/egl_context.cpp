@@ -10,7 +10,7 @@ context::context(EGLint major, EGLint minor)
 //------------------------------------------------------------------------------
 context::context(EGLint major, EGLint minor, const context& parent)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
-  setup(major, minor, parent.m_egl_context, true);
+  setup(major, minor, parent.m_egl_context, false);
 }
 //------------------------------------------------------------------------------
 context::~context() {
@@ -24,7 +24,10 @@ context context::create_shared_context(int major, int minor) const {
 }
 //------------------------------------------------------------------------------
 void context::make_current() {
-  eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, m_egl_context);
+  if (!eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                      m_egl_context)) {
+    throw std::runtime_error{"[EGL] make context current."};
+  }
   if (!m_glew_initialized) {
     init_glew();
     m_glew_initialized = true;
@@ -32,12 +35,15 @@ void context::make_current() {
 }
 //------------------------------------------------------------------------------
 void context::release() {
-  eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, 0);
+  if (!eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                      EGL_NO_CONTEXT)) {
+    throw std::runtime_error{"[EGL] could not release context"};
+  }
 }
 //------------------------------------------------------------------------------
 void context::init_glew() {
   glewExperimental = true;
-  GLenum err       = glewInit();
+  auto err         = glewInit();
   if (GLEW_OK != err) {
     throw std::runtime_error{std::string("cannot initialize GLEW: ") +
                              std::string((char*)glewGetErrorString(err))};
