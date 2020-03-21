@@ -101,7 +101,6 @@ class texture : public id_holder<GLuint> {
   //----------------------------------------------------------------------------
   /// TODO: copy wrap and interpolation modes
   texture(const texture& other) : texture{} {
-    std::cerr << "copy constructor\n";
     copy_data(other);
   }
   //----------------------------------------------------------------------------
@@ -109,7 +108,6 @@ class texture : public id_holder<GLuint> {
       : id_holder{std::move(other)}, m_size{std::move(other.m_size)} {}
   //----------------------------------------------------------------------------
   auto& operator=(const texture& other) {
-    std::cerr << "copy constructor\n";
     copy_data(other);
     return *this;
   }
@@ -288,26 +286,32 @@ class texture : public id_holder<GLuint> {
 
   //----------------------------------------------------------------------------
   void copy_data(const texture& other) {
-    m_size = other.m_size;
+    resize(other.m_size);
     if constexpr (D == 1) {
-      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(), target, 0,
-                              0, 0, 0, m_size[0], 1, 1);
+      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0,
+                                    id(), target, 0, 0, 0, 0,
+                              m_size[0], 1, 1);
     } else if (D == 2) {
-      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(), target, 0,
-                              0, 0, 0, m_size[0], m_size[1], 1);
+      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0,
+                                    id(), target, 0, 0, 0, 0,
+                              m_size[0], m_size[1], 1);
 
     } else {
-      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0, id(), target, 0,
-                              0, 0, 0, m_size[0], m_size[1], m_size[2]);
+      gl::copy_image_sub_data(other.id(), target, 0, 0, 0, 0,
+                                    id(), target, 0, 0, 0, 0,
+                              m_size[0], m_size[1], m_size[2]);
     }
   }
   //------------------------------------------------------------------------------
-  template <typename... Sizes>
-  void resize(Sizes... sizes) {
-    static_assert(sizeof...(Sizes) == D);
-    static_assert((std::is_integral_v<Sizes> && ...));
+  template <typename Size>
+  void resize(const std::array<Size, D>& size) {
+    static_assert(std::is_integral_v<Size>);
     auto last_tex = bind();
-    m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
+    if constexpr (std::is_same_v<size_t, Size>) {
+      m_size = size;
+    } else {
+      m_size = std::array<size_t, D>(begin(size), end(size));
+    }
     if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
                        gl_type, nullptr);
@@ -319,6 +323,13 @@ class texture : public id_holder<GLuint> {
                        depth(), 0, gl_format, gl_type, nullptr);
     }
     if (last_tex > 0) { gl::bind_texture(target, last_tex); }
+  }
+  //------------------------------------------------------------------------------
+  template <typename... Sizes>
+  void resize(Sizes... sizes) {
+    static_assert(sizeof...(Sizes) == D);
+    static_assert((std::is_integral_v<Sizes> && ...));
+    resize(std::array<size_t, D>{static_cast<size_t>(sizes)...});
   }
 
  private:
