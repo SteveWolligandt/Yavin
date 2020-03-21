@@ -2,13 +2,10 @@
 #include <catch2/catch.hpp>
 #include <random>
 #include <type_traits>
-#include <yavin>
-
+#include <yavin/texture.h>
 //==============================================================================
 namespace yavin::test {
 //==============================================================================
-extern Window window;
-
 template <typename type, typename C>
 struct RandomTexture2D : tex2<type, C> {
   using parent_t = tex2<type, C>;
@@ -56,9 +53,17 @@ TEMPLATE_PRODUCT_TEST_CASE(
   REQUIRE(tex.data.size() == downloaded_data.size());
   auto it      = begin(tex.data);
   auto it_down = begin(downloaded_data);
-  for (; it != end(tex.data); ++it, ++it_down) REQUIRE(*it == *it_down);
+  for (; it != end(tex.data); ++it, ++it_down) { REQUIRE(*it == *it_down); }
 }
-
+//==============================================================================
+TEST_CASE("tex2d_texel_indexing", "[texture2d][texture][texel][indexing]") {
+  std::vector<float>tex_data {1,2,3,4};
+  tex2r32f tex{tex_data, 2, 2};
+  REQUIRE(tex(0, 0) == 1);
+  REQUIRE(tex(1, 0) == 2);
+  REQUIRE(tex(0, 1) == 3);
+  REQUIRE(tex(1, 1) == 4);
+}
 //==============================================================================
 }  // namespace yavin::test
 //==============================================================================

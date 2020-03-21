@@ -466,9 +466,21 @@ struct gl {
                                        GLenum format, GLenum type,
                                        const GLvoid* pixels);
   //------------------------------------------------------------------------------
+  DLL_API static void texture_sub_image_1d(GLuint texture, GLint level,
+                                           GLint xoffset, GLsizei width,
+                                           GLenum format, GLenum type,
+                                           const void* pixels);
+  //------------------------------------------------------------------------------
   DLL_API static void texture_sub_image_2d(GLuint texture, GLint level,
                                            GLint xoffset, GLint yoffset,
                                            GLsizei width, GLsizei height,
+                                           GLenum format, GLenum type,
+                                           const void* pixels);
+  //------------------------------------------------------------------------------
+  DLL_API static void texture_sub_image_3d(GLuint texture, GLint level,
+                                           GLint xoffset, GLint yoffset,
+                                           GLint zoffset, GLsizei width,
+                                           GLsizei height, GLsizei depth,
                                            GLenum format, GLenum type,
                                            const void* pixels);
   //------------------------------------------------------------------------------
@@ -498,7 +510,13 @@ struct gl {
   DLL_API static void get_texture_image(GLuint texture, GLint level,
                                         GLenum format, GLenum type,
                                         GLsizei bufSize, void* pixels);
-
+  //------------------------------------------------------------------------------
+  DLL_API static void get_texture_sub_image(GLuint texture, GLint level,
+                                            GLint xoffset, GLint yoffset,
+                                            GLint zoffset, GLsizei width,
+                                            GLsizei height, GLsizei depth,
+                                            GLenum format, GLenum type,
+                                            GLsizei bufSize, void* pixels);
   //------------------------------------------------------------------------------
   DLL_API static void tex_parameter_f(GLenum target, GLenum pname,
                                       GLfloat param);

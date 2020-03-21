@@ -991,6 +991,21 @@ void gl::get_texture_image(GLuint texture, GLint level, GLenum format,
   glGetTextureImage(texture, level, format, type, bufSize, pixels);
   gl_error_check("glGetTextureImage");
 }
+//------------------------------------------------------------------------------
+void gl::get_texture_sub_image(GLuint texture, GLint level, GLint xoffset,
+                               GLint yoffset, GLint zoffset, GLsizei width,
+                               GLsizei height, GLsizei depth, GLenum format,
+                               GLenum type, GLsizei bufSize, void* pixels) {
+  if (verbose) {
+    *out << "glGetTextureSubImage(" << texture << ", " << level << ", "
+         << xoffset << ", " << yoffset << ", " << zoffset << ", " << width
+         << ", " << height << ", " << depth << ", " << format << ", " << type
+         << ", " << bufSize << ", " << pixels << ")\n";
+  }
+  glGetTextureSubImage(texture, level, xoffset, yoffset, zoffset, width, height,
+                       depth, format, type, bufSize, pixels);
+  gl_error_check("glGetTextureSubImage");
+}
 
 //------------------------------------------------------------------------------
 void gl::tex_parameter_f(GLenum target, GLenum pname, GLfloat param) {

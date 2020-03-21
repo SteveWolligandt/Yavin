@@ -139,7 +139,8 @@ class texture : public id_holder<GLuint> {
             typename = std::enable_if_t<sizeof...(Sizes) == D>,
             typename = std::enable_if_t<
                 (std::is_integral_v<typename std::decay_t<Sizes>> && ...)>>
-  texture(const std::vector<S>& data, Sizes... sizes) : m_size{sizes...} {
+  texture(const std::vector<S>& data, Sizes... sizes)
+      : m_size{static_cast<size_t>(sizes)...} {
     static_assert(sizeof...(Sizes) == D,
                   "number of sizes does not match number of dimensions");
     static_assert((std::is_integral_v<Sizes> && ...),
@@ -384,15 +385,15 @@ class texture : public id_holder<GLuint> {
   auto download_data() const {
     std::vector<type> data(num_components * num_texels());
     gl::get_texture_image(id(), 0, gl_format, gl_type,
-                          num_texels() * num_components * sizeof(type),
+                          data.size() * sizeof(type),
                           data.data());
     return data;
   }
   //------------------------------------------------------------------------------
   void download_data(std::vector<type>& data) const {
-    assert(data.size() == num_components * num_texels());
-    gl::get_texture_image(id(), 0, gl_format, gl_type,
-                          num_texels() * num_components * sizeof(type),
+    const auto n = num_components * num_texels();
+    if (data.size() != n) { data.resize(n); }
+    gl::get_texture_image(id(), 0, gl_format, gl_type, n * sizeof(type),
                           data.data());
   }
   //------------------------------------------------------------------------------
@@ -400,21 +401,93 @@ class texture : public id_holder<GLuint> {
     gl::get_texture_image(id(), 0, gl_format, gl_type,
                           num_texels() * num_components * sizeof(type), data);
   }
+  //------------------------------------------------------------------------------
+  template <size_t D_ = D, std::enable_if_t<D_ == 1, bool> = true>
+  auto& download_sub_data(GLint xoffset, GLsizei width, std::vector<T>& data,
+                          GLint level = 0) const {
+    if (data.size() != width * num_components) {
+      data.resize(width * num_components);
+    }
+    gl::get_texture_sub_image(id(), level, xoffset, 0, 0, width, 1, 1,
+                              gl_format, gl_type, data.size()* sizeof(type),
+                              data.data());
+    return data;
+  }
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  template <size_t D_ = D, std::enable_if_t<D_ == 1, bool> = true>
+  auto download_sub_data(GLint xoffset, GLsizei width, GLint level = 0) const {
+    std::vector<T> data(width * num_components);
+    gl::get_texture_sub_image(id(), level, xoffset, 0, 0, width, 1, 1,
+                              gl_format, gl_type, data.size() * sizeof(type),
+                              data.data());
+    return data;
+  }
+  //------------------------------------------------------------------------------
+  template <size_t D_ = D, std::enable_if_t<D_ == 2, bool> = true>
+  auto& download_sub_data(GLint xoffset, GLint yoffset, GLsizei width,
+                          GLsizei height, std::vector<T>& data,
+                          GLint level = 0) const {
+    if (data.size() != width * height * num_components) {
+      data.resize(width * height * num_components);
+    }
+    gl::get_texture_sub_image(id(), level, xoffset, yoffset, 0, width, height,
+                              1, gl_format, gl_type, data.size() * sizeof(type),
+                              data.data());
+    return data;
+  }
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  template <size_t D_ = D, std::enable_if_t<D_ == 2, bool> = true>
+  auto download_sub_data(GLint xoffset, GLint yoffset, GLsizei width,
+                         GLsizei height, GLint level = 0) const {
+    std::vector<T> data(width * height * num_components);
+    gl::get_texture_sub_image(id(), level, xoffset, yoffset, 0, width, height,
+                              1, gl_format, gl_type, data.size() * sizeof(type),
+                              data.data());
+    return data;
+  }
+  //------------------------------------------------------------------------------
+  template <size_t D_ = D, std::enable_if_t<D_ == 3, bool> = true>
+  auto& download_sub_data(GLint xoffset, GLint yoffset, GLint zoffset,
+                          GLsizei width, GLsizei height, GLsizei depth,
+                          std::vector<T>& data, GLint level = 0) const {
+    if (data.size() != width * height * depth * num_components) {
+      data.resize(width * height * depth * num_components);
+    }
+    gl::get_texture_sub_image(id(), level, xoffset, yoffset, zoffset, width,
+                              height, depth, gl_format, gl_type,
+                              data.size() * sizeof(type), data.data());
+    return data;
+  }
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  template <size_t D_ = D, std::enable_if_t<D_ == 3, bool> = true>
+  auto download_sub_data(GLint xoffset, GLint yoffset, GLint zoffset,
+                         GLsizei width, GLsizei height, GLsizei depth,
+                         GLint level = 0) const {
+    std::vector<T> data(width * height * depth * num_components);
+    gl::get_texture_sub_image(id(), level, xoffset, yoffset, zoffset, width,
+                              height, depth, gl_format, gl_type,
+                              data.size() * sizeof(type), data.data());
+    return data;
+  }
+  //----------------------------------------------------------------------------
+  template <typename... Indices, unsigned int D_ = D,
+            std::enable_if_t<sizeof...(Indices) == D_, bool>             = true,
+            std::enable_if_t<(std::is_integral_v<Indices> && ...), bool> = true>
+  auto operator()(Indices... indices) const {
+    return download_sub_data(indices..., ((void)indices, 1)..., 0).front();
+  }
   //----------------------------------------------------------------------------
   auto width() const { return m_size[0]; }
-
   //----------------------------------------------------------------------------
   template <unsigned int D_ = D, typename = std::enable_if_t<(D_ > 1)>>
   auto height() const {
     return m_size[1];
   }
-
   //----------------------------------------------------------------------------
   template <unsigned int D_ = D, typename = std::enable_if_t<(D_ > 2)>>
   auto depth() const {
     return m_size[2];
   }
-
   //----------------------------------------------------------------------------
   /// setting all wrapmodes to same mode
   template <unsigned int D_ = D, typename = std::enable_if_t<(D_ > 1)>>
@@ -513,7 +586,7 @@ class texture : public id_holder<GLuint> {
     gl::clear_tex_image(id(), 0, gl_format, gl_type, col.data());
   }
   //------------------------------------------------------------------------------
-  template <unsigned int D_ = D, typename = std::enable_if_t<D_ == 2>>
+  template <unsigned int D_ = D, std::enable_if_t<D_ == 2, bool> = true>
   void set_data(const pixelunpackbuffer<type>& pbo) {
     pbo.bind();
     auto last_tex = bind();
