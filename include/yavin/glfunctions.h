@@ -30,16 +30,19 @@ struct gl {
   DLL_API static void line_width(GLfloat width);
   //------------------------------------------------------------------------------
   DLL_API static void get_boolean_v(GLenum pname, GLboolean* params);
-
-  //------------------------------------------------------------------------------
   DLL_API static void get_double_v(GLenum pname, GLdouble* params);
-
-  //------------------------------------------------------------------------------
   DLL_API static void get_float_v(GLenum pname, GLfloat* params);
-
-  //------------------------------------------------------------------------------
   DLL_API static void get_integer_v(GLenum pname, GLint* params);
-
+  DLL_API static void get_integer64_v(GLenum pname, GLint64* params);
+  //------------------------------------------------------------------------------
+  DLL_API static void get_booleani_v(GLenum target, GLuint index,
+                                     GLboolean* data);
+  DLL_API static void get_integeri_v(GLenum target, GLuint index, GLint* data);
+  DLL_API static void get_floati_v(GLenum target, GLuint index, GLfloat* data);
+  DLL_API static void get_doublei_v(GLenum target, GLuint index,
+                                    GLdouble* data);
+  DLL_API static void get_integer64i_v(GLenum target, GLuint index,
+                                       GLint64* data);
   //------------------------------------------------------------------------------
   DLL_API static void enable(GLenum cap);
 
@@ -611,6 +614,8 @@ struct gl {
   DLL_API static void named_framebuffer_draw_buffers(GLuint        framebuffer,
                                                      GLsizei       n,
                                                      const GLenum* bufs);
+  //------------------------------------------------------------------------------
+  DLL_API static void memory_barrier(GLbitfield barriers);
 };
 //==============================================================================
 }  // namespace yavin

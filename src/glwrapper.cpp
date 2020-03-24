@@ -60,5 +60,37 @@ GLint bound_texture3d() {
   return bound_texture(GL_TEXTURE_BINDING_3D);
 }
 //==============================================================================
+GLint max_compute_shared_memory_size() {
+  GLint s;
+  gl::get_integer_v(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &s);
+  return s;
+}
+//------------------------------------------------------------------------------
+void shader_storage_barrier() {
+  gl::memory_barrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+//------------------------------------------------------------------------------
+std::array<GLint, 3> max_compute_work_group_count() {
+  std::array<GLint, 3> work_grp_cnt;
+  gl::get_integeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_cnt[0]);
+  gl::get_integeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &work_grp_cnt[1]);
+  gl::get_integeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &work_grp_cnt[2]);
+  return work_grp_cnt;
+}
+//------------------------------------------------------------------------------
+std::array<GLint, 3> max_compute_work_group_size() {
+  std::array<GLint, 3> work_grp_size;
+  gl::get_integeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &work_grp_size[0]);
+  gl::get_integeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &work_grp_size[1]);
+  gl::get_integeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &work_grp_size[2]);
+  return work_grp_size;
+}
+//------------------------------------------------------------------------------
+GLint max_compute_work_group_invocations() {
+  GLint work_grp_inv;
+  gl::get_integer_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &work_grp_inv);
+  return work_grp_inv;
+}
+//==============================================================================
 }  // namespace yavin
 //==============================================================================

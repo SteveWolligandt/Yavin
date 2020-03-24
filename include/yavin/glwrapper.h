@@ -39,6 +39,12 @@ DLL_API GLint bound_texture1d();
 DLL_API GLint bound_texture2d();
 DLL_API GLint bound_texture3d();
 //==============================================================================
+DLL_API GLint max_compute_shared_memory_size();
+DLL_API void shader_storage_barrier();
+std::array<GLint, 3> max_compute_work_group_count();
+std::array<GLint, 3> max_compute_work_group_size();
+GLint max_compute_work_group_invocations();
+//==============================================================================
 }  // namespace yavin
 //==============================================================================
 #endif

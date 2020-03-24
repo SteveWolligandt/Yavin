@@ -310,6 +310,58 @@ inline std::string map_access_to_string(GLbitfield b) {
     pipe();
     flags += "GL_MAP_UNSYNCHRONIZED_BIT";
   }
+  if (GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT";
+  }
+  if (GL_ELEMENT_ARRAY_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_ELEMENT_ARRAY_BARRIER_BIT";
+  }
+  if (GL_UNIFORM_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_UNIFORM_BARRIER_BIT";
+  }
+  if (GL_TEXTURE_FETCH_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_TEXTURE_FETCH_BARRIER_BIT";
+  }
+  if (GL_SHADER_IMAGE_ACCESS_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_SHADER_IMAGE_ACCESS_BARRIER_BIT";
+  }
+  if (GL_COMMAND_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_COMMAND_BARRIER_BIT";
+  }
+  if (GL_PIXEL_BUFFER_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_PIXEL_BUFFER_BARRIER_BIT";
+  }
+  if (GL_TEXTURE_UPDATE_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_TEXTURE_UPDATE_BARRIER_BIT";
+  }
+  if (GL_BUFFER_UPDATE_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_BUFFER_UPDATE_BARRIER_BIT";
+  }
+  if (GL_FRAMEBUFFER_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_FRAMEBUFFER_BARRIER_BIT";
+  }
+  if (GL_TRANSFORM_FEEDBACK_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_TRANSFORM_FEEDBACK_BARRIER_BIT";
+  }
+  if (GL_ATOMIC_COUNTER_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_ATOMIC_COUNTER_BARRIER_BIT";
+  }
+  if (GL_SHADER_STORAGE_BARRIER_BIT & b) {
+    pipe();
+    flags += "GL_SHADER_STORAGE_BARRIER_BIT";
+  }
   return flags;
 }
 

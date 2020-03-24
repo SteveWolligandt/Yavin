@@ -1,5 +1,5 @@
-#ifndef __YAVIN_FRAGMENTSHADER_H__
-#define __YAVIN_FRAGMENTSHADER_H__
+#ifndef YAVIN_FRAGMENTSHADER_H
+#define YAVIN_FRAGMENTSHADER_H
 
 #include <string>
 #include "glincludes.h"

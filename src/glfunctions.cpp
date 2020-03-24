@@ -47,7 +47,59 @@ void gl::get_integer_v(GLenum pname, GLint* params) {
   glGetIntegerv(pname, params);
   gl_error_check("glGetIntergerv");
 }
-
+//------------------------------------------------------------------------------
+void gl::get_integer64_v(GLenum pname, GLint64* params) {
+  if (verbose) {
+    *out << "glGetInteger64v(" << to_string(pname) << ", " << params << ")\n";
+  }
+  glGetInteger64v(pname, params);
+  gl_error_check("glGetInterger64v");
+}
+//------------------------------------------------------------------------------
+void gl::get_booleani_v(GLenum target, GLuint index, GLboolean* data) {
+  if (verbose) {
+    *out << "glGetBooleani_v(" << to_string(target) << ", " << index << ", "
+         << data << ")\n";
+  }
+  glGetBooleani_v(target, index, data);
+  gl_error_check("glGetBooleani_v");
+}
+//------------------------------------------------------------------------------
+void gl::get_integeri_v(GLenum target, GLuint index, GLint* data) {
+  if (verbose) {
+    *out << "glGetIntegeri_v(" << to_string(target) << ", " << index << ", "
+         << data << ")\n";
+  }
+  glGetIntegeri_v(target, index, data);
+  gl_error_check("glGetIntegeri_v");
+}
+//------------------------------------------------------------------------------
+void gl::get_floati_v(GLenum target, GLuint index, GLfloat* data) {
+  if (verbose) {
+    *out << "glGetFloati_v(" << to_string(target) << ", " << index << ", "
+         << data << ")\n";
+  }
+  glGetFloati_v(target, index, data);
+  gl_error_check("glGetFloati_v");
+}
+//------------------------------------------------------------------------------
+void gl::get_doublei_v(GLenum target, GLuint index, GLdouble* data) {
+  if (verbose) {
+    *out << "glGetDoublei_v(" << to_string(target) << ", " << index << ", "
+         << data << ")\n";
+  }
+  glGetDoublei_v(target, index, data);
+  gl_error_check("glGetDoublei_v");
+}
+//------------------------------------------------------------------------------
+void gl::get_integer64i_v(GLenum target, GLuint index, GLint64* data) {
+  if (verbose) {
+    *out << "glGetInteger64i_v(" << to_string(target) << ", " << index << ", "
+         << data << ")\n";
+  }
+  glGetInteger64i_v(target, index, data);
+  gl_error_check("glGetInteger64i_v");
+}
 //------------------------------------------------------------------------------
 void gl::enable(GLenum cap) {
   if (verbose) *out << "glEnable(" << to_string(cap) << ")\n";
@@ -1222,6 +1274,12 @@ void gl::named_framebuffer_draw_buffers(GLuint framebuffer, GLsizei n,
   }
   glNamedFramebufferDrawBuffers(framebuffer, n, bufs);
   gl_error_check("glCheckNamedFramebufferStatus");
+}
+//------------------------------------------------------------------------------
+void gl::memory_barrier(GLbitfield barriers) {
+  if (verbose) { *out << "glMemoryBarrier(" << to_string(barriers) << ")\n"; }
+  glMemoryBarrier(barriers);
+  gl_error_check("glMemoryBarrier");
 }
 //==============================================================================
 }  // namespace yavin

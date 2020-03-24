@@ -100,9 +100,9 @@ void shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
       m_include_tree.parse_line(line_number - 1);
 
   // print file and include hierarchy
-  if (use_ansi_color) os << ansi::red << ansi::bold;
+  if (use_ansi_color) { os << ansi::red << ansi::bold; }
   os << "[GLSL " << stage_name() << " Shader " << match.str(2) << "]\n";
-  if (use_ansi_color) os << ansi::reset;
+  if (use_ansi_color) { os << ansi::reset; }
 
   os << "in file ";
   if (use_ansi_color) os << ansi::cyan << ansi::bold;
