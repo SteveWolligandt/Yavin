@@ -49,7 +49,7 @@ class shaderstoragebuffer : public buffer<GL_SHADER_STORAGE_BUFFER, T> {
   //----------------------------------------------------------------------------
   // methods
   //----------------------------------------------------------------------------
-  void bind(size_t index) const {
+  void bind(GLuint index) const {
     gl::bind_buffer_base(GL_SHADER_STORAGE_BUFFER, index, this->id());
   }
   //----------------------------------------------------------------------------

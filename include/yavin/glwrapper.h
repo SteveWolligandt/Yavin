@@ -19,6 +19,15 @@ DLL_API void disable_depth_test();
 DLL_API void enable_depth_write();
 DLL_API void disable_depth_write();
 //==============================================================================
+DLL_API void depth_func_never();
+DLL_API void depth_func_less();
+DLL_API void depth_func_equal();
+DLL_API void depth_func_lequal();
+DLL_API void depth_func_greater();
+DLL_API void depth_func_notequal();
+DLL_API void depth_func_gequal();
+DLL_API void depth_func_always();
+//==============================================================================
 DLL_API void enable_multisampling();
 DLL_API void disable_multisampling();
 DLL_API bool multisampling_enabled();

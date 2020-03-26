@@ -14,6 +14,15 @@ void disable_depth_test() { gl::disable(GL_DEPTH_TEST); }
 void enable_depth_write() { gl::depth_mask(GL_TRUE); }
 void disable_depth_write() { gl::depth_mask(GL_FALSE); }
 //==============================================================================
+void depth_func_never()    { gl::depth_func(GL_NEVER); }
+void depth_func_less()     { gl::depth_func(GL_LESS); }
+void depth_func_equal()    { gl::depth_func(GL_EQUAL); }
+void depth_func_lequal()   { gl::depth_func(GL_LEQUAL); }
+void depth_func_greater()  { gl::depth_func(GL_GREATER); }
+void depth_func_notequal() { gl::depth_func(GL_NOTEQUAL); }
+void depth_func_gequal()   { gl::depth_func(GL_GEQUAL); }
+void depth_func_always()   { gl::depth_func(GL_ALWAYS); }
+//==============================================================================
 void enable_blending() { gl::enable(GL_BLEND); }
 void disable_blending() { gl::disable(GL_BLEND); }
 //==============================================================================

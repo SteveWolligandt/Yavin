@@ -129,10 +129,16 @@ const GLubyte* gl::get_string(GLenum name) {
   gl_error_check("glGetString");
   return result;
 }
-
 //------------------------------------------------------------------------------
 GLenum gl::get_error() {
+  if (verbose) { *out << "glGetError\n"; }
   return glGetError();
+}
+//------------------------------------------------------------------------------
+void gl::depth_func(GLenum func) {
+  if (verbose) { *out << "glDepthFunc(" << to_string(func) << ")\n"; }
+  glDepthFunc(func);
+  gl_error_check("glDepthFunc");
 }
 
 //==============================================================================

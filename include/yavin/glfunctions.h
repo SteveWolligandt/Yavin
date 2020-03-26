@@ -56,6 +56,8 @@ struct gl {
   DLL_API static const GLubyte* get_string(GLenum name);
   //------------------------------------------------------------------------------
   DLL_API static GLenum get_error();
+  //------------------------------------------------------------------------------
+  DLL_API static void depth_func(GLenum func);
 
   //==============================================================================
   // BACKBUFFER RELATED
@@ -135,7 +137,6 @@ struct gl {
   // BUFFER RELATED
   //==============================================================================
   DLL_API static void bind_buffer(GLenum target, GLuint buffer);
-
   //------------------------------------------------------------------------------
   DLL_API static void bind_buffer_base(GLenum target, GLuint index,
                                        GLuint buffer);
@@ -152,26 +153,22 @@ struct gl {
                                                  GLintptr readOffset,
                                                  GLintptr writeOffset,
                                                  GLsizei  size);
-
   //------------------------------------------------------------------------------
   DLL_API static void* map_buffer(GLenum target, GLenum access);
 
   //------------------------------------------------------------------------------
   DLL_API static void* map_named_buffer(GLuint buffer, GLenum access);
-
   //------------------------------------------------------------------------------
-
   DLL_API static void* map_buffer_range(GLenum target, GLintptr offset,
                                         GLsizeiptr length, GLbitfield access);
-
   //------------------------------------------------------------------------------
   DLL_API static void* map_named_buffer_range(GLuint buffer, GLintptr offset,
                                               GLsizei    length,
                                               GLbitfield access);
-
+  //------------------------------------------------------------------------------
   template <typename T>
   static void named_buffer_data(GLuint buffer, GLsizei size, const T* data,
-                         GLenum usage) {
+                                GLenum usage) {
     if (verbose) {
       if constexpr (std::is_arithmetic_v<T>) {
         *out << "glNamedBufferData(" << buffer << ", " << size << ", "
@@ -200,146 +197,109 @@ struct gl {
       }
     }
   }
-
   //------------------------------------------------------------------------------
   DLL_API static GLboolean unmap_buffer(GLenum target);
-
   //------------------------------------------------------------------------------
   DLL_API static GLboolean unmap_named_buffer(GLuint buffer);
-
   //------------------------------------------------------------------------------
   DLL_API static void buffer_sub_data(GLenum target, GLintptr offset,
                                       GLsizeiptr size, const GLvoid* data);
   //------------------------------------------------------------------------------
   DLL_API static void named_buffer_sub_data(GLuint buffer, GLintptr offset,
                                             GLsizei size, const void* data);
-
   //------------------------------------------------------------------------------
   DLL_API static void get_buffer_parameter_iv(GLenum target, GLenum value,
                                               GLint* data);
-
   //==============================================================================
   // SHADER RELATED
   //==============================================================================
   DLL_API static GLuint create_program();
-
   //------------------------------------------------------------------------------
   DLL_API static void attach_shader(GLuint program, GLuint shader);
-
   //------------------------------------------------------------------------------
   DLL_API static void link_program(GLuint program);
-
   //------------------------------------------------------------------------------
   DLL_API static void delete_program(GLuint program);
-
   //------------------------------------------------------------------------------
   DLL_API static void use_program(GLuint program);
-
   //------------------------------------------------------------------------------
   DLL_API static GLuint create_shader(GLenum shaderType);
-
   //------------------------------------------------------------------------------
   DLL_API static void shader_source(GLuint shader, GLsizei count,
                                     const GLchar** string, const GLint* length);
-
   //------------------------------------------------------------------------------
   DLL_API static void compile_shader(GLuint shader);
-
   //------------------------------------------------------------------------------
   DLL_API static void delete_shader(GLuint shader);
-
   //------------------------------------------------------------------------------
   DLL_API static void dispatch_compute(GLuint num_groups_x, GLuint num_groups_y,
                                        GLuint num_groups_z);
-
   //------------------------------------------------------------------------------
   DLL_API static void get_shader_iv(GLuint shader, GLenum pname, GLint* params);
-
   //------------------------------------------------------------------------------
   DLL_API static GLint get_shader_info_log_length(GLuint shader);
-
   //------------------------------------------------------------------------------
   DLL_API static void get_shader_info_log(GLuint shader, GLsizei maxLength,
                                           GLsizei* length, GLchar* infoLog);
-
   //------------------------------------------------------------------------------
   DLL_API static std::string get_shader_info_log(GLuint  shader,
                                                  GLsizei maxLength);
-
   //------------------------------------------------------------------------------
   DLL_API static std::string get_shader_info_log(GLuint shader);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_1f(GLuint program, GLint location,
                                          GLfloat v0);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_2f(GLuint program, GLint location,
                                          GLfloat v0, GLfloat v1);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_3f(GLuint program, GLint location,
                                          GLfloat v0, GLfloat v1, GLfloat v2);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_4f(GLuint program, GLint location,
                                          GLfloat v0, GLfloat v1, GLfloat v2,
                                          GLfloat v3);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_1i(GLuint program, GLint location,
                                          GLint v0);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_2i(GLuint program, GLint location,
                                          GLint v0, GLint v1);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_3i(GLuint program, GLint location,
                                          GLint v0, GLint v1, GLint v2);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_4i(GLuint program, GLint location,
                                          GLint v0, GLint v1, GLint v2,
                                          GLint v3);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_1ui(GLuint program, GLint location,
                                           GLuint v0);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_2ui(GLuint program, GLint location,
                                           GLuint v0, GLuint v1);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_3ui(GLuint program, GLint location,
                                           GLuint v0, GLuint v1, GLuint v2);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_4ui(GLuint program, GLint location,
                                           GLuint v0, GLuint v1, GLuint v2,
                                           GLuint v3);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_1fv(GLuint program, GLint location,
                                           GLsizei count, const GLfloat* value);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_2fv(GLuint program, GLint location,
                                           GLsizei count, const GLfloat* value);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_3fv(GLuint program, GLint location,
                                           GLsizei count, const GLfloat* value);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_4fv(GLuint program, GLint location,
                                           GLsizei count, const GLfloat* value);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_1iv(GLuint program, GLint location,
                                           GLsizei count, const GLint* value);
-
   //------------------------------------------------------------------------------
   DLL_API static void program_uniform_2iv(GLuint program, GLint location,
                                           GLsizei count, const GLint* value);
