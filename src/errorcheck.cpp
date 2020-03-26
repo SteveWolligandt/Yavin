@@ -4,26 +4,17 @@
 #include <sstream>
 
 #include <yavin/glfunctions.h>
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
-gl_error::gl_error(const std::string& function_name, const std::string& message,
-                   const std::string& file, size_t line)
+gl_error::gl_error(const std::string& function_name, const std::string& message)
     : std::runtime_error(ansi::red + ansi::bold + "[" + function_name + "] " +
-                         ansi::reset + ansi::cyan + file + ansi::reset + ":" +
-                         ansi::yellow + std::to_string(line) + ansi::reset +
-                         "\n  " + message) {}
-
+                         ansi::reset + message) {}
 //------------------------------------------------------------------------------
-
 gl_framebuffer_not_complete_error::gl_framebuffer_not_complete_error(
     const std::string& what)
     : std::runtime_error("[FrameBuffer incomplete] " + what) {}
-
 //------------------------------------------------------------------------------
-
 const std::string gl_error_to_string(GLenum err) {
   switch (err) {
     case GL_INVALID_ENUM:      return "invalid enum";
@@ -39,9 +30,7 @@ const std::string gl_error_to_string(GLenum err) {
     default: return "unknown GL error";
   }
 }
-
 //------------------------------------------------------------------------------
-
 const std::string gl_framebuffer_error_to_string(GLenum status) {
   switch (status) {
     case GL_FRAMEBUFFER_UNDEFINED: return "undefined";
@@ -57,24 +46,22 @@ const std::string gl_framebuffer_error_to_string(GLenum status) {
   }
   return "";
 }
-
 //------------------------------------------------------------------------------
-
-void _gl_error_check(const std::string& function, const char* file,
-                     size_t line) {
-  auto err     = gl::get_error();
-  auto err_str = gl_error_to_string(err);
-  if (err != GL_NO_ERROR)
-    throw gl_error(function, err_str, file, line);
+void gl_error_check(const std::string& function) {
+  const auto err = gl::get_error();
+  if (err != GL_NO_ERROR) {
+    const auto err_str = gl_error_to_string(err);
+    throw gl_error(function, err_str);
+  }
 }
-
 //------------------------------------------------------------------------------
-
 void gl_framebuffer_not_complete_check(const GLuint fbo_id) {
-  auto status     = gl::check_named_framebuffer_status(fbo_id, GL_FRAMEBUFFER);
-  auto status_str = gl_framebuffer_error_to_string(status);
-  if (status != GL_FRAMEBUFFER_COMPLETE)
+  const auto status =
+      gl::check_named_framebuffer_status(fbo_id, GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE) {
+    const auto status_str = gl_framebuffer_error_to_string(status);
     throw gl_framebuffer_not_complete_error(status_str);
+  }
 }
 
 //==============================================================================

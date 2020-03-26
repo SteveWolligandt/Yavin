@@ -189,7 +189,6 @@ void gl::viewport(const camera& cam) {
   gl::viewport(cam.viewport_x(), cam.viewport_y(), cam.viewport_width(),
                cam.viewport_height());
 }
-
 //------------------------------------------------------------------------------
 void gl::flush() {
   if (verbose) *out << "glFlush\n";

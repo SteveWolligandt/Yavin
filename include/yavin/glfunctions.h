@@ -188,7 +188,17 @@ struct gl {
       }
     }
     glNamedBufferData(buffer, size, data, usage);
-    gl_error_check("glNamedBufferData");
+    auto err     = gl::get_error();
+    if (err != GL_NO_ERROR) {
+      auto err_str = gl_error_to_string(err);
+      if (err == GL_INVALID_VALUE) {
+        throw gl_error("glNamedBufferData", err_str +
+                                                " (size should be negative: " +
+                                                std::to_string(size) + ")");
+      } else {
+        throw gl_error("glNamedBufferData", err_str);
+      }
+    }
   }
 
   //------------------------------------------------------------------------------
