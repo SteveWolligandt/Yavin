@@ -13,9 +13,7 @@ void disable_depth_test() { gl::disable(GL_DEPTH_TEST); }
 //==============================================================================
 void enable_depth_write() { gl::depth_mask(GL_TRUE); }
 void disable_depth_write() { gl::depth_mask(GL_FALSE); }
-//==============================================================================
-void depth_func_never()    { gl::depth_func(GL_NEVER); }
-void depth_func_less()     { gl::depth_func(GL_LESS); }
+//============================================================================== void depth_func_never()    { gl::depth_func(GL_NEVER); } void depth_func_less()     { gl::depth_func(GL_LESS); }
 void depth_func_equal()    { gl::depth_func(GL_EQUAL); }
 void depth_func_lequal()   { gl::depth_func(GL_LEQUAL); }
 void depth_func_greater()  { gl::depth_func(GL_GREATER); }
@@ -96,10 +94,17 @@ std::array<GLint, 3> max_compute_work_group_size() {
 }
 //------------------------------------------------------------------------------
 GLint max_compute_work_group_invocations() {
-  GLint work_grp_inv;
-  gl::get_integer_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &work_grp_inv);
-  return work_grp_inv;
+  GLint val;
+  gl::get_integer_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &val);
+  return val;
 }
+//------------------------------------------------------------------------------
+GLint max_compute_image_uniforms() {
+  GLint val;
+  gl::get_integer_v(GL_MAX_COMPUTE_IMAGE_UNIFORMS, &val);
+  return val;
+}
+
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
