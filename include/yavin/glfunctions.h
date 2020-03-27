@@ -210,6 +210,11 @@ struct gl {
   //------------------------------------------------------------------------------
   DLL_API static void get_buffer_parameter_iv(GLenum target, GLenum value,
                                               GLint* data);
+  //------------------------------------------------------------------------------
+  DLL_API static void clear_named_buffer_data(GLuint buffer,
+                                              GLenum internalformat,
+                                              GLenum format, GLenum type,
+                                              const void* data);
   //==============================================================================
   // SHADER RELATED
   //==============================================================================

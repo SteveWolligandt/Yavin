@@ -423,7 +423,6 @@ void gl::named_buffer_sub_data(GLuint buffer, GLintptr offset, GLsizei size,
   glNamedBufferSubData(buffer, offset, size, data);
   gl_error_check("glNamedBufferSubData");
 }
-
 //------------------------------------------------------------------------------
 void gl::get_buffer_parameter_iv(GLenum target, GLenum value, GLint* data) {
   assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER);
@@ -434,7 +433,17 @@ void gl::get_buffer_parameter_iv(GLenum target, GLenum value, GLint* data) {
   glGetBufferParameteriv(target, value, data);
   gl_error_check("glGetBufferParameteriv");
 }
-
+//------------------------------------------------------------------------------
+void gl::clear_named_buffer_data(GLuint buffer, GLenum internalformat,
+                                 GLenum format, GLenum type, const void* data) {
+  if (verbose) {
+    *out << "glClearNamedBufferData(" << buffer << ", "
+         << to_string(internalformat) << ", " << to_string(format) << ", "
+         << to_string(type) << ", " << data << ")\n";
+  }
+  glClearNamedBufferData(buffer, internalformat, format, type, data);
+  gl_error_check("glClearNamedBufferData");
+}
 //==============================================================================
 // SHADER RELATED
 //==============================================================================

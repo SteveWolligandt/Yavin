@@ -4,6 +4,7 @@
 #include <mutex>
 #include <vector>
 #include "glfunctions.h"
+#include "texsettings.h"
 #include "mutexhandler.h"
 #include "idholder.h"
 //==============================================================================
@@ -363,6 +364,7 @@ class buffer : public id_holder<GLuint> {
   void create_handle();
   void destroy_handle();
 
+  void           upload_data(const T& data);
   void           upload_data(const std::vector<T>& data);
   std::vector<T> download_data() const;
 
@@ -485,8 +487,21 @@ void buffer<array_type, T>::create_handle() {
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::destroy_handle() {
-  if (id() != 0) gl::delete_buffers(1, &id_ref());
+  if (id() != 0) { gl::delete_buffers(1, &id_ref()); }
   set_id(0);
+}
+//------------------------------------------------------------------------------
+template <GLsizei array_type, typename T>
+void buffer<array_type, T>::upload_data(const T& data) {
+  if constexpr (std::is_arithmetic_v<T>) {
+    using s = tex::settings<T, R>;
+    gl::clear_named_buffer_data(id(), s::internal_format, s::format, s::type,
+                                &data);
+  } else {
+    std::vector<T> data(m_capacity, data);
+    gl::named_buffer_data(this->id(), data_size * m_capacity, data.data(),
+                          m_usage);
+  }
 }
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
@@ -496,7 +511,6 @@ void buffer<array_type, T>::upload_data(const std::vector<T>& data) {
     gl::named_buffer_data(id(), data_size * data.size(), data.data(),
                           m_usage);
     m_size = m_capacity = data.size();
-
   } else {
     // just update buffer
     gl::named_buffer_sub_data(id(), 0, data_size * data.size(),
@@ -536,8 +550,13 @@ void buffer<array_type, T>::gpu_malloc(size_t n) {
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::gpu_malloc(size_t n, const T& initial) {
-  std::vector<T> data(n, initial);
-  gl::named_buffer_data(this->id(), data_size * n, data.data(), m_usage);
+  if constexpr (std::is_arithmetic_v<T>) {
+    gl::named_buffer_data<void>(this->id(), data_size * n, nullptr, m_usage);
+    upload_data(initial);
+  } else {
+    std::vector<T> data(n, initial);
+    gl::named_buffer_data(this->id(), data_size * n, data.data(), m_usage);
+  }
   m_capacity = n;
 }
 //------------------------------------------------------------------------------

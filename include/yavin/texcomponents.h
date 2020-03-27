@@ -1,12 +1,10 @@
-#ifndef __YAVIN_TEX_COMPONENTS_H__
-#define __YAVIN_TEX_COMPONENTS_H__
-
-#include <cstdint>
-
+#ifndef YAVIN_TEX_COMPONENTS_H
+#define YAVIN_TEX_COMPONENTS_H
+//==============================================================================
+#include "glincludes.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 struct R {
   static constexpr std::size_t num_components = 1;
 };

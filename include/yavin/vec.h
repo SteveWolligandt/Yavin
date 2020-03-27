@@ -21,7 +21,7 @@ struct vec {
   using data_container_t       = std::array<Real, N>;
   using iterator               = typename data_container_t::iterator;
   using const_iterator         = typename data_container_t::const_iterator;
-  static constexpr GLenum type = gl_type<Real>::type;
+  static constexpr GLenum type = gl_type_v<Real>;
 
  private:
   //===========================================================================

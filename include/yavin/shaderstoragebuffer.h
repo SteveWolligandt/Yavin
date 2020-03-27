@@ -1,5 +1,5 @@
-#ifndef __YAVIN_SHADER_STORAGE_BUFFER_H__
-#define __YAVIN_SHADER_STORAGE_BUFFER_H__
+#ifndef YAVIN_SHADER_STORAGE_BUFFER_H
+#define YAVIN_SHADER_STORAGE_BUFFER_H
 
 #include <initializer_list>
 #include <iostream>
@@ -8,11 +8,9 @@
 #include "dllexport.h"
 #include "errorcheck.h"
 #include "glincludes.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 template <typename T>
 class shaderstoragebuffer : public buffer<GL_SHADER_STORAGE_BUFFER, T> {
   //----------------------------------------------------------------------------

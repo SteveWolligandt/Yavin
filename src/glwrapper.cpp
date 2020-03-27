@@ -13,7 +13,9 @@ void disable_depth_test() { gl::disable(GL_DEPTH_TEST); }
 //==============================================================================
 void enable_depth_write() { gl::depth_mask(GL_TRUE); }
 void disable_depth_write() { gl::depth_mask(GL_FALSE); }
-//============================================================================== void depth_func_never()    { gl::depth_func(GL_NEVER); } void depth_func_less()     { gl::depth_func(GL_LESS); }
+//==============================================================================
+void depth_func_never()    { gl::depth_func(GL_NEVER); }
+void depth_func_less()     { gl::depth_func(GL_LESS); }
 void depth_func_equal()    { gl::depth_func(GL_EQUAL); }
 void depth_func_lequal()   { gl::depth_func(GL_LEQUAL); }
 void depth_func_greater()  { gl::depth_func(GL_GREATER); }
@@ -73,7 +75,7 @@ GLint max_compute_shared_memory_size() {
   return s;
 }
 //------------------------------------------------------------------------------
-void shader_storage_barrier() {
+void shaderstorage_barrier() {
   gl::memory_barrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 //------------------------------------------------------------------------------

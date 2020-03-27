@@ -1,74 +1,68 @@
-#ifndef __YAVIN_GL_TYPE_H__
-#define __YAVIN_GL_TYPE_H__
-
-#include <cstdint>
+#ifndef YAVIN_GLTYPE_H
+#define YAVIN_GLTYPE_H
+//==============================================================================
 #include "glincludes.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
+struct gl_half;
 
 template <typename T>
 struct gl_type;
-
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+template <typename T>
+static constexpr auto gl_type_v = gl_type<T>::value;
 //------------------------------------------------------------------------------
-
-template <>
-struct gl_type<float> {
-  static constexpr GLenum type = GL_FLOAT;
-};
-
+//template <>
+//struct gl_type<GLfixed> {
+//  static constexpr GLenum value = GL_FIXED;
+//};
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<double> {
-  static constexpr GLenum type = GL_DOUBLE;
+struct gl_type<gl_half> {
+  static constexpr GLenum value = GL_HALF_FLOAT;
 };
-
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<int8_t> {
-  static constexpr GLenum type = GL_BYTE;
+struct gl_type<GLfloat> {
+  static constexpr GLenum value = GL_FLOAT;
 };
-
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<uint8_t> {
-  static constexpr GLenum type = GL_UNSIGNED_BYTE;
+struct gl_type<GLdouble> {
+  static constexpr GLenum value = GL_DOUBLE;
 };
-
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<int16_t> {
-  static constexpr GLenum type = GL_INT;
+struct gl_type<GLubyte> {
+  static constexpr GLenum value = GL_UNSIGNED_BYTE;
 };
-
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<uint16_t> {
-  static constexpr GLenum type = GL_UNSIGNED_SHORT;
+struct gl_type<GLbyte> {
+  static constexpr GLenum value = GL_BYTE;
 };
-
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<int32_t> {
-  static constexpr GLenum type = GL_SHORT;
+struct gl_type<GLushort> {
+  static constexpr GLenum value = GL_UNSIGNED_SHORT;
 };
-
 //------------------------------------------------------------------------------
-
 template <>
-struct gl_type<uint32_t> {
-  static constexpr GLenum type = GL_UNSIGNED_INT;
+struct gl_type<GLshort> {
+  static constexpr GLenum value = GL_SHORT;
 };
-
+//------------------------------------------------------------------------------
+template <>
+struct gl_type<GLuint> {
+  static constexpr GLenum value = GL_UNSIGNED_INT;
+};
+//------------------------------------------------------------------------------
+template <>
+struct gl_type<GLint> {
+  static constexpr GLenum value = GL_INT;
+};
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

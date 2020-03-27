@@ -723,40 +723,47 @@ template <typename T>
 using tex3bgr = tex3<T, BGR>;
 template <typename T>
 using tex3bgra = tex3<T, BGRA>;
-using texdepth = tex2<unsigned int, Depth>;
 
-using tex2r8ui  = tex2r<std::uint8_t>;
-using tex2r16ui = tex2r<std::uint16_t>;
-using tex2r32ui = tex2r<std::uint32_t>;
-using tex2r8i   = tex2r<std::int8_t>;
-using tex2r16i  = tex2r<std::int16_t>;
-using tex2r32i  = tex2r<std::int32_t>;
-using tex2r32f  = tex2r<float>;
+using tex2r8ui  = tex2r<GLubyte>;
+using tex2r16ui = tex2r<GLushort>;
+using tex2r32ui = tex2r<GLuint>;
+using tex2r8i   = tex2r<GLbyte>;
+using tex2r16i  = tex2r<GLshort>;
+using tex2r32i  = tex2r<GLint>;
+using tex2r16f  = tex2r<GLhalf>;
+using tex2r32f  = tex2r<GLfloat>;
 
-using tex2rg8ui  = tex2rg<std::uint8_t>;
-using tex2rg16ui = tex2rg<std::uint16_t>;
-using tex2rg32ui = tex2rg<std::uint32_t>;
-using tex2rg8i   = tex2rg<std::int8_t>;
-using tex2rg16i  = tex2rg<std::int16_t>;
-using tex2rg32i  = tex2rg<std::int32_t>;
-using tex2rg32f  = tex2rg<float>;
+using tex2rg8ui  = tex2rg<GLubyte>;
+using tex2rg16ui = tex2rg<GLushort>;
+using tex2rg32ui = tex2rg<GLuint>;
+using tex2rg8i   = tex2rg<GLbyte>;
+using tex2rg16i  = tex2rg<GLshort>;
+using tex2rg32i  = tex2rg<GLint>;
+using tex2rg16f  = tex2rg<GLhalf>;
+using tex2rg32f  = tex2rg<GLfloat>;
 
-using tex2rgb8ui  = tex2rgb<std::uint8_t>;
-using tex2rgb16ui = tex2rgb<std::uint16_t>;
-using tex2rgb32ui = tex2rgb<std::uint32_t>;
-using tex2rgb8i   = tex2rgb<std::int8_t>;
-using tex2rgb16i  = tex2rgb<std::int16_t>;
-using tex2rgb32i  = tex2rgb<std::int32_t>;
-using tex2rgb32f  = tex2rgb<float>;
+using tex2rgb8ui  = tex2rgb<GLubyte>;
+using tex2rgb16ui = tex2rgb<GLushort>;
+using tex2rgb32ui = tex2rgb<GLuint>;
+using tex2rgb8i   = tex2rgb<GLbyte>;
+using tex2rgb16i  = tex2rgb<GLshort>;
+using tex2rgb32i  = tex2rgb<GLint>;
+using tex2rgb16f  = tex2rgb<GLhalf>;
+using tex2rgb32f  = tex2rgb<GLfloat>;
 
-using tex2rgba8ui  = tex2rgba<std::uint8_t>;
-using tex2rgba16ui = tex2rgba<std::uint16_t>;
-using tex2rgba32ui = tex2rgba<std::uint32_t>;
-using tex2rgba8i   = tex2rgba<std::int8_t>;
-using tex2rgba16i  = tex2rgba<std::int16_t>;
-using tex2rgba32i  = tex2rgba<std::int32_t>;
-using tex2rgba32f  = tex2rgba<float>;
+using tex2rgba8ui  = tex2rgba<GLubyte>;
+using tex2rgba16ui = tex2rgba<GLushort>;
+using tex2rgba32ui = tex2rgba<GLuint>;
+using tex2rgba8i   = tex2rgba<GLbyte>;
+using tex2rgba16i  = tex2rgba<GLshort>;
+using tex2rgba32i  = tex2rgba<GLint>;
+using tex2rgba16f  = tex2rgba<GLhalf>;
+using tex2rgba32f  = tex2rgba<GLfloat>;
 
+using texdepth16ui = tex2depth<GLushort>;
+using texdepth24ui = tex2depth<tex::depth24>;
+using texdepth32ui = tex2depth<GLuint>;
+using texdepth32f  = tex2depth<GLfloat>;
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
