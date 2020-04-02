@@ -21,7 +21,6 @@ class pixelunpackbuffer : public buffer<GL_PIXEL_UNPACK_BUFFER, T> {
  public:
   using parent_t                         = buffer<GL_PIXEL_UNPACK_BUFFER, T>;
   using this_t                           = pixelunpackbuffer<T>;
-  using usage_t                          = typename parent_t::usage_t;
   static constexpr usage_t default_usage = usage_t::STATIC_COPY;
   //----------------------------------------------------------------------------
   // ctors

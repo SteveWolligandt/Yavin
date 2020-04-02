@@ -10,6 +10,18 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
+enum usage_t {
+  STREAM_DRAW  = GL_STREAM_DRAW,
+  STREAM_READ  = GL_STREAM_READ,
+  STREAM_COPY  = GL_STREAM_COPY,
+  STATIC_DRAW  = GL_STATIC_DRAW,
+  STATIC_READ  = GL_STATIC_READ,
+  STATIC_COPY  = GL_STATIC_COPY,
+  DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
+  DYNAMIC_READ = GL_DYNAMIC_READ,
+  DYNAMIC_COPY = GL_DYNAMIC_COPY
+};
+//==============================================================================
 template <GLsizei array_type, typename T>
 class buffer;
 //==============================================================================
@@ -316,18 +328,6 @@ class buffer : public id_holder<GLuint> {
   friend class readable_buffer_element<_array_type, T>;
   friend class writeable_buffer_element<_array_type, T>;
 
-  enum usage_t {
-    STREAM_DRAW  = GL_STREAM_DRAW,
-    STREAM_READ  = GL_STREAM_READ,
-    STREAM_COPY  = GL_STREAM_COPY,
-    STATIC_DRAW  = GL_STATIC_DRAW,
-    STATIC_READ  = GL_STATIC_READ,
-    STATIC_COPY  = GL_STATIC_COPY,
-    DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
-    DYNAMIC_READ = GL_DYNAMIC_READ,
-    DYNAMIC_COPY = GL_DYNAMIC_COPY
-  };
-
   constexpr static GLsizei array_type = _array_type;
   constexpr static size_t  data_size  = sizeof(T);
 
@@ -382,6 +382,7 @@ class buffer : public id_holder<GLuint> {
 
   void gpu_malloc(size_t n);
   void gpu_malloc(size_t n, const T& initial);
+  void set_usage (usage_t);
 
   void push_back(T&&);
   void pop_back();
@@ -513,8 +514,7 @@ void buffer<array_type, T>::upload_data(const std::vector<T>& data) {
     m_size = m_capacity = data.size();
   } else {
     // just update buffer
-    gl::named_buffer_sub_data(id(), 0, data_size * data.size(),
-                              data.data());
+    gl::named_buffer_data(id(), data_size * data.size(), data.data(), m_usage);
     m_size = data.size();
   }
 }
@@ -558,6 +558,11 @@ void buffer<array_type, T>::gpu_malloc(size_t n, const T& initial) {
     gl::named_buffer_data(this->id(), data_size * n, data.data(), m_usage);
   }
   m_capacity = n;
+}
+//------------------------------------------------------------------------------
+template <GLsizei array_type, typename T>
+void buffer<array_type, T>::set_usage(usage_t u) {
+  m_usage = u;
 }
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>

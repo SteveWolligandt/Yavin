@@ -21,7 +21,6 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
   using parent_t = buffer<GL_ARRAY_BUFFER, tuple<Ts...>>;
   using this_t   = vertexbuffer<Ts...>;
   using data_t   = typename parent_t::data_t;
-  using usage_t  = typename parent_t::usage_t;
 
   static constexpr size_t data_size = parent_t::data_size;
 

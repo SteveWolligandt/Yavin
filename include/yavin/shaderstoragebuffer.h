@@ -18,7 +18,6 @@ class shaderstoragebuffer : public buffer<GL_SHADER_STORAGE_BUFFER, T> {
   //----------------------------------------------------------------------------
  public:
   using parent_t                     = buffer<GL_SHADER_STORAGE_BUFFER, T>;
-  using usage_t                      = typename parent_t::usage_t;
   static const usage_t default_usage = usage_t::DYNAMIC_DRAW;
 
   //----------------------------------------------------------------------------
