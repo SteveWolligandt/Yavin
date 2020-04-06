@@ -8,14 +8,15 @@
 namespace yavin {
 //==============================================================================
 gl_error::gl_error(const std::string& function_name, const std::string& message)
-    : std::runtime_error(ansi::red + ansi::bold + "[" + function_name + "] " +
-                         ansi::reset + message) {}
+    : std::runtime_error(std::string{ansi::red} + std::string{ansi::bold} +
+                         "[" + function_name + "] " + std::string{ansi::reset} +
+                         message) {}
 //------------------------------------------------------------------------------
 gl_framebuffer_not_complete_error::gl_framebuffer_not_complete_error(
     const std::string& what)
     : std::runtime_error("[FrameBuffer incomplete] " + what) {}
 //------------------------------------------------------------------------------
-const std::string gl_error_to_string(GLenum err) {
+auto gl_error_to_string(GLenum err) -> std::string{
   switch (err) {
     case GL_INVALID_ENUM:      return "invalid enum";
     case GL_INVALID_VALUE:     return "invalid value";
@@ -31,7 +32,7 @@ const std::string gl_error_to_string(GLenum err) {
   }
 }
 //------------------------------------------------------------------------------
-const std::string gl_framebuffer_error_to_string(GLenum status) {
+auto gl_framebuffer_error_to_string(GLenum status) -> std::string{
   switch (status) {
     case GL_FRAMEBUFFER_UNDEFINED: return "undefined";
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: return "incomplete attachment";
@@ -47,11 +48,11 @@ const std::string gl_framebuffer_error_to_string(GLenum status) {
   return "";
 }
 //------------------------------------------------------------------------------
-void gl_error_check(const std::string& function) {
+void gl_error_check(std::string_view function) {
   const auto err = gl::get_error();
   if (err != GL_NO_ERROR) {
     const auto err_str = gl_error_to_string(err);
-    throw gl_error(function, err_str);
+    throw gl_error(std::string{function}, err_str);
   }
 }
 //------------------------------------------------------------------------------

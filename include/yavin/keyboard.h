@@ -102,7 +102,7 @@ enum key {
   KEY_UNKNOWN
 };
 
-std::string to_string(key k);
+auto to_string(key k) -> std::string;
 
 struct keyboard_listener {
   virtual void on_key_pressed(key /*k*/) {}

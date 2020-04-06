@@ -41,6 +41,8 @@ class buffer_map {
         access);
     detail::mutex::gl_call.lock();
   }
+  buffer_map(const buffer_map&) = delete;
+  buffer_map(buffer_map&&)      = delete;
 
   /// destructor unmaps the buffer
   ~buffer_map() { unmap(); }

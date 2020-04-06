@@ -10,7 +10,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_compile_options(-fdiagnostics-color=always)
 endif()
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # git submodules
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(Git QUIET)
@@ -90,6 +90,41 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(Boost REQUIRED)
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# clang-tidy
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+set(YAVIN_COMPILE_WITH_CLANG_TIDY_CHECKS false CACHE BOOL
+    "use clang-tidy checks while building")
+option(YAVIN_COMPILE_WITH_CLANG_TIDY_CHECKS
+       "use clang-tidy checks while building" FALSE)
+find_program(YAVIN_CLANG_TIDY NAMES "clang-tidy" DOC "Path to clang-tidy executable")
+string(CONCAT YAVIN_CLANG_TIDY_CHECKS
+  "-checks="
+  ",cppcoreguidelines*"
+  ",-cppcoreguidelines-pro-type-reinterpret-cast"
+  ",-cppcoreguidelines-pro-bounds-pointer-arithmetic"
+  ",-cppcoreguidelines-pro-bounds-constant-array-index"
+  ",-cppcoreguidelines-avoid-magic-numbers"
+  ",-cppcoreguidelines-macro-usage"
+  ",cert*"
+  ",-cert-err34-c"
+  ",hicpp"
+  ",modernize*"
+  ",performance*"
+  ",readability*"
+  ",-readability-magic-numbers"
+  ",-readability-isolate-declaration"
+  ",-readability-static-accessed-through-instance"
+  ",-readability-named-parameter"
+  ",google-explicit-constructor"
+  )
+if(YAVIN_CLANG_TIDY)
+  set(YAVIN_CLANG_TIDY_CMD
+    ${YAVIN_CLANG_TIDY}
+    ${YAVIN_CLANG_TIDY_CHECKS}
+    "-header-filter=yavin")
+endif()
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # setup yavin library target
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -162,6 +197,9 @@ elseif(YAVIN_USE_EGL)
   target_link_libraries(
     yavin PRIVATE
     OpenGL::EGL)
+endif()
+if(YAVIN_CLANG_TIDY AND YAVIN_COMPILE_WITH_CLANG_TIDY_CHECKS)
+  set_target_properties(yavin PROPERTIES CXX_CLANG_TIDY "${YAVIN_CLANG_TIDY_CMD}")
 endif()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

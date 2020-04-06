@@ -1,14 +1,12 @@
-#ifndef __YAVIN_TO_STRING_H__
-#define __YAVIN_TO_STRING_H__
-
+#ifndef YAVIN_TO_STRING_H
+#define YAVIN_TO_STRING_H
+//==============================================================================
 #include <string>
 #include "glincludes.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
-inline std::string texparami_to_string(GLint i) {
+inline auto texparami_to_string(GLint i) -> std::string {
   switch (i) {
     // texture wrapping
     case GL_CLAMP_TO_BORDER: return "GL_CLAMP_TO_BORDER";
@@ -26,8 +24,8 @@ inline std::string texparami_to_string(GLint i) {
     default: return std::to_string(i);
   }
 }
-
-inline std::string to_string(GLenum e) {
+//------------------------------------------------------------------------------
+inline auto to_string(GLenum e) -> std::string {
   switch (e) {
     // buffers
     case GL_ARRAY_BUFFER: return "GL_ARRAY_BUFFER";
@@ -270,13 +268,11 @@ inline std::string to_string(GLenum e) {
     default: return "GLenum(" + std::to_string(e) + ")";
   }
 }
-
 //------------------------------------------------------------------------------
-
-inline std::string map_access_to_string(GLbitfield b) {
+inline auto map_access_to_string(GLbitfield b) -> std::string {
   std::string flags;
   auto        pipe = [&flags]() {
-    if (!flags.empty()) flags += std::string(" | ");
+    if (!flags.empty()) { flags += std::string(" | "); }
   };
   if (GL_MAP_READ_BIT & b) {
     pipe();
@@ -345,7 +341,7 @@ inline std::string map_access_to_string(GLbitfield b) {
   if (GL_BUFFER_UPDATE_BARRIER_BIT & b) {
     pipe();
     flags += "GL_BUFFER_UPDATE_BARRIER_BIT";
-  }
+  } 
   if (GL_FRAMEBUFFER_BARRIER_BIT & b) {
     pipe();
     flags += "GL_FRAMEBUFFER_BARRIER_BIT";
@@ -364,9 +360,7 @@ inline std::string map_access_to_string(GLbitfield b) {
   }
   return flags;
 }
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

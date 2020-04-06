@@ -22,13 +22,11 @@ class gl_framebuffer_not_complete_error : public std::runtime_error {
   DLL_API explicit gl_framebuffer_not_complete_error(const std::string& what);
 };
 
-DLL_API const std::string gl_error_to_string(GLenum err);
-DLL_API const std::string gl_framebuffer_error_to_string(GLenum status);
+DLL_API auto gl_error_to_string(GLenum err) -> std::string;
+DLL_API auto gl_framebuffer_error_to_string(GLenum status) -> std::string;
 
-DLL_API void gl_error_check(const std::string& function);
-DLL_API void gl_framebuffer_not_complete_check(const GLuint fbo_id);
-
-
+DLL_API void gl_error_check(std::string_view function);
+DLL_API void gl_framebuffer_not_complete_check(GLuint fbo_id);
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
