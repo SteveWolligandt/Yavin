@@ -109,6 +109,7 @@ string(CONCAT YAVIN_CLANG_TIDY_CHECKS
   ",cert*"
   ",-cert-err34-c"
   ",-cert-dcl21-cpp"
+  ",-cert-oop54-cpp" #self-assignment
   ",hicpp"
   ",modernize*"
   ",performance*"
