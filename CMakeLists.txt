@@ -108,6 +108,7 @@ string(CONCAT YAVIN_CLANG_TIDY_CHECKS
   ",-cppcoreguidelines-macro-usage"
   ",cert*"
   ",-cert-err34-c"
+  ",-cert-dcl21-cpp"
   ",hicpp"
   ",modernize*"
   ",performance*"

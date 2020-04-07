@@ -43,6 +43,8 @@ class buffer_map {
   }
   buffer_map(const buffer_map&) = delete;
   buffer_map(buffer_map&&)      = delete;
+  auto operator=(const buffer_map&) -> buffer_map& = delete;
+  auto operator=(buffer_map &&)     -> buffer_map& = delete;
 
   /// destructor unmaps the buffer
   ~buffer_map() { unmap(); }
@@ -55,27 +57,28 @@ class buffer_map {
     }
   }
 
-  auto&       at(size_t i) { return m_gpu_mapping[i]; }
-  const auto& at(size_t i) const { return m_gpu_mapping[i]; }
+  auto at(size_t i) -> auto& { return m_gpu_mapping[i]; }
+  auto at(size_t i) const -> const auto& { return m_gpu_mapping[i]; }
 
-  auto&       front() { return at(0); }
-  const auto& front() const { return at(0); }
+  auto front() -> auto& { return at(0); }
+  auto front() const -> const auto& { return at(0); }
 
-  auto&       back() { return at(m_length - 1); }
-  const auto& back() const { return at(m_length - 1); }
+  auto back() -> auto& { return at(m_length - 1); }
+  auto back() const -> const auto& { return at(m_length - 1); }
 
-  auto&       operator[](size_t i) { return at(i); }
-  const auto& operator[](size_t i) const { return at(i); }
+  auto operator[](size_t i) -> auto& { return at(i); }
+  auto operator[](size_t i) const -> const auto& { return at(i); }
 
   auto begin() { return m_gpu_mapping; }
-  auto end() { return m_gpu_mapping + m_length; }
   auto begin() const { return m_gpu_mapping; }
+
+  auto end() { return m_gpu_mapping + m_length; }
   auto end() const { return m_gpu_mapping + m_length; }
 
   auto offset() const { return m_offset; }
   auto length() const { return m_length; }
 
- protected:
+ private:
   const buffer_t* m_buffer;
   size_t          m_offset;
   size_t          m_length;
@@ -104,26 +107,33 @@ class readable_buffer_element {
   readable_buffer_element(const buffer_t* buffer, size_t idx)
       : m_buffer(buffer), m_idx(idx) {}
   readable_buffer_element(const readable_buffer_element& other)
-      : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
-  readable_buffer_element(readable_buffer_element&& other)
-      : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
+    = default;
+  readable_buffer_element(readable_buffer_element&& other) noexcept
+    = default;
+
+  auto operator=(const readable_buffer_element& other)
+    -> readable_buffer_element& = default;
+  auto operator=(readable_buffer_element&& other) noexcept
+    -> readable_buffer_element& = default;
+
+  ~readable_buffer_element() = default;
 
   /// for accessing single gpu data element.
-  operator T() const { return download(); }
+  explicit operator T() const { return download(); }
 
   auto download() const {
     rmap_t map(m_buffer, m_idx, 1);
     return map.front();
   }
 
- protected:
+ private:
   const buffer_t* m_buffer;
   size_t          m_idx;
 };
 
 template <GLsizei array_type, typename T>
-inline auto& operator<<(std::ostream&                         out,
-                        readable_buffer_element<array_type, T>& data) {
+inline auto operator<<(std::ostream& out,
+                       readable_buffer_element<array_type, T>& data) -> auto& {
   out << data.download();
   return out;
 }
@@ -140,24 +150,28 @@ class writeable_buffer_element : public readable_buffer_element<array_type, T> {
   writeable_buffer_element(buffer_t* buffer, size_t idx)
       : parent_t(buffer, idx) {}
   writeable_buffer_element(const writeable_buffer_element& other)
-      : parent_t(other) {}
-  writeable_buffer_element(writeable_buffer_element&& other)
-      : parent_t(std::move(other)) {}
+    = default;
+  writeable_buffer_element(writeable_buffer_element&& other) noexcept
+    = default;
+  auto operator=(const writeable_buffer_element& other)
+    -> writeable_buffer_element& = default;
+  auto operator=(writeable_buffer_element&& other) noexcept
+    -> writeable_buffer_element& = default;
+
+  ~writeable_buffer_element() = default;
 
   /// for assigning single gpu data element.
-  auto& operator=(T&& data) {
+  auto operator=(T&& data) -> auto& {
     gl::named_buffer_sub_data(this->m_buffer->id(),
                               this->m_idx * buffer_t::data_size,
                               buffer_t::data_size, &data);
     return *this;
   }
 };
-
 //------------------------------------------------------------------------------
-
 template <GLsizei array_type, typename T>
-inline auto& operator<<(std::ostream&                          out,
-                        writeable_buffer_element<array_type, T>& data) {
+inline auto operator<<(std::ostream& out,
+                       writeable_buffer_element<array_type, T>& data) -> auto& {
   out << data.download();
   return out;
 }
@@ -178,39 +192,31 @@ class buffer_iterator {
   //----------------------------------------------------------------------------
   buffer_iterator(buffer_t* buffer, size_t idx) : m_buffer(buffer), m_idx(idx) {}
   //----------------------------------------------------------------------------
-  buffer_iterator(const buffer_iterator& other)
-      : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
+  buffer_iterator(const buffer_iterator& other) = default;
+  buffer_iterator(buffer_iterator&& other) noexcept = default;
   //----------------------------------------------------------------------------
-  buffer_iterator(buffer_iterator&& other)
-      : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
+  auto operator=(const buffer_iterator& other) -> auto& = default;
+  auto operator=(buffer_iterator&& other) noexcept -> auto& = default;
   //----------------------------------------------------------------------------
-  auto& operator=(const buffer_iterator& other) {
-    m_buffer = other.m_buffer;
-    m_idx    = other.m_idx;
-    return *this;
-  }
-  //----------------------------------------------------------------------------
-  auto& operator=(buffer_iterator&& other) {
-    m_buffer = other.m_buffer;
-    m_idx    = other.m_idx;
-    return *this;
-  }
+  ~buffer_iterator() = default;
   //----------------------------------------------------------------------------
   /// get the buffer element the iterator refers to
-  T operator*() const { return readable_buffer_element(m_buffer, m_idx); }
+  auto operator*() const -> T {
+    return readable_buffer_element(m_buffer, m_idx);
+  }
   //----------------------------------------------------------------------------
   /// are two iterators equal?
-  bool operator==(const buffer_iterator& other) const {
-    return (m_idx == other.m_idx);
+  auto operator==(const buffer_iterator& other) const {
+    return m_idx == other.m_idx;
   }
   //----------------------------------------------------------------------------
   /// are two iterators different?
-  bool operator!=(const buffer_iterator& other) const {
+  auto operator!=(const buffer_iterator& other) const {
     return !operator==(other);
   }
   //----------------------------------------------------------------------------
   /// pre-increment iterator
-  auto& operator++() {
+  auto operator++() ->auto& {
     ++m_idx;
     return *this;
   }
@@ -223,7 +229,7 @@ class buffer_iterator {
   }
   //----------------------------------------------------------------------------
   /// pre-decrement iterator
-  auto& operator--() {
+  auto operator--() -> auto& {
     --m_idx;
     return *this;
   }
@@ -257,39 +263,31 @@ class cbuffer_iterator {
   cbuffer_iterator(const buffer_t* buffer, size_t idx)
       : m_buffer(buffer), m_idx(idx) {}
   //----------------------------------------------------------------------------
-  cbuffer_iterator(const cbuffer_iterator& other)
-      : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
+  cbuffer_iterator(const cbuffer_iterator& other)     = default;
+  cbuffer_iterator(cbuffer_iterator&& other) noexcept = default;
   //----------------------------------------------------------------------------
-  cbuffer_iterator(cbuffer_iterator&& other)
-      : m_buffer(other.m_buffer), m_idx(other.m_idx) {}
+  auto operator=(const cbuffer_iterator& other) -> auto& = default;
+  auto operator=(cbuffer_iterator&& other) noexcept -> auto& = default;
   //----------------------------------------------------------------------------
-  auto& operator=(const cbuffer_iterator& other) {
-    m_buffer = other.m_buffer;
-    m_idx    = other.m_idx;
-    return *this;
-  }
-  //----------------------------------------------------------------------------
-  auto& operator=(cbuffer_iterator&& other) {
-    m_buffer = other.m_buffer;
-    m_idx    = other.m_idx;
-    return *this;
-  }
+  ~cbuffer_iterator() = default;
   //----------------------------------------------------------------------------
   /// get the buffer element the iterator refers to
-  T operator*() const { return readable_buffer_element(m_buffer, m_idx); }
+  auto operator*() const -> T {
+    return readable_buffer_element(m_buffer, m_idx);
+  }
   //----------------------------------------------------------------------------
   /// are two iterators equal?
-  bool operator==(const cbuffer_iterator& other) const {
+  auto operator==(const cbuffer_iterator& other) const {
     return (m_idx == other.m_idx);
   }
   //----------------------------------------------------------------------------
   /// are two iterators different?
-  bool operator!=(const cbuffer_iterator& other) const {
+  auto operator!=(const cbuffer_iterator& other) const {
     return !operator==(other);
   }
   //----------------------------------------------------------------------------
   /// pre-increment iterator
-  auto& operator++() {
+  auto operator++() -> auto& {
     ++m_idx;
     return *this;
   }
@@ -302,7 +300,7 @@ class cbuffer_iterator {
   }
   //----------------------------------------------------------------------------
   /// pre-decrement iterator
-  auto& operator--() {
+  auto operator--() -> auto& {
     --m_idx;
     return *this;
   }
@@ -346,17 +344,17 @@ class buffer : public id_holder<GLuint> {
   using wmap_t  = wbuffer_map<array_type, T>;
   using rwmap_t = rwbuffer_map<array_type, T>;
 
- protected:
+ private:
   size_t  m_size     = 0;
   size_t  m_capacity = 0;
   usage_t m_usage;
 
  public:
-  buffer(usage_t usage);
+  explicit buffer(usage_t usage);
   buffer(const buffer& other);
   buffer(buffer&& other);
-  buffer& operator=(const buffer& other);
-  buffer& operator=(buffer&& other);
+  auto operator=(const buffer& other) -> buffer&;
+  auto operator=(buffer&& other) noexcept -> buffer&;
 
   buffer(size_t n, usage_t usage);
   buffer(size_t n, const T& initial, usage_t usage);
@@ -368,15 +366,15 @@ class buffer : public id_holder<GLuint> {
 
   void           upload_data(const T& data);
   void           upload_data(const std::vector<T>& data);
-  std::vector<T> download_data() const;
+  [[nodiscard]] auto download_data() const -> std::vector<T>;
 
   void        bind() const;
   static void unbind();
 
   void copy(const this_t& other);
 
-  auto size() const { return m_size; }
-  auto capacity() const { return m_capacity; }
+  [[nodiscard]] auto size() const { return m_size; }
+  [[nodiscard]] auto capacity() const { return m_capacity; }
 
   void reserve(size_t size);
   void resize(size_t size);

@@ -36,7 +36,7 @@ atomiccounterbuffer::atomiccounterbuffer(const std::vector<unsigned int>& data,
     : buffer(data, usage) {}
 //------------------------------------------------------------------------------
 atomiccounterbuffer::atomiccounterbuffer(
-    std::initializer_list<unsigned int>&& list)
+    std::initializer_list<unsigned int>&& data)
     : buffer(std::move(list), default_usage) {}
 //------------------------------------------------------------------------------
 void atomiccounterbuffer::set_all_to(unsigned int val) {

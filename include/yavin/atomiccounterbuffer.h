@@ -24,10 +24,10 @@ class atomiccounterbuffer
   DLL_API auto operator=(this_t&& other) noexcept -> atomiccounterbuffer&;
   ~atomiccounterbuffer() = default;
 
-  DLL_API atomiccounterbuffer(size_t n, usage_t usage = default_usage);
+  DLL_API explicit atomiccounterbuffer(size_t n, usage_t usage = default_usage);
   DLL_API atomiccounterbuffer(size_t n, unsigned int initial,
                               usage_t usage = default_usage);
-  DLL_API atomiccounterbuffer(const std::vector<unsigned int>& data,
+  DLL_API explicit atomiccounterbuffer(const std::vector<unsigned int>& data,
                               usage_t usage = default_usage);
   DLL_API atomiccounterbuffer(std::initializer_list<unsigned int>&& data);
 
