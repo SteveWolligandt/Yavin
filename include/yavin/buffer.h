@@ -131,6 +131,10 @@ class rbuffer_map_element {
   }
   auto operator==(const T& t) const -> bool { return download() == t; }
   auto operator!=(const T& t) const -> bool { return !operator==(t); }
+  auto operator>(const T& t) const -> bool { return download() > t; }
+  auto operator>=(const T& t) const -> bool { return download() >= t; }
+  auto operator<(const T& t) const -> bool { return download() < t; }
+  auto operator<=(const T& t) const -> bool { return download() <= t; }
 };
 
 template <GLsizei array_type, typename T>
@@ -142,37 +146,6 @@ inline auto operator<<(std::ostream& out,
 
 //==============================================================================
 /// Returned by buffer::operator[] for reading and writing single elements
-template <GLsizei array_type, typename T>
-class wbuffer_map_element  {
- public:
-  using buffer_t = buffer<array_type, T>;
-  using rmap_t   = rbuffer_map<array_type, T>;
-
- private:
-  const buffer_t* m_buffer;
-  size_t          m_idx;
-
- public:
-  wbuffer_map_element(const buffer_t* buffer, size_t idx)
-      : m_buffer{buffer}, m_idx{idx} {}
-  wbuffer_map_element(const wbuffer_map_element& other)     = default;
-  wbuffer_map_element(wbuffer_map_element&& other) noexcept = default;
-
-  auto operator=(const wbuffer_map_element& other)
-    -> wbuffer_map_element& = default;
-  auto operator=(wbuffer_map_element&& other) noexcept
-    -> wbuffer_map_element& = default;
-
-  ~wbuffer_map_element() = default;
-  /// for assigning single gpu data element.
-  auto operator=(T&& data) -> auto& {
-    gl::named_buffer_sub_data(this->get_buffer().id(),
-                              this->get_idx() * buffer_t::data_size,
-                              buffer_t::data_size, &data);
-    return *this;
-  }
-};
-//==============================================================================
 /// Returned by buffer::operator[] for reading and writing single elements
 template <GLsizei array_type, typename T>
 class rwbuffer_map_element  {
@@ -198,8 +171,8 @@ class rwbuffer_map_element  {
   ~rwbuffer_map_element() = default;
   /// for assigning single gpu data element.
   auto operator=(T&& data) -> auto& {
-    gl::named_buffer_sub_data(this->get_buffer().id(),
-                              this->get_idx() * buffer_t::data_size,
+    gl::named_buffer_sub_data(m_buffer->id(),
+                              m_idx * buffer_t::data_size,
                               buffer_t::data_size, &data);
     return *this;
   }
@@ -213,6 +186,10 @@ class rwbuffer_map_element  {
   }
   auto operator==(const T& t) const -> bool { return download() == t; }
   auto operator!=(const T& t) const -> bool { return !operator==(t); }
+  auto operator>(const T& t) const -> bool { return download() > t; }
+  auto operator>=(const T& t) const -> bool { return download() >= t; }
+  auto operator<(const T& t) const -> bool { return download() < t; }
+  auto operator<=(const T& t) const -> bool { return download() <= t; }
 };
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
@@ -372,7 +349,6 @@ class buffer : public id_holder<GLuint> {
   using parent_t = id_holder<GLuint>;
   using parent_t::id;
   friend class rbuffer_map_element<_array_type, T>;
-  friend class wbuffer_map_element<_array_type, T>;
   friend class rwbuffer_map_element<_array_type, T>;
 
   constexpr static GLsizei array_type = _array_type;
@@ -381,7 +357,6 @@ class buffer : public id_holder<GLuint> {
   using this_t = buffer<array_type, T>;
   using data_t = T;
 
-  using welement_t  = wbuffer_map_element<array_type, T>;
   using relement_t  = rbuffer_map_element<array_type, T>;
   using rwelement_t = rwbuffer_map_element<array_type, T>;
 
@@ -438,9 +413,8 @@ class buffer : public id_holder<GLuint> {
   template <typename... Ts>
   void emplace_back(Ts&&...);
 
-  [[nodiscard]] auto r_at(size_t idx) const { return element_t(this, idx); }
-  [[nodiscard]] auto w_at(size_t idx) { return const_element_t(this, idx); }
-  [[nodiscard]] auto rw_at(size_t idx) { return const_element_t(this, idx); }
+  [[nodiscard]] auto r_at(size_t idx) const { return relement_t(this, idx); }
+  [[nodiscard]] auto rw_at(size_t idx) { return rwelement_t(this, idx); }
 
   [[nodiscard]] auto at(size_t idx) { return rw_at(idx); }
   [[nodiscard]] auto at(size_t idx) const { return r_at(idx); }
