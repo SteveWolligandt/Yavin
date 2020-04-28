@@ -49,7 +49,10 @@ DLL_API GLint bound_texture2d();
 DLL_API GLint bound_texture3d();
 //==============================================================================
 DLL_API GLint        max_compute_shared_memory_size();
-DLL_API void         shaderstorage_barrier();
+DLL_API void         barrier();
+DLL_API void         shader_storage_barrier();
+DLL_API void         shader_image_access_barrier();
+DLL_API void         atomic_counter_barrier();
 std::array<GLint, 3> max_compute_work_group_count();
 std::array<GLint, 3> max_compute_work_group_size();
 GLint                max_compute_work_group_invocations();

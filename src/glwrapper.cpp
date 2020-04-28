@@ -2,37 +2,81 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-void clear_color_buffer() { gl::clear(GL_COLOR_BUFFER_BIT); }
-void clear_depth_buffer() { gl::clear(GL_DEPTH_BUFFER_BIT); }
+void clear_color_buffer() {
+  gl::clear(GL_COLOR_BUFFER_BIT);
+}
+void clear_depth_buffer() {
+  gl::clear(GL_DEPTH_BUFFER_BIT);
+}
 void clear_color_depth_buffer() {
   gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 //==============================================================================
-void enable_depth_test() { gl::enable(GL_DEPTH_TEST); }
-void disable_depth_test() { gl::disable(GL_DEPTH_TEST); }
+void enable_depth_test() {
+  gl::enable(GL_DEPTH_TEST);
+}
+void disable_depth_test() {
+  gl::disable(GL_DEPTH_TEST);
+}
 //==============================================================================
-void enable_depth_write() { gl::depth_mask(GL_TRUE); }
-void disable_depth_write() { gl::depth_mask(GL_FALSE); }
+void enable_depth_write() {
+  gl::depth_mask(GL_TRUE);
+}
+void disable_depth_write() {
+  gl::depth_mask(GL_FALSE);
+}
 //==============================================================================
-void depth_func_never()    { gl::depth_func(GL_NEVER); }
-void depth_func_less()     { gl::depth_func(GL_LESS); }
-void depth_func_equal()    { gl::depth_func(GL_EQUAL); }
-void depth_func_lequal()   { gl::depth_func(GL_LEQUAL); }
-void depth_func_greater()  { gl::depth_func(GL_GREATER); }
-void depth_func_notequal() { gl::depth_func(GL_NOTEQUAL); }
-void depth_func_gequal()   { gl::depth_func(GL_GEQUAL); }
-void depth_func_always()   { gl::depth_func(GL_ALWAYS); }
+void depth_func_never() {
+  gl::depth_func(GL_NEVER);
+}
+void depth_func_less() {
+  gl::depth_func(GL_LESS);
+}
+void depth_func_equal() {
+  gl::depth_func(GL_EQUAL);
+}
+void depth_func_lequal() {
+  gl::depth_func(GL_LEQUAL);
+}
+void depth_func_greater() {
+  gl::depth_func(GL_GREATER);
+}
+void depth_func_notequal() {
+  gl::depth_func(GL_NOTEQUAL);
+}
+void depth_func_gequal() {
+  gl::depth_func(GL_GEQUAL);
+}
+void depth_func_always() {
+  gl::depth_func(GL_ALWAYS);
+}
 //==============================================================================
-void enable_blending() { gl::enable(GL_BLEND); }
-void disable_blending() { gl::disable(GL_BLEND); }
+void enable_blending() {
+  gl::enable(GL_BLEND);
+}
+void disable_blending() {
+  gl::disable(GL_BLEND);
+}
 //==============================================================================
-void enable_multisampling() { gl::enable(GL_MULTISAMPLE); }
-void disable_multisampling() { gl::disable(GL_MULTISAMPLE); }
-bool multisampling_enabled() { return gl::is_enabled(GL_MULTISAMPLE); }
+void enable_multisampling() {
+  gl::enable(GL_MULTISAMPLE);
+}
+void disable_multisampling() {
+  gl::disable(GL_MULTISAMPLE);
+}
+bool multisampling_enabled() {
+  return gl::is_enabled(GL_MULTISAMPLE);
+}
 //==============================================================================
-void blend_func_additive() { gl::blend_func(GL_ONE, GL_ONE); }
-void blend_func_multiplicative() { gl::blend_func(GL_ONE, GL_ONE); }
-void blend_func_subtractive() { gl::blend_func(GL_ONE, GL_ONE); }
+void blend_func_additive() {
+  gl::blend_func(GL_ONE, GL_ONE);
+}
+void blend_func_multiplicative() {
+  gl::blend_func(GL_ONE, GL_ONE);
+}
+void blend_func_subtractive() {
+  gl::blend_func(GL_ONE, GL_ONE);
+}
 void blend_func_alpha() {
   gl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -75,8 +119,27 @@ GLint max_compute_shared_memory_size() {
   return s;
 }
 //------------------------------------------------------------------------------
-void shaderstorage_barrier() {
+void barrier() {
+  gl::memory_barrier(
+      GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT |
+      GL_UNIFORM_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT |
+      GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_COMMAND_BARRIER_BIT |
+      GL_PIXEL_BUFFER_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT |
+      GL_BUFFER_UPDATE_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT |
+      GL_TRANSFORM_FEEDBACK_BARRIER_BIT | GL_ATOMIC_COUNTER_BARRIER_BIT |
+      GL_SHADER_STORAGE_BARRIER_BIT);
+}
+//------------------------------------------------------------------------------
+void shader_storage_barrier() {
   gl::memory_barrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+//------------------------------------------------------------------------------
+void shader_image_access_barrier() {
+  gl::memory_barrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+}
+//------------------------------------------------------------------------------
+void atomic_counter_barrier() {
+  gl::memory_barrier(GL_ATOMIC_COUNTER_BARRIER_BIT);
 }
 //------------------------------------------------------------------------------
 std::array<GLint, 3> max_compute_work_group_count() {
