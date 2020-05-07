@@ -253,9 +253,9 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
 //------------------------------------------------------------------------------
 bool imgui_render_backend::create_fonts_texture() {
   // Build texture atlas
-  ImGuiIO&       io = ImGui::GetIO();
+  ImGuiIO&      io = ImGui::GetIO();
   std::uint8_t* pixels;
-  int            width, height;
+  int           width, height;
   io.Fonts->GetTexDataAsRGBA32(
       &pixels, &width,
       &height);  // Load as RGBA 32-bit (75% of the memory is wasted, but
@@ -265,6 +265,11 @@ bool imgui_render_backend::create_fonts_texture() {
                  // GL texture id, consider calling GetTexDataAsAlpha8()
                  // instead to save on GPU memory.
 
+  const auto err = gl::get_error();
+  if (err != GL_NO_ERROR) {
+    const auto err_str = gl_error_to_string(err);
+    throw gl_error(std::string{"imgui"}, err_str);
+  }
   // Upload texture to graphics system
   m_font_texture.upload_data(pixels, width, height);
   // Store our identifier

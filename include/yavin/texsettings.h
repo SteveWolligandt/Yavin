@@ -44,7 +44,7 @@ template <>
 struct settings<GLubyte, RGBA> {
   using real_t                            = GLubyte;
   using comp_t                            = RGBA;
-  static constexpr GLint  internal_format = GL_RGBA8UI;
+  static constexpr GLint  internal_format = GL_RGBA;
   static constexpr GLenum format          = GL_RGBA;
   static constexpr GLenum type            = gl_type_v<real_t>;
 };

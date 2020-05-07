@@ -43,10 +43,10 @@ DLL_API void blend_func_alpha();
 DLL_API GLint get_total_available_memory();
 DLL_API GLint get_current_available_memory();
 //==============================================================================
-DLL_API GLint bound_texture(GLenum binding);
-DLL_API GLint bound_texture1d();
-DLL_API GLint bound_texture2d();
-DLL_API GLint bound_texture3d();
+DLL_API GLuint bound_texture(GLenum binding);
+DLL_API GLuint bound_texture1d();
+DLL_API GLuint bound_texture2d();
+DLL_API GLuint bound_texture3d();
 //==============================================================================
 DLL_API GLint        max_compute_shared_memory_size();
 DLL_API void         barrier();

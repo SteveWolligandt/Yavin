@@ -95,21 +95,21 @@ GLint get_current_available_memory() {
   return tam;
 }
 //==============================================================================
-GLint bound_texture(GLenum binding) {
+GLuint bound_texture(GLenum binding) {
   GLint tex;
   gl::get_integer_v(binding, &tex);
-  return tex;
+  return static_cast<GLuint>(tex);
 }
 //------------------------------------------------------------------------------
-GLint bound_texture1d() {
+GLuint bound_texture1d() {
   return bound_texture(GL_TEXTURE_BINDING_1D);
 }
 //------------------------------------------------------------------------------
-GLint bound_texture2d() {
+GLuint bound_texture2d() {
   return bound_texture(GL_TEXTURE_BINDING_2D);
 }
 //------------------------------------------------------------------------------
-GLint bound_texture3d() {
+GLuint bound_texture3d() {
   return bound_texture(GL_TEXTURE_BINDING_3D);
 }
 //==============================================================================

@@ -21,7 +21,7 @@ struct imgui_render_backend {
                             // GL_MINOR_VERSION queries.
   char m_glsl_version_string[32] =
       "";  // Specified by user or detected based on compile time GL settings.
-  tex2rgba8ui  m_font_texture;
+  tex2rgba<std::uint8_t>  m_font_texture;
   imgui_shader m_shader;
   vertexbuffer<vec2, vec2, ui8vec4> m_vbo;
   indexbuffer m_ibo;

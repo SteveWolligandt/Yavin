@@ -339,7 +339,7 @@ class texture : public id_holder<GLuint> {
     upload_data(std::vector<type>(begin(data), end(data)));
   }
   //------------------------------------------------------------------------------
-  void upload_data(const type* data) {
+  void upload_data(type const* const data) {
     auto last_tex = bind();
     if constexpr (D == 1) {
       gl::tex_image_1d(target, 0, gl_internal_format, width(), 0, gl_format,
@@ -370,7 +370,7 @@ class texture : public id_holder<GLuint> {
   }
   //------------------------------------------------------------------------------
   template <typename... Sizes>
-  void upload_data(const type* data, Sizes... sizes) {
+  void upload_data(type const* const data, Sizes... sizes) {
     static_assert(sizeof...(Sizes) == D);
     static_assert((std::is_integral_v<Sizes> && ...));
     m_size = std::array<size_t, D>{static_cast<size_t>(sizes)...};
