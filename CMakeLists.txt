@@ -168,6 +168,7 @@ if(YAVIN_USE_GLX)
 elseif(YAVIN_USE_EGL)
   list(APPEND YAVIN_SOURCES 
     ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
+    ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
   )
 endif()
 add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES} ${YAVIN_IMGUI_FILES})
@@ -185,21 +186,21 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
-    ${YAVIN_IMGUI_INCLUDE_DIR})
+    ${YAVIN_IMGUI_INCLUDE_DIR}
+    ${X11_INCLUDE_DIR})
 
-target_link_libraries(
-  yavin PRIVATE
-  OpenGL::OpenGL OpenGL::GLU ${YAVIN_GLEW_LIBRARY})
+target_link_libraries(yavin
+                       PRIVATE
+                        OpenGL::OpenGL
+                        OpenGL::GLU
+                        ${YAVIN_GLEW_LIBRARY}
+                        ${X11_LIBRARIES})
 if(YAVIN_USE_GLX)
-  target_link_libraries(
-    yavin PRIVATE
-    OpenGL::GLX ${X11_LIBRARIES})
-  target_include_directories(yavin PRIVATE ${X11_INCLUDE_DIR})
+  target_link_libraries(yavin PRIVATE OpenGL::GLX)
 elseif(YAVIN_USE_EGL)
-  target_link_libraries(
-    yavin PRIVATE
-    OpenGL::EGL)
+  target_link_libraries(yavin PRIVATE OpenGL::EGL)
 endif()
+
 if(YAVIN_CLANG_TIDY AND YAVIN_COMPILE_WITH_CLANG_TIDY_CHECKS)
   set_target_properties(yavin PROPERTIES CXX_CLANG_TIDY "${YAVIN_CLANG_TIDY_CMD}")
 endif()
@@ -244,7 +245,6 @@ configure_file(include/yavin/shaderincludepaths.h.in
                include/yavin/shaderincludepaths.h)
 configure_file(include/yavin/texpng.h.in
                include/yavin/texpng.h)
-
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # subdirectories
