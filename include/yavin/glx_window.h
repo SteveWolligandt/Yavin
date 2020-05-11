@@ -23,17 +23,17 @@ class window : public window_notifier{
                                                        const int *);
   static std::list<window *> contexts;
 
-  static bool                      m_error_occured;
-  static const int                 m_visual_attribs[23];
-  Display *                        m_display;
-  Screen *                         m_screen;
-  int                              m_screen_id;
-  Window                           m_window;
-  GLXContext                       m_context;
-  Colormap                         m_colormap;
-  XEvent                           m_xevent;
-  std::unique_ptr<imgui_render_backend>         m_imgui_render_backend;
-  bool                             m_shift_down, m_ctrl_down, m_alt_down;
+  static bool                           m_error_occured;
+  static const int                      m_visual_attribs[23];
+  Display *                             m_display;
+  Screen *                              m_screen;
+  int                                   m_screen_id;
+  Window                                m_window;
+  GLXContext                            m_context;
+  Colormap                              m_colormap;
+  XEvent                                m_xevent;
+  std::unique_ptr<imgui_render_backend> m_imgui_render_backend;
+  bool                                  m_shift_down, m_ctrl_down, m_alt_down;
 
  public:
   window(const std::string &title, GLsizei width, GLsizei height,
@@ -56,6 +56,8 @@ class window : public window_notifier{
   bool       alt_down() const { return m_alt_down; }
 
  private:
+  void setup(const std::string &title, GLsizei width, GLsizei height,
+         int major = 4, int minor = 5);
   void init_imgui();
   void deinit_imgui();
 };

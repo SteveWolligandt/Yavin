@@ -62,8 +62,8 @@ int main() {
     yavin::gl::viewport(0, 0, w, h);
 
     imgui();
-
     window.render_imgui();
+    
     window.swap_buffers();
   }
 }

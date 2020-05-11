@@ -5,7 +5,7 @@
 
 #include <imgui/imgui.h>
 #include <chrono>
-#include "glx_window.h"
+#include <yavin/window.h>
 #include "window_listener.h"
 //==============================================================================
 namespace yavin {

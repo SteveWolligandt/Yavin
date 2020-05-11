@@ -6,6 +6,8 @@
 #  define YAVIN_EGL @YAVIN_USE_EGL@
 #endif
 
-#if defined(YAVIN_GLX)
-#  include "yavin/glx_window.h"
+#if YAVIN_GLX
+#  include <yavin/glx_window.h>
+#elif YAVIN_EGL
+#  include <yavin/egl_window.h>
 #endif

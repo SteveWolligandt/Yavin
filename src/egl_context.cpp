@@ -59,15 +59,15 @@ void context::setup(EGLint major, EGLint minor, EGLContext parent, bool cur) {
   }
 
   EGLint    num_cfgs;
-  EGLConfig egl_cfg;
+  EGLConfig egl_config;
 
-  if (!eglChooseConfig(m_egl_display, attribute_list.data(), &egl_cfg, 1,
+  if (!eglChooseConfig(m_egl_display, attribute_list.data(), &egl_config, 1,
                        &num_cfgs)) {
     throw std::runtime_error{"[EGL] failed to choose config"};
   }
   eglBindAPI(EGL_OPENGL_API);
   m_egl_context =
-      eglCreateContext(m_egl_display, egl_cfg, parent, nullptr);
+      eglCreateContext(m_egl_display, egl_config, parent, nullptr);
 
   std::cerr << "Created GL " << major << "." << minor << " egl::context\n";
 

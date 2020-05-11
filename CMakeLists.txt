@@ -27,8 +27,8 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # build glew
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-set(YAVIN_CONTEXT_SYSTEM "GLX" CACHE STRING "GLX or EGL")
-set_property(CACHE YAVIN_CONTEXT_SYSTEM PROPERTY STRINGS GLX EGL)
+set(YAVIN_CONTEXT_SYSTEM "EGL" CACHE STRING "EGL or GLX")
+set_property(CACHE YAVIN_CONTEXT_SYSTEM PROPERTY STRINGS EGL GLX)
 set(YAVIN_GLEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
 set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_DIR}/include)
 set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_DIR}/lib/libGLEW.a)

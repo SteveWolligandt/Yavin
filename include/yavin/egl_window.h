@@ -1,8 +1,9 @@
-#ifndef YAVIN_EGL_CONTEXT_H
-#define YAVIN_EGL_CONTEXT_H
+#ifndef YAVIN_EGL_WINDOW_H
+#define YAVIN_EGL_WINDOW_H
 //==============================================================================
 #include <yavin/glincludes.h>
 
+#include <memory>
 #include <EGL/egl.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -12,57 +13,77 @@
 #include <iostream>
 #include <list>
 #include <string>
+
+#include "imgui_api_backend.h"
+#include "imgui_render_backend.h"
+#include "window_listener.h"
+#include "window_notifier.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
-class window {
-  public:
+std::string egl_error_to_string(EGLint error);
+//==============================================================================
+class window : public window_notifier {
+ public:
   //============================================================================
   // static fields
   //============================================================================
-  static constexpr std::array<EGLint, 13> attribute_list  {
-    EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,
-    EGL_BLUE_SIZE,       8,
-    EGL_GREEN_SIZE,      8,
-    EGL_RED_SIZE,        8,
-    EGL_DEPTH_SIZE,      8,
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-    EGL_NONE
+  static constexpr std::array<EGLint, 3> attribute_list  {
+    EGL_BUFFER_SIZE,        32,
+    //EGL_RED_SIZE,            8,
+    //EGL_GREEN_SIZE,          8,
+    //EGL_BLUE_SIZE,           8,
+    //EGL_ALPHA_SIZE,          8,
+    //
+    //EGL_DEPTH_SIZE,         EGL_DONT_CARE,
+    //EGL_STENCIL_SIZE,       EGL_DONT_CARE,
+    //
+    //EGL_RENDERABLE_TYPE,    EGL_OPENGL_BIT,
+    //EGL_SURFACE_TYPE,       EGL_WINDOW_BIT | EGL_PIXMAP_BIT,
+    EGL_NONE,
   };
 
   //============================================================================
   // members
   //============================================================================
-  Display *  x_display;
-  Window     win;
-  EGLDisplay m_egl_display;
-  EGLContext m_egl_context;
-  bool m_glew_initialized = false;
+  Display *                             m_x_display;
+  Window                                m_x_window;
+  EGLDisplay                            m_egl_display;
+  EGLContext                            m_egl_context;
+  EGLSurface                            m_egl_surface;
+  bool                                  m_glew_initialized = false;
+  std::unique_ptr<imgui_render_backend> m_imgui_render_backend;
+  bool                                  m_shift_down, m_ctrl_down, m_alt_down;
+  XEvent                                m_xevent;
 
   //============================================================================
   // ctors / dtor
   //============================================================================
  public:
   window(const std::string &title, GLsizei width, GLsizei height,
-         EGLint major = 4, EGLint minor = 5);
+             EGLint major = 4, EGLint minor = 5);
   ~window();
 
   //============================================================================
   // methods
   //============================================================================
  public:
-  //context create_shared_context(EGLint major = 4, EGLint minor = 5) const;
-  void           make_current();
-  void           release();
+  // context create_shared_context() const;
+  void make_current();
+  void release();
+  void refresh();
+  void render_imgui();
+  void check_events();
+  void swap_buffers();
 
  private:
   void setup(const std::string &title, GLsizei width, GLsizei height,
-             EGLint major, EGLint minor, bool cur);
-  void setup_x(const std::string &title, GLsizei width, GLsizei height);
-  void setup_egl(EGLint major, EGLint minor, bool cur);
+             EGLint major, EGLint minor);
   void init_glew();
+  void init_imgui(size_t width, size_t height);
+  void deinit_imgui();
 };
-//==============================================================================
+  //==============================================================================
 }  // namespace yavin
 //==============================================================================
 #endif

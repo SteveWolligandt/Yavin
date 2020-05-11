@@ -41,6 +41,21 @@ const int           window::m_visual_attribs[23] = {GLX_X_RENDERABLE,
 window::window(const std::string &title, GLsizei width, GLsizei height,
                int major, int minor)
     : m_display{XOpenDisplay(nullptr)}, m_context{0} {
+      setup(title, width, height, major, minor);
+}
+//------------------------------------------------------------------------------
+window::~window() {
+  deinit_imgui();
+  glXMakeCurrent(m_display, 0, 0);
+  glXDestroyContext(m_display, m_context);
+
+  XDestroyWindow(m_display, m_window);
+  XFreeColormap(m_display, m_colormap);
+  XCloseDisplay(m_display);
+  contexts.remove(this);
+}
+void window::setup(const std::string &title, GLsizei width, GLsizei height,
+                   int major, int minor) {
   contexts.push_back(this);
   if (!m_display) { throw std::runtime_error{"Failed to open X m_display"}; }
   m_screen    = DefaultScreenOfDisplay(m_display);
@@ -187,17 +202,6 @@ window::window(const std::string &title, GLsizei width, GLsizei height,
     throw std::runtime_error{"Failed to create an OpenGL context"};
   }
   init_imgui();
-}
-//------------------------------------------------------------------------------
-window::~window() {
-  deinit_imgui();
-  glXMakeCurrent(m_display, 0, 0);
-  glXDestroyContext(m_display, m_context);
-
-  XDestroyWindow(m_display, m_window);
-  XFreeColormap(m_display, m_colormap);
-  XCloseDisplay(m_display);
-  contexts.remove(this);
 }
 //------------------------------------------------------------------------------
 void window::refresh() {
