@@ -469,15 +469,15 @@ constexpr Mat4<Real> perspective_matrix(const Real l, const Real r,
 }
 //------------------------------------------------------------------------------
 template <typename Real>
-constexpr auto perspective_matrix(const Real angleOfView,
-                                  const Real imageAspectRatio, const Real n,
-                                  const Real f) {
-  const Real scale = std::tan(angleOfView * 0.5 * M_PI / 180) * n;
-  const Real r     = imageAspectRatio * scale;
+constexpr auto perspective_matrix(const Real angle_of_view,
+                                  const Real image_aspect_ratio, const Real near,
+                                  const Real far) {
+  const Real scale = std::tan(angle_of_view * 0.5 * M_PI / 180) * near;
+  const Real r     = image_aspect_ratio * scale;
   const Real l     = -r;
   const Real t     = scale;
   const Real b     = -t;
-  return perspective_matrix(l, r, b, t, n, f);
+  return perspective_matrix(l, r, b, t, near, far);
 }
 //------------------------------------------------------------------------------
 template <typename Real>
