@@ -296,7 +296,9 @@ constexpr auto operator/(Real s, const vec<Real, N>& v) {
 /// printing a vector into a stream
 template <typename Real, size_t N>
 auto& operator<<(std::ostream& str, const vec<Real, N>& v) {
-  for (auto c : v) str << "[ " << c << " ]\n";
+  str << "[ "<< v(0);
+  for (size_t i = 1; i < N; ++i) { str << ", " << v(i); }
+  str << " ]\n";
   return str;
 }
 //==============================================================================

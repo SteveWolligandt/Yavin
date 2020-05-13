@@ -54,6 +54,12 @@ class buffer_map {
   auto operator=(const buffer_map&) -> buffer_map& = delete;
   auto operator=(buffer_map &&)     -> buffer_map& = delete;
 
+  auto operator=(const std::vector<T>& data) ->buffer_map& {
+    assert(size(data) == m_buffer->size());
+    for (size_t i = 0; i < size(data); ++i) { at(i) = data[i]; }
+    return &this;
+  }
+
   /// destructor unmaps the buffer
   ~buffer_map() { unmap(); }
 
@@ -378,6 +384,7 @@ class buffer : public id_holder<GLuint> {
   buffer(buffer&& other) noexcept;
   auto operator=(const buffer& other) -> buffer&;
   auto operator=(buffer&& other) noexcept -> buffer&;
+  auto operator=(const std::vector<T>& data) -> buffer&;
 
   buffer(size_t n, usage_t usage);
   buffer(size_t n, const T& initial, usage_t usage);
@@ -482,6 +489,14 @@ auto buffer<array_type, T>::operator=(buffer&& other) noexcept -> buffer& {
   std::swap(m_size, other.m_size);
   std::swap(m_capacity, other.m_capacity);
   std::swap(m_usage, other.m_usage);
+  return *this;
+}
+//------------------------------------------------------------------------------
+template <GLsizei array_type, typename T>
+auto buffer<array_type, T>::operator=(const std::vector<T>& data) -> buffer& {
+  auto mapped = map();
+  mapped = data;
+  mapped.unmap();
   return *this;
 }
 //------------------------------------------------------------------------------

@@ -14,8 +14,7 @@
 #include <list>
 #include <string>
 
-#include "imgui_api_backend.h"
-#include "imgui_render_backend.h"
+#include <yavin/imgui.h>
 #include "window_listener.h"
 #include "window_notifier.h"
 //==============================================================================
