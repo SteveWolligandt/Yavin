@@ -205,7 +205,7 @@ void window::setup(const std::string &title, GLsizei width, GLsizei height,
       eglGetConfigAttrib(m_egl_display, egl_config, EGL_SURFACE_TYPE,
                          &surface_type);
       bool has_window_bit = (surface_type & EGL_WINDOW_BIT) > 0;
-      if (buffer_size == 32 && has_window_bit &&
+      if (buffer_size == 32 && has_window_bit && depth_size == 24 &&
           eglGetConfigAttrib(m_egl_display, egl_config, EGL_NATIVE_VISUAL_ID,
                              (EGLint *)&visual_template.visualid)) {
         config = egl_config;
