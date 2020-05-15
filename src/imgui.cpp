@@ -20,6 +20,12 @@ bool InputDouble4(const char* label, double v[4], const char* format,
                       flags);
 }
 //------------------------------------------------------------------------------
+bool DragDouble(const char* label, double* v, double v_speed, double v_min,
+                double v_max, const char* format, double power) {
+  return DragScalar(label, ImGuiDataType_Double, v, v_speed, &v_min, &v_max,
+                    format, power);
+}
+//------------------------------------------------------------------------------
 bool DragDouble2(const char* label, double v[2], double v_speed, double v_min,
                  double v_max, const char* format, double power) {
   return DragScalarN(label, ImGuiDataType_Double, v, 2, v_speed, &v_min, &v_max,
