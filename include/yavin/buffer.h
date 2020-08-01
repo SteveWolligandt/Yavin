@@ -632,9 +632,9 @@ void buffer<array_type, T>::copy(const this_t& other) {
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
 void buffer<array_type, T>::push_back(T&& t) {
-  if (m_capacity < m_size + 1) { reserve(m_size * 2); }
-  at(size()) = std::forward<T>(t);
+  if (m_capacity < m_size + 1) { reserve(std::max<size_t>(m_size * 2, 1)); }
   ++m_size;
+  at(m_size - 1) = std::forward<T>(t);
 }
 //------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>

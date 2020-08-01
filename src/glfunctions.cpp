@@ -131,7 +131,7 @@ const GLubyte* gl::get_string(GLenum name) {
 }
 //------------------------------------------------------------------------------
 GLenum gl::get_error() {
-  if (verbose) { *out << "glGetError\n"; }
+  //if (verbose) { *out << "glGetError\n"; }
   return glGetError();
 }
 //------------------------------------------------------------------------------

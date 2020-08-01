@@ -1,4 +1,3 @@
-#define YAVIN_X11_CONTEXT_DONT_DELETE
 #include <yavin/egl_window.h>
 #include <yavin/x11buttons.h>
 #include <yavin/x11keys.h>
@@ -55,9 +54,9 @@ window::~window() {
 //==============================================================================
 // methods
 //==============================================================================
-// context window::create_shared_context() const {
-//  return context{*this};
-//}
+context window::create_shared_context(int major, int minor) const {
+  return context{major, minor, m_egl_context};
+}
 //------------------------------------------------------------------------------
 void window::make_current() {
   if (!eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface,

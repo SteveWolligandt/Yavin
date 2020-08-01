@@ -4,6 +4,8 @@
 #include "imgui_api_backend.h"
 #include "imgui_render_backend.h"
 //==============================================================================
+#include <imgui/imgui_internal.h>
+//==============================================================================
 namespace ImGui {
 //==============================================================================
 bool InputDouble2(const char* label, double v[2], const char* format = "%.3lf",

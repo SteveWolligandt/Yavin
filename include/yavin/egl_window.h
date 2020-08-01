@@ -15,6 +15,7 @@
 #include <string>
 
 #include <yavin/imgui.h>
+#include <yavin/egl_context.h>
 #include "window_listener.h"
 #include "window_notifier.h"
 //==============================================================================
@@ -67,7 +68,7 @@ class window : public window_notifier {
   // methods
   //============================================================================
  public:
-  // context create_shared_context() const;
+  context create_shared_context(int major = 3, int minor = 3) const;
   void make_current();
   void release();
   void refresh();

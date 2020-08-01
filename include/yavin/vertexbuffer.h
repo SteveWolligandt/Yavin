@@ -1,6 +1,6 @@
 #ifndef YAVIN_VERTEXBUFFER_H
 #define YAVIN_VERTEXBUFFER_H
-
+//==============================================================================
 #include <initializer_list>
 #include <iostream>
 #include <tuple>
@@ -10,11 +10,9 @@
 #include "glincludes.h"
 #include "tuple.h"
 #include "vbohelpers.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 template <typename... Ts>
 class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
  public:

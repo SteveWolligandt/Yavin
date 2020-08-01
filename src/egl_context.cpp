@@ -13,6 +13,11 @@ context::context(EGLint major, EGLint minor, const context& parent)
   setup(major, minor, parent.m_egl_context, false);
 }
 //------------------------------------------------------------------------------
+context::context(EGLint major, EGLint minor, EGLContext const& ctx)
+    : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
+  setup(major, minor, ctx, false);
+}
+//------------------------------------------------------------------------------
 context::~context() {
   eglTerminate(m_egl_display);
 }
@@ -28,10 +33,10 @@ void context::make_current() {
                       m_egl_context)) {
     throw std::runtime_error{"[EGL] make context current."};
   }
-  if (!m_glew_initialized) {
-    init_glew();
-    m_glew_initialized = true;
-  }
+  //if (!m_glew_initialized) {
+  //  init_glew();
+  //  m_glew_initialized = true;
+  //}
 }
 //------------------------------------------------------------------------------
 void context::release() {

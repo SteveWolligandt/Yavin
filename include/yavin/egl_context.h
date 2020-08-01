@@ -10,8 +10,10 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
+class window;
 class context {
   public:
+    friend class window;
   //============================================================================
   // static fields
   //============================================================================
@@ -37,10 +39,13 @@ class context {
   //============================================================================
  public:
   context(EGLint major = 4, EGLint minor = 5);
+  context(context&&) noexcept = default;
+  auto operator=(context&&) noexcept -> context& = default;
   ~context();
 
  private:
   context(EGLint major, EGLint minor, const context& parent);
+  context(EGLint major, EGLint minor, EGLContext const& parent);
 
   //============================================================================
   // methods
