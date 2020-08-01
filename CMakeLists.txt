@@ -80,7 +80,6 @@ file(GLOB YAVIN_IMGUI_FILES "${YAVIN_IMGUI_DIR}/*.cpp")
 set(OpenGL_GL_PREFERENCE "GLVND")
 if(YAVIN_USE_GLX)
   find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
-  find_package(X11 REQUIRED)
 elseif(YAVIN_USE_EGL)
   find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
 endif()
@@ -88,6 +87,7 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # find misc packages
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+find_package(X11 REQUIRED)
 find_package(Boost REQUIRED)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
