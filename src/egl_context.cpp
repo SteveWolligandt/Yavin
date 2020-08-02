@@ -1,5 +1,5 @@
 #include <yavin/egl_context.h>
-
+#include <yavin/egl_window.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -8,14 +8,14 @@ context::context(EGLint major, EGLint minor)
   setup(major, minor, EGL_NO_CONTEXT, true);
 }
 //------------------------------------------------------------------------------
-context::context(EGLint major, EGLint minor, const context& parent)
+context::context(EGLint major, EGLint minor, context const & parent)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
   setup(major, minor, parent.m_egl_context, false);
 }
 //------------------------------------------------------------------------------
-context::context(EGLint major, EGLint minor, EGLContext const& ctx)
+context::context(EGLint major, EGLint minor, window const& parent)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
-  setup(major, minor, ctx, false);
+  setup(major, minor, parent.m_egl_context, false);
 }
 //------------------------------------------------------------------------------
 context::~context() {
@@ -33,25 +33,13 @@ void context::make_current() {
                       m_egl_context)) {
     throw std::runtime_error{"[EGL] make context current."};
   }
-  //if (!m_glew_initialized) {
-  //  init_glew();
-  //  m_glew_initialized = true;
-  //}
+  if (m_glew == nullptr) { m_glew = glew::create(); }
 }
 //------------------------------------------------------------------------------
 void context::release() {
   if (!eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                       EGL_NO_CONTEXT)) {
     throw std::runtime_error{"[EGL] could not release context"};
-  }
-}
-//------------------------------------------------------------------------------
-void context::init_glew() {
-  glewExperimental = true;
-  auto err         = glewInit();
-  if (GLEW_OK != err) {
-    throw std::runtime_error{std::string("cannot initialize GLEW: ") +
-                             std::string((char*)glewGetErrorString(err))};
   }
 }
 //------------------------------------------------------------------------------
@@ -73,12 +61,8 @@ void context::setup(EGLint major, EGLint minor, EGLContext parent, bool cur) {
   eglBindAPI(EGL_OPENGL_API);
   m_egl_context =
       eglCreateContext(m_egl_display, egl_config, parent, nullptr);
-
-  std::cerr << "Created GL " << major << "." << minor << " egl::context\n";
-
   if (cur) { make_current(); }
 }
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

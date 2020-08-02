@@ -1,10 +1,10 @@
 #include <yavin/egl_window.h>
 #include <yavin/x11buttons.h>
 #include <yavin/x11keys.h>
+#include <yavin/context.h>
 
 #include <cstring>
 #include <string>
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -55,7 +55,7 @@ window::~window() {
 // methods
 //==============================================================================
 context window::create_shared_context(int major, int minor) const {
-  return context{major, minor, m_egl_context};
+  return context{major, minor, *this};
 }
 //------------------------------------------------------------------------------
 void window::make_current() {
@@ -63,10 +63,7 @@ void window::make_current() {
                       m_egl_context)) {
     throw std::runtime_error{"[EGL] cannot make window current."};
   }
-  if (!m_glew_initialized) {
-    init_glew();
-    m_glew_initialized = true;
-  }
+  if (m_glew == nullptr) { m_glew = glew::create(); }
 }
 //------------------------------------------------------------------------------
 void window::release() {
@@ -127,15 +124,6 @@ void window::check_events() {
         notify_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
         break;
     }
-  }
-}
-//------------------------------------------------------------------------------
-void window::init_glew() {
-  glewExperimental = true;
-  auto err         = glewInit();
-  if (err != GLEW_OK) {
-    throw std::runtime_error{std::string("[GLEW] cannot initialize: ") +
-                             std::string((char *)glewGetErrorString(err))};
   }
 }
 //------------------------------------------------------------------------------

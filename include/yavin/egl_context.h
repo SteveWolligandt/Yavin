@@ -3,6 +3,7 @@
 //==============================================================================
 #include <EGL/egl.h>
 #include <yavin/glincludes.h>
+#include <yavin/glew.h>
 #include <array>
 #include <iostream>
 #include <list>
@@ -32,7 +33,7 @@ class context {
   //============================================================================
   EGLDisplay m_egl_display;
   EGLContext m_egl_context;
-  bool m_glew_initialized = false;
+  std::unique_ptr<glew> m_glew;
 
   //============================================================================
   // ctors / dtor
@@ -43,9 +44,8 @@ class context {
   auto operator=(context&&) noexcept -> context& = default;
   ~context();
 
- private:
-  context(EGLint major, EGLint minor, const context& parent);
-  context(EGLint major, EGLint minor, EGLContext const& parent);
+  context(EGLint major, EGLint minor, context const& parent);
+  context(EGLint major, EGLint minor, window const& parent);
 
   //============================================================================
   // methods
@@ -57,7 +57,6 @@ class context {
 
  private:
   void setup(EGLint major, EGLint minor, EGLContext parent, bool cur);
-  void init_glew();
 };
 //==============================================================================
 }  // namespace yavin

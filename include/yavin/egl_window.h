@@ -2,6 +2,7 @@
 #define YAVIN_EGL_WINDOW_H
 //==============================================================================
 #include <yavin/glincludes.h>
+#include <yavin/glew.h>
 
 #include <memory>
 #include <EGL/egl.h>
@@ -23,8 +24,10 @@ namespace yavin {
 //==============================================================================
 std::string egl_error_to_string(EGLint error);
 //==============================================================================
+class context;
 class window : public window_notifier {
  public:
+   friend class context;
   //============================================================================
   // static fields
   //============================================================================
@@ -51,7 +54,7 @@ class window : public window_notifier {
   EGLDisplay                            m_egl_display;
   EGLContext                            m_egl_context;
   EGLSurface                            m_egl_surface;
-  bool                                  m_glew_initialized = false;
+  std::unique_ptr<glew> m_glew;
   std::unique_ptr<imgui_render_backend> m_imgui_render_backend;
   bool                                  m_shift_down, m_ctrl_down, m_alt_down;
   XEvent                                m_xevent;
@@ -79,7 +82,6 @@ class window : public window_notifier {
  private:
   void setup(const std::string &title, GLsizei width, GLsizei height,
              EGLint major, EGLint minor);
-  void init_glew();
   void init_imgui(size_t width, size_t height);
   void deinit_imgui();
 };
