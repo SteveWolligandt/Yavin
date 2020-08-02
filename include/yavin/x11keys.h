@@ -1,10 +1,12 @@
 #ifndef YAVIN_X11KEYS_H
 #define YAVIN_X11KEYS_H
+//==============================================================================
 #include <X11/XKBlib.h>
+#include <yavin/keyboard.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
-auto x11_keysym_to_key(KeySym keysym) {
+inline auto x11_keysym_to_key(KeySym keysym) {
   switch (keysym) {
     case XK_0: return key::KEY_0;
     case XK_1: return key::KEY_1;

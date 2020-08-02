@@ -3,19 +3,19 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-context::context(EGLint major, EGLint minor)
+context::context()
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
-  setup(major, minor, EGL_NO_CONTEXT, true);
+  setup( EGL_NO_CONTEXT, true);
 }
 //------------------------------------------------------------------------------
-context::context(EGLint major, EGLint minor, context const & parent)
+context::context( context const & parent)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
-  setup(major, minor, parent.m_egl_context, false);
+  setup( parent.m_egl_context, false);
 }
 //------------------------------------------------------------------------------
-context::context(EGLint major, EGLint minor, window const& parent)
+context::context( window const& parent)
     : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
-  setup(major, minor, parent.m_egl_context, false);
+  setup( parent.m_egl_context->get(), false);
 }
 //------------------------------------------------------------------------------
 context::~context() {
@@ -24,8 +24,8 @@ context::~context() {
 //==============================================================================
 // methods
 //==============================================================================
-context context::create_shared_context(int major, int minor) const {
-  return context{major, minor, *this};
+context context::create_shared_context() const {
+  return context{ *this};
 }
 //------------------------------------------------------------------------------
 void context::make_current() {
@@ -43,10 +43,11 @@ void context::release() {
   }
 }
 //------------------------------------------------------------------------------
-void context::setup(EGLint major, EGLint minor, EGLContext parent, bool cur) {
+void context::setup( EGLContext parent, bool cur) {
   if (m_egl_display == EGL_NO_DISPLAY) {
     throw std::runtime_error{"[EGL] could not get a display"};
   }
+  EGLint major, minor;
   if (!eglInitialize(m_egl_display, &major, &minor)) {
     throw std::runtime_error{"[EGL] failed to initialize"};
   }
@@ -59,8 +60,9 @@ void context::setup(EGLint major, EGLint minor, EGLContext parent, bool cur) {
     throw std::runtime_error{"[EGL] failed to choose config"};
   }
   eglBindAPI(EGL_OPENGL_API);
+  EGLint context_attributes[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
   m_egl_context =
-      eglCreateContext(m_egl_display, egl_config, parent, nullptr);
+      eglCreateContext(m_egl_display, egl_config, parent, context_attributes);
   if (cur) { make_current(); }
 }
 //==============================================================================
