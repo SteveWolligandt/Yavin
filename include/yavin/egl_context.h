@@ -2,6 +2,9 @@
 #define YAVIN_EGL_CONTEXT_H
 //==============================================================================
 #include <EGL/egl.h>
+#include <yavin/egl/display.h>
+#include <yavin/egl/environment.h>
+#include <yavin/egl/context.h>
 #include <yavin/glew.h>
 #include <yavin/glincludes.h>
 
@@ -19,26 +22,21 @@ class context {
   //============================================================================
   // static fields
   //============================================================================
-  static constexpr std::array<EGLint, 13> attribute_list{EGL_SURFACE_TYPE,
-                                                         EGL_PBUFFER_BIT,
-                                                         EGL_BLUE_SIZE,
-                                                         8,
-                                                         EGL_GREEN_SIZE,
-                                                         8,
-                                                         EGL_RED_SIZE,
-                                                         8,
-                                                         EGL_DEPTH_SIZE,
-                                                         8,
-                                                         EGL_RENDERABLE_TYPE,
-                                                         EGL_OPENGL_BIT,
-                                                         EGL_NONE};
+  static constexpr std::array<EGLint, 13> attribute_list{
+    EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,
+    EGL_BLUE_SIZE,       8,
+    EGL_GREEN_SIZE,      8,
+    EGL_RED_SIZE,        8,
+    EGL_DEPTH_SIZE,      8,
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+    EGL_NONE};
 
   //============================================================================
   // members
   //============================================================================
-  EGLDisplay            m_egl_display;
-  EGLContext            m_egl_context;
-  std::unique_ptr<glew> m_glew;
+  std::shared_ptr<egl::environment> m_egl_env;
+  std::shared_ptr<egl::context>     m_egl_context;
+  std::shared_ptr<glew>             m_glew;
 
   //============================================================================
   // ctors / dtor
@@ -47,16 +45,14 @@ class context {
   context();
   context(context&&) noexcept = default;
   auto operator=(context&&) noexcept -> context& = default;
-  ~context();
+  ~context()                                     = default;
 
-  context(context const& parent);
   context(window const& parent);
 
   //============================================================================
   // methods
   //============================================================================
  public:
-  context create_shared_context() const;
   void    make_current();
   void    release();
 

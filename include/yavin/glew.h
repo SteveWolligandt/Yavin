@@ -17,7 +17,7 @@ struct glew {
                                std::string((char*)glewGetErrorString(err))};
     }
   }
-  static auto create() { return std::make_unique<glew>(); }
+  static auto create() { return std::make_shared<glew>(); }
 };
 //==============================================================================
 }  // namespace yavin

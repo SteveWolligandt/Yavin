@@ -16,6 +16,12 @@ class context {
         m_egl_context{eglCreateContext(m_egl_display->get(),
                                        m_egl_display->config(), EGL_NO_CONTEXT,
                                        attributes)} {}
+  context(std::shared_ptr<egl::display> const& disp, EGLContext shared_context,
+          EGLint* attributes)
+      : m_egl_display{disp},
+        m_egl_context{eglCreateContext(m_egl_display->get(),
+                                       m_egl_display->config(), shared_context,
+                                       attributes)} {}
   //------------------------------------------------------------------------------
   ~context() { eglDestroyContext(m_egl_display->get(), m_egl_context); }
   //==============================================================================

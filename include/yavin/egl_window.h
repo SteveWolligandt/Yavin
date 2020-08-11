@@ -34,7 +34,7 @@ class window : public window_notifier, public window_listener {
   std::shared_ptr<egl::environment>     m_egl_env;
   std::shared_ptr<egl::context>         m_egl_context;
   std::shared_ptr<egl::surface>         m_egl_surface;
-  std::unique_ptr<glew>                 m_glew;
+  std::shared_ptr<glew>                 m_glew;
   std::unique_ptr<imgui_render_backend> m_imgui_render_backend;
   //============================================================================
   // ctors / dtor
