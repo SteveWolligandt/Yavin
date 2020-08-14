@@ -15,13 +15,23 @@ class surface {
   //==============================================================================
  public:
   surface(std::string const &name, size_t width, size_t height,
-          std::shared_ptr<egl::display> const &disp)
-      : m_egl_display{disp} {
-    m_x11_window = std::make_shared<x11::window>(name, width, height,
-                                                 m_egl_display->x11_display(),
+          std::shared_ptr<egl::display> const &egl_disp,
+          std::shared_ptr<x11::display> const &x11_disp) {
+    m_egl_display = egl_disp;
+    m_x11_window  = std::make_shared<x11::window>(name, width, height, x11_disp,
                                                  m_egl_display->visual_info());
-    m_egl_surface = eglCreateWindowSurface(
-        m_egl_display->get(), m_egl_display->config(), m_x11_window->get(), nullptr);
+    m_egl_surface =
+        eglCreateWindowSurface(m_egl_display->get(), m_egl_display->config(),
+                               m_x11_window->get(), nullptr);
+  }
+  surface(std::string const &name, size_t width, size_t height,
+          std::shared_ptr<x11::display> const &x11_disp) {
+    m_egl_display = std::make_shared<egl::display>(x11_disp);
+    m_x11_window  = std::make_shared<x11::window>(name, width, height, x11_disp,
+                                                 m_egl_display->visual_info());
+    m_egl_surface =
+        eglCreateWindowSurface(m_egl_display->get(), m_egl_display->config(),
+                               m_x11_window->get(), nullptr);
   }
   //------------------------------------------------------------------------------
   ~surface() {
@@ -34,6 +44,6 @@ class surface {
   auto x11_window() -> auto & { return m_x11_window; }
 };
 //==============================================================================
-}
+}  // namespace yavin::egl
 //==============================================================================
 #endif

@@ -9,16 +9,22 @@ namespace yavin::egl {
 //==============================================================================
 class environment {
   std::shared_ptr<egl::display> m_display;
-  EGLint                        m_egl_major = 4, m_egl_minor = 5;
   //============================================================================
  public:
-  environment() : environment{std::make_shared<egl::display>()} {}
-  environment(std::shared_ptr<egl::display> const& disp) : m_display{disp} {
-    if (!eglInitialize(m_display->get(), &m_egl_major, &m_egl_minor)) {
+  environment(EGLint* attr_list) : m_display{std::make_shared<egl::display>()} {
+    if (!eglInitialize(m_display->get(), nullptr, nullptr)) {
       throw std::runtime_error{"[EGL] cannot initialize: " +
                                error_string(eglGetError())};
     }
-    m_display->bar();
+    m_display->create_config(attr_list);
+  }
+  environment(std::shared_ptr<x11::display> const& x11_disp)
+      : m_display{std::make_shared<egl::display>(x11_disp)} {
+    if (!eglInitialize(m_display->get(), nullptr, nullptr)) {
+      throw std::runtime_error{"[EGL] cannot initialize: " +
+                               error_string(eglGetError())};
+    }
+    m_display->create_config(x11_disp);
   }
   //============================================================================
   auto display() const -> auto const& { return m_display; }
