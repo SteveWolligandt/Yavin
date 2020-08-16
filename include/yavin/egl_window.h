@@ -58,6 +58,10 @@ class window : public window_notifier, public window_listener {
   void    on_key_released(key /*k*/) override;
   void    on_button_pressed(button /*b*/) override;
   void    on_button_released(button /*b*/) override;
+  void    on_wheel_up() override;
+  void    on_wheel_down() override;
+  void    on_wheel_left() override;
+  void    on_wheel_right() override;
   void    on_mouse_motion(int /*x*/, int /*y*/) override;
   void    on_resize(int /*width*/, int /*height*/) override;
   //----------------------------------------------------------------------------

@@ -115,6 +115,24 @@ void window::on_button_released(button b) {
   if (!ImGui::GetIO().WantCaptureMouse) { notify_button_released(b); }
 }
 //------------------------------------------------------------------------------
+void window::on_wheel_up() {
+  imgui_api_backend::instance().on_mouse_wheel(1);
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_up(); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_down() {
+  imgui_api_backend::instance().on_mouse_wheel(-1);
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_down(); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_left() {
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_left(); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_right() {
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_right(); }
+}
+//------------------------------------------------------------------------------
 void window::on_mouse_motion(int x, int y) {
   imgui_api_backend::instance().on_mouse_motion(x,y);
   if (!ImGui::GetIO().WantCaptureMouse) { notify_mouse_motion(x, y); }

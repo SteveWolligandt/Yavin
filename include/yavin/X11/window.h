@@ -62,8 +62,18 @@ class window : public window_notifier {
         case KeyPress: notify_key_pressed(k); break;
         case KeyRelease: notify_key_released(k); break;
         case ButtonPress:
-                         notify_button_pressed(b);
-                         break;
+          if (b == BUTTON_WHEEL_UP) {
+            notify_wheel_up();
+          } else if (b == BUTTON_WHEEL_DOWN) {
+            notify_wheel_down();
+          } else if (b == BUTTON_WHEEL_LEFT) {
+            notify_wheel_left();
+          } else if (b == BUTTON_WHEEL_RIGHT) {
+            notify_wheel_right();
+          } else {
+            notify_button_pressed(b);
+          }
+          break;
         case ButtonRelease: notify_button_released(b); break;
         case MotionNotify:
           notify_mouse_motion(m_xevent.xmotion.x, m_xevent.xmotion.y);

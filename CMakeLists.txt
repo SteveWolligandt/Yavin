@@ -71,7 +71,7 @@ add_custom_target(glew.build
 # build imgui
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
-set(YAVIN_IMGUI_INCLUDE_DIR ${YAVIN_IMGUI_DIR}/..)
+set(YAVIN_IMGUI_INCLUDE_DIRS ${YAVIN_IMGUI_DIR}/.. ${YAVIN_IMGUI_DIR})
 file(GLOB YAVIN_IMGUI_FILES "${YAVIN_IMGUI_DIR}/*.cpp")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -189,7 +189,7 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
-    ${YAVIN_IMGUI_INCLUDE_DIR}
+    ${YAVIN_IMGUI_INCLUDE_DIRS}
     ${X11_INCLUDE_DIR})
 
 target_link_libraries(yavin

@@ -15,6 +15,10 @@ struct window_notifier {
   void notify_key_released(key k);
   void notify_button_pressed(button b);
   void notify_button_released(button b);
+  void notify_wheel_up();
+  void notify_wheel_down();
+  void notify_wheel_left();
+  void notify_wheel_right();
   void notify_mouse_motion(int x, int y);
   void notify_resize(int width, int height);
 };
