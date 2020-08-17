@@ -12,39 +12,26 @@
 namespace yavin::egl {
 //==============================================================================
 class display {
-  static constexpr std::array<EGLint, 3> attribute_list{
-      EGL_BUFFER_SIZE,
-      32,
-      // EGL_RED_SIZE,            8,
-      // EGL_GREEN_SIZE,          8,
-      // EGL_BLUE_SIZE,           8,
-      // EGL_ALPHA_SIZE,          8,
-      //
-      // EGL_DEPTH_SIZE,         EGL_DONT_CARE,
-      // EGL_STENCIL_SIZE,       EGL_DONT_CARE,
-      //
-      // EGL_RENDERABLE_TYPE,    EGL_OPENGL_BIT,
-      // EGL_SURFACE_TYPE,       EGL_WINDOW_BIT | EGL_PIXMAP_BIT,
-      EGL_NONE,
-  };
   //==============================================================================
-  std::shared_ptr<x11::display> m_x11_display;
-  EGLDisplay                    m_egl_display;
-  XVisualInfo*                  m_visual_info;
-  EGLConfig                     m_config;
+  EGLDisplay   m_egl_display;
+  EGLConfig    m_config;
+  XVisualInfo* m_visual_info;
 
   //==============================================================================
  public:
-  display() : display{std::make_shared<x11::display>()} {}
+  display() : m_egl_display{eglGetDisplay(EGL_DEFAULT_DISPLAY)} {
+    if (m_egl_display == EGL_NO_DISPLAY) {
+      throw std::runtime_error{"[EGL] could not get default display."};
+    }
+  }
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   display(std::shared_ptr<x11::display> const& x11_disp)
-      : m_x11_display{x11_disp},
-        m_egl_display{
+      : m_egl_display{
 #ifdef USE_EGL_KHR_PLATFORM_X11
-            eglGetPlatformDisplay(EGL_PLATFORM_X11_KHR, m_x11_display->get(),
+            eglGetPlatformDisplay(EGL_PLATFORM_X11_KHR, x11_disp->get(),
                                   nullptr)
 #else
-            eglGetDisplay(m_x11_display->get())
+            eglGetDisplay(x11_disp->get())
 #endif
         } {
     if (m_egl_display == EGL_NO_DISPLAY) {
@@ -59,11 +46,17 @@ class display {
   //==============================================================================
   auto get() const -> auto const& { return m_egl_display; }
   auto get() -> auto& { return m_egl_display; }
-  auto x11_display() const -> auto const& { return m_x11_display; }
-  auto visual_info() const -> auto const& { return m_visual_info; }
   auto config() const -> auto const& { return m_config; }
+  auto visual_info() const -> auto const& { return m_visual_info; }
 
-  void bar() {
+  void create_config(EGLint* attr_list) {
+    EGLint num_cfgs;
+    if (!eglChooseConfig(m_egl_display, attr_list, &m_config, 1, &num_cfgs)) {
+      throw std::runtime_error{"[EGL] failed to choose config"};
+    }
+  }
+  //------------------------------------------------------------------------------
+  void create_config(std::shared_ptr<x11::display> const& x11_disp) {
     XVisualInfo visual_template;
     visual_template.visualid = 0;
     int num_visuals_returned;
@@ -79,12 +72,12 @@ class display {
         throw std::runtime_error{
             "[EGL] no configs in general have been found."};
       }
-      std::cout << "number of configs found " << num_configs << "\n";
+      std::cerr << "number of configs found " << num_configs << "\n";
       // now we create a buffer to store all our configs
       std::vector<EGLConfig> egl_configs(num_configs);
       // and copy them into our buffer (don't forget to delete once done)
-      if (!eglGetConfigs(m_egl_display, egl_configs.data(),
-                         num_configs, &num_configs)) {
+      if (!eglGetConfigs(m_egl_display, egl_configs.data(), num_configs,
+                         &num_configs)) {
         throw std::runtime_error{"[EGL] could not get list of all configs."};
       }
       bool any = false;
@@ -120,7 +113,7 @@ class display {
             "window."};
       }
     }
-    m_visual_info = XGetVisualInfo(m_x11_display->get(), VisualIDMask,
+    m_visual_info = XGetVisualInfo(x11_disp->get(), VisualIDMask,
                                    &visual_template, &num_visuals_returned);
     if (num_visuals_returned != 1) {
       throw std::runtime_error{

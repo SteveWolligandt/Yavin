@@ -6,12 +6,12 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-window::window(const std::string &title, GLsizei width, GLsizei height)
-    : m_egl_env{std::make_shared<egl::environment>()} {
+window::window(const std::string &title, GLsizei width, GLsizei height) {
   setup(title, width, height);
 }
 //------------------------------------------------------------------------------
 window::~window() {
+  for (auto &t : m_async_tasks) { t.join(); }
   deinit_imgui();
 }
 //==============================================================================
@@ -43,6 +43,16 @@ void window::refresh() {
 }
 //------------------------------------------------------------------------------
 void window::check_events() {
+  {
+    std::lock_guard lock{m_async_tasks_mutex};
+    if (!m_joinable_async_tasks.empty()) {
+      for (auto const &it : m_joinable_async_tasks) {
+        it->join();
+        m_async_tasks.erase(it);
+      }
+      m_joinable_async_tasks.clear();
+    }
+  }
   m_egl_surface->x11_window()->check_events();
 }
 //------------------------------------------------------------------------------
@@ -52,13 +62,18 @@ void window::render_imgui() {
 }
 //------------------------------------------------------------------------------
 void window::setup(const std::string &title, GLsizei width, GLsizei height) {
+  auto x11_disp = std::make_shared<x11::display>();
+  m_egl_env     = std::make_shared<egl::environment>(x11_disp);
   // EGL context and surface
   eglBindAPI(EGL_OPENGL_API);
-  EGLint context_attributes[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
+  EGLint context_attributes[] = {
+    EGL_CONTEXT_MAJOR_VERSION, 4,
+    EGL_CONTEXT_MINOR_VERSION, 5,
+    EGL_NONE};
   m_egl_context =
       std::make_shared<egl::context>(m_egl_env->display(), context_attributes);
-  m_egl_surface = std::make_shared<egl::surface>(title, width, height,
-                                                 m_egl_env->display());
+  m_egl_surface = std::make_shared<egl::surface>(
+      title, width, height, m_egl_env->display(), x11_disp);
   m_egl_surface->x11_window()->add_listener(*this);
   make_current();
 
@@ -98,6 +113,24 @@ void window::on_button_pressed(button b) {
 void window::on_button_released(button b) {
   imgui_api_backend::instance().on_button_released(b);
   if (!ImGui::GetIO().WantCaptureMouse) { notify_button_released(b); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_up() {
+  imgui_api_backend::instance().on_mouse_wheel(1);
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_up(); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_down() {
+  imgui_api_backend::instance().on_mouse_wheel(-1);
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_down(); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_left() {
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_left(); }
+}
+//------------------------------------------------------------------------------
+void window::on_wheel_right() {
+  if (!ImGui::GetIO().WantCaptureMouse) { notify_wheel_right(); }
 }
 //------------------------------------------------------------------------------
 void window::on_mouse_motion(int x, int y) {
