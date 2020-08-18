@@ -1,10 +1,10 @@
-#ifndef YAVIN_EGL_WINDOW_H
-#define YAVIN_EGL_WINDOW_H
+#ifndef YAVIN_WINDOW_H
+#define YAVIN_WINDOW_H
 //==============================================================================
 #include <yavin/egl/context.h>
 #include <yavin/egl/display.h>
 #include <yavin/egl/surface.h>
-#include <yavin/egl_context.h>
+#include <yavin/context.h>
 #include <yavin/glew.h>
 #include <yavin/glincludes.h>
 #include <yavin/imgui.h>
@@ -28,7 +28,7 @@ class window : public window_notifier, public window_listener {
   //============================================================================
   // members
   //============================================================================
-  std::shared_ptr<egl::environment>             m_egl_env;
+  std::shared_ptr<egl::display>                 m_egl_disp;
   std::shared_ptr<egl::context>                 m_egl_context;
   std::shared_ptr<egl::surface>                 m_egl_surface;
   std::shared_ptr<glew>                         m_glew;
@@ -67,18 +67,18 @@ class window : public window_notifier, public window_listener {
   //----------------------------------------------------------------------------
   template <typename F>
   void do_async(F &&f) {
-    auto it = [&] {
+    auto it = [this] {
       std::lock_guard lock{m_async_tasks_mutex};
       m_async_tasks.emplace_back();
       return prev(m_async_tasks.end());
     }();
 
-    m_async_tasks.back() = std::thread{[this, it, f] {
-      auto ctx = create_shared_context();
+    m_async_tasks.back() = std::thread{[w = this, it, g = f] {
+      auto ctx = w->create_shared_context();
       ctx.make_current();
-      f();
-      std::lock_guard lock{m_async_tasks_mutex};
-      m_joinable_async_tasks.push_back(it);
+      g();
+      std::lock_guard lock{w->m_async_tasks_mutex};
+      w->m_joinable_async_tasks.push_back(it);
     }};
   }
 

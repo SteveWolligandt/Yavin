@@ -1,4 +1,4 @@
-#include <yavin/egl_window.h>
+#include <yavin/window.h>
 #include <yavin/context.h>
 
 #include <cstring>
@@ -22,7 +22,7 @@ context window::create_shared_context() const {
 }
 //------------------------------------------------------------------------------
 void window::make_current() {
-  if (!eglMakeCurrent(m_egl_env->display()->get(), m_egl_surface->get(),
+  if (!eglMakeCurrent(m_egl_disp->get(), m_egl_surface->get(),
                       m_egl_surface->get(), m_egl_context->get())) {
     throw std::runtime_error{"[EGL] cannot make window current. " +
                              egl::error_string(eglGetError())};
@@ -31,7 +31,7 @@ void window::make_current() {
 }
 //------------------------------------------------------------------------------
 void window::release() {
-  if (!eglMakeCurrent(m_egl_env->display()->get(), EGL_NO_SURFACE,
+  if (!eglMakeCurrent(m_egl_disp->get(), EGL_NO_SURFACE,
                       EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
     throw std::runtime_error{"[EGL] could not release window"};
   }
@@ -63,25 +63,35 @@ void window::render_imgui() {
 //------------------------------------------------------------------------------
 void window::setup(const std::string &title, GLsizei width, GLsizei height) {
   auto x11_disp = std::make_shared<x11::display>();
-  m_egl_env     = std::make_shared<egl::environment>(x11_disp);
+  m_egl_disp     = std::make_shared<egl::display>(x11_disp);
   // EGL context and surface
   eglBindAPI(EGL_OPENGL_API);
-  EGLint context_attributes[] = {
-    EGL_CONTEXT_MAJOR_VERSION, 4,
-    EGL_CONTEXT_MINOR_VERSION, 5,
-    EGL_NONE};
+  EGLint const ctx_attrs[] = {EGL_CONTEXT_MAJOR_VERSION, 4,
+                              EGL_CONTEXT_MINOR_VERSION, 5,
+                              EGL_NONE};
+  EGLint const cfg_attrs[] = {EGL_RED_SIZE,     8,
+                              EGL_GREEN_SIZE,   8,
+                              EGL_BLUE_SIZE,    8,
+                              EGL_ALPHA_SIZE,   8,
+                              EGL_DEPTH_SIZE,   24,
+                              EGL_CONFORMANT,   EGL_OPENGL_BIT,
+                              EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                              EGL_NONE};
+  auto [visual_info, cfg] =
+      m_egl_disp->create_visual_info(cfg_attrs, x11_disp);
   m_egl_context =
-      std::make_shared<egl::context>(m_egl_env->display(), context_attributes);
+      std::make_shared<egl::context>(m_egl_disp, cfg, ctx_attrs);
   m_egl_surface = std::make_shared<egl::surface>(
-      title, width, height, m_egl_env->display(), x11_disp);
+      title, width, height, m_egl_disp, x11_disp, cfg, visual_info);
   m_egl_surface->x11_window()->add_listener(*this);
   make_current();
 
   init_imgui(width, height);
+  XFree(visual_info);
 }
 //------------------------------------------------------------------------------
 void window::swap_buffers() {
-  eglSwapBuffers(m_egl_env->display()->get(), m_egl_surface->get());
+  eglSwapBuffers(m_egl_disp->get(), m_egl_surface->get());
 }
 //------------------------------------------------------------------------------
 void window::init_imgui(size_t width, size_t height) {
