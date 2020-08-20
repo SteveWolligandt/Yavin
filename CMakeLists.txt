@@ -27,19 +27,10 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # build glew
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-set(YAVIN_CONTEXT_SYSTEM "EGL" CACHE STRING "EGL or GLX")
-set_property(CACHE YAVIN_CONTEXT_SYSTEM PROPERTY STRINGS EGL GLX)
 set(YAVIN_GLEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
 set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_DIR}/include)
 set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_DIR}/lib/libGLEW.a)
 
-if(YAVIN_CONTEXT_SYSTEM STREQUAL "GLX")
-  set(YAVIN_USE_EGL 0)
-  set(YAVIN_USE_GLX 1)
-elseif(YAVIN_CONTEXT_SYSTEM STREQUAL "EGL")
-  set(YAVIN_USE_EGL 1)
-  set(YAVIN_USE_GLX 0)
-endif()
 add_custom_target(glew.download
                   COMMAND make
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
@@ -52,17 +43,10 @@ add_custom_target(glew.download.clean
 add_custom_target(glew.clean
                   DEPENDS glew.download.clean glew.build.clean
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
-if(YAVIN_USE_GLX)
-  add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
-                    COMMAND make
-                    DEPENDS glew.download
-                    WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
-elseif(YAVIN_USE_EGL)
-  add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
-                    COMMAND make SYSTEM=linux-egl
-                    DEPENDS glew.download
-                    WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
-endif()
+add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
+                  COMMAND make SYSTEM=linux-egl
+                  DEPENDS glew.download
+                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
 add_custom_target(glew.build
                   DEPENDS ${YAVIN_GLEW_LIBRARY}
                   WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
@@ -78,11 +62,7 @@ file(GLOB YAVIN_IMGUI_FILES "${YAVIN_IMGUI_DIR}/*.cpp")
 # find OpenGL packages
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(OpenGL_GL_PREFERENCE "GLVND")
-if(YAVIN_USE_GLX)
-  find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
-elseif(YAVIN_USE_EGL)
-  find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
-endif()
+find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # find misc packages
@@ -160,20 +140,11 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/imgui_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_render_backend.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui.cpp
-  ${CMAKE_SOURCE_DIR}/src/egl_error_string.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/error_string.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
+  ${CMAKE_SOURCE_DIR}/src/context.cpp
+  ${CMAKE_SOURCE_DIR}/src/window.cpp
 )
-if(YAVIN_USE_GLX)
-  list(APPEND YAVIN_SOURCES 
-    ${CMAKE_SOURCE_DIR}/src/glx_context.cpp
-    ${CMAKE_SOURCE_DIR}/src/glx_window.cpp
-  )
-elseif(YAVIN_USE_EGL)
-  list(APPEND YAVIN_SOURCES 
-    ${CMAKE_SOURCE_DIR}/src/egl_context.cpp
-    ${CMAKE_SOURCE_DIR}/src/egl_window.cpp
-  )
-endif()
 add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES} ${YAVIN_IMGUI_FILES})
 target_compile_features(yavin PUBLIC cxx_std_17)
 
@@ -198,11 +169,7 @@ target_link_libraries(yavin
                         OpenGL::GLU
                         ${YAVIN_GLEW_LIBRARY}
                         ${X11_LIBRARIES})
-if(YAVIN_USE_GLX)
-  target_link_libraries(yavin PRIVATE OpenGL::GLX)
-elseif(YAVIN_USE_EGL)
-  target_link_libraries(yavin PRIVATE OpenGL::EGL)
-endif()
+target_link_libraries(yavin PRIVATE OpenGL::EGL)
 
 if(YAVIN_CLANG_TIDY AND YAVIN_COMPILE_WITH_CLANG_TIDY_CHECKS)
   set_target_properties(yavin PROPERTIES CXX_CLANG_TIDY "${YAVIN_CLANG_TIDY_CMD}")
@@ -238,10 +205,6 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # configure files
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/yavin/context.h.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/include/yavin/context.h")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/yavin/window.h.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/include/yavin/window.h")
 configure_file(src/glverbose.cpp.in
                src/glverbose.cpp)
 configure_file(include/yavin/shaderincludepaths.h.in

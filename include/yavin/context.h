@@ -1,5 +1,5 @@
-#ifndef YAVIN_EGL_CONTEXT_H
-#define YAVIN_EGL_CONTEXT_H
+#ifndef YAVIN_CONTEXT_H
+#define YAVIN_CONTEXT_H
 //==============================================================================
 #include <yavin/egl/context.h>
 #include <yavin/egl/display.h>
@@ -21,9 +21,9 @@ class context {
   //============================================================================
   // members
   //============================================================================
-  std::shared_ptr<egl::environment>             m_egl_env;
-  std::shared_ptr<egl::context>                 m_egl_context;
-  std::shared_ptr<glew>                         m_glew;
+  std::shared_ptr<egl::display> m_egl_disp;
+  std::shared_ptr<egl::context> m_egl_context;
+  std::shared_ptr<glew>         m_glew;
 
   //============================================================================
   // ctors / dtor
