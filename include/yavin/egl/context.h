@@ -13,21 +13,12 @@ class context {
   //============================================================================
  public:
   context(std::shared_ptr<egl::display> const& disp, EGLConfig cfg,
-          EGLint const* context_attributes)
-      : context(disp, EGL_NO_CONTEXT, cfg, context_attributes) {}
+          EGLint const* context_attributes);
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   context(std::shared_ptr<egl::display> const& disp, EGLContext parent_context,
-          EGLConfig cfg, EGLint const* context_attributes)
-      : m_egl_display{disp} {
-    m_egl_context = eglCreateContext(m_egl_display->get(), cfg, parent_context,
-                                     context_attributes);
-    if (auto const err = eglGetError(); err != EGL_SUCCESS) {
-      throw std::runtime_error{"[EGL] could not create context: " +
-                               egl::error_string(err)};
-    }
-  }
+          EGLConfig cfg, EGLint const* context_attributes);
   //----------------------------------------------------------------------------
-  ~context() { eglDestroyContext(m_egl_display->get(), m_egl_context); }
+  ~context();
   //============================================================================
   auto get() const -> auto const& { return m_egl_context; }
   auto get() -> auto& { return m_egl_context; }

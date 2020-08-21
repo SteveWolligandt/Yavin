@@ -141,6 +141,11 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/imgui_render_backend.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui.cpp
   ${CMAKE_SOURCE_DIR}/src/egl/error_string.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/context.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/surface.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/display.cpp
+  ${CMAKE_SOURCE_DIR}/src/X11/display.cpp
+  ${CMAKE_SOURCE_DIR}/src/X11/window.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
   ${CMAKE_SOURCE_DIR}/src/context.cpp
   ${CMAKE_SOURCE_DIR}/src/window.cpp
