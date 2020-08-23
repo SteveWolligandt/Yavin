@@ -162,7 +162,6 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/single_include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
     ${YAVIN_IMGUI_INCLUDE_DIRS}
@@ -216,7 +215,6 @@ configure_file(include/yavin/shaderincludepaths.h.in
                include/yavin/shaderincludepaths.h)
 configure_file(include/yavin/texpng.h.in
                include/yavin/texpng.h)
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # subdirectories
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
