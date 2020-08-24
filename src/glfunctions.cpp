@@ -11,6 +11,12 @@ void gl::cull_face(GLenum mode) {
   gl_error_check("glCullFace");
 }
 //------------------------------------------------------------------------------
+void gl::front_face(GLenum mode) {
+  if (verbose) { *out << "glFrontFace(" << to_string(mode) << ")\n"; }
+  glFrontFace(mode);
+  gl_error_check("glFrontFace");
+}
+//------------------------------------------------------------------------------
 void gl::point_size(GLfloat size) {
   if (verbose) { *out << "glPointSize(" << size << ")\n"; }
   glPointSize(size);
