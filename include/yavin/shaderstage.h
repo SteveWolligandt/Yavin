@@ -16,11 +16,10 @@ namespace yavin {
 //==============================================================================
 class shaderstage {
  public:
-  using StringType = shaderstageparser::StringType;
   DLL_API static std::string type_to_string(GLenum shader_type);
   //----------------------------------------------------------------------------
   DLL_API shaderstage(GLenum shader_type, const std::string& shaderfilepath,
-                      StringType string_type    = StringType::FILE);
+                      shadersourcetype string_type = FILE);
   //----------------------------------------------------------------------------
   DLL_API shaderstage(shaderstage&& other);
   //----------------------------------------------------------------------------
@@ -46,9 +45,9 @@ class shaderstage {
   GLuint m_id     = 0;
   bool   m_delete = true;
 
-  GLenum                        m_shader_type;
-  shaderstageparser::StringType m_string_type;
-  std::string                   m_filename_or_source;
+  GLenum           m_shader_type;
+  shadersourcetype m_string_type;
+  std::string      m_filename_or_source;
 
   std::vector<GLSLVar> m_glsl_vars;
   IncludeTree          m_include_tree;

@@ -5,6 +5,12 @@ namespace yavin {
 //==============================================================================
 // MISC
 //==============================================================================
+void gl::cull_face(GLenum mode) {
+  if (verbose) { *out << "glCullFace(" << to_string(mode) << ")\n"; }
+  glCullFace(mode);
+  gl_error_check("glCullFace");
+}
+//------------------------------------------------------------------------------
 void gl::point_size(GLfloat size) {
   if (verbose) { *out << "glPointSize(" << size << ")\n"; }
   glPointSize(size);

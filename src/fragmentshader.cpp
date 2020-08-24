@@ -4,7 +4,7 @@
 namespace yavin {
 //==============================================================================
 fragmentshader::fragmentshader(const std::string& filepath,
-                               StringType         string_type)
+                               shadersourcetype         string_type)
     : shaderstage(GL_FRAGMENT_SHADER, filepath, string_type) {}
 //------------------------------------------------------------------------------
 fragmentshader::fragmentshader(fragmentshader&& other)

@@ -14,13 +14,13 @@
 namespace yavin {
 //==============================================================================
 
+enum shadersourcetype { FILE, SOURCE };
 class shaderstageparser {
  public:
-  enum StringType { FILE, SOURCE };
   DLL_API static std::string parse(const std::string&    filename_or_source,
                                    std::vector<GLSLVar>& vars,
                                    IncludeTree&          include_tree,
-                                   StringType            string_type = FILE);
+                                   shadersourcetype      string_type = FILE);
   DLL_API static std::string parse_file(const std::string& filename_or_source,
                                         std::vector<GLSLVar>& vars,
                                         IncludeTree&          include_tree);

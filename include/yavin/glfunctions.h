@@ -25,6 +25,7 @@ struct gl {
   //==============================================================================
   // MISC
   //==============================================================================
+  DLL_API static void cull_face(GLenum mode);
   DLL_API static void point_size(GLfloat size);
   //------------------------------------------------------------------------------
   DLL_API static void line_width(GLfloat width);

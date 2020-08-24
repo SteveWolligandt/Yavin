@@ -4,7 +4,7 @@
 namespace yavin {
 //==============================================================================
 computeshader::computeshader(const std::string& filepath,
-                               StringType         string_type)
+                             shadersourcetype   string_type)
     : shaderstage(GL_COMPUTE_SHADER, filepath, string_type) {}
 //------------------------------------------------------------------------------
 computeshader::computeshader(computeshader&& other)

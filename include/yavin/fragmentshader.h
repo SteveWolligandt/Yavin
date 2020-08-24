@@ -13,9 +13,8 @@ namespace yavin {
 
 class fragmentshader : public shaderstage {
  public:
-  using StringType = shaderstage::StringType;
   DLL_API fragmentshader(const std::string& filename,
-                         StringType         string_type = StringType::FILE);
+                         shadersourcetype string_type = shadersourcetype::FILE);
   DLL_API fragmentshader(fragmentshader&& other);
 };
 

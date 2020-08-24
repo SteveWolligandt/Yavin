@@ -36,6 +36,11 @@ DLL_API bool multisampling_enabled();
 DLL_API void enable_blending();
 DLL_API void disable_blending();
 //==============================================================================
+DLL_API void enable_face_culling();
+DLL_API void disable_face_culling();
+DLL_API void set_front_face_culling();
+DLL_API void set_back_face_culling();
+//==============================================================================
 DLL_API void blend_func_additive();
 DLL_API void blend_func_multiplicative();
 DLL_API void blend_func_subtractive();

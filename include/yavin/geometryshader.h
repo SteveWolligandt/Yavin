@@ -1,5 +1,5 @@
-#ifndef __YAVIN_GEOMETRYSHADER_H__
-#define __YAVIN_GEOMETRYSHADER_H__
+#ifndef YAVIN_GEOMETRYSHADER_H
+#define YAVIN_GEOMETRYSHADER_H
 
 #include <string>
 
@@ -12,9 +12,8 @@ namespace yavin {
 
 class geometryshader : public shaderstage {
  public:
-  using StringType = shaderstage::StringType;
   DLL_API geometryshader(const std::string& filename,
-                         StringType         string_type = StringType::FILE);
+                         shadersourcetype string_type = FILE);
   DLL_API geometryshader(geometryshader&& other);
 };
 

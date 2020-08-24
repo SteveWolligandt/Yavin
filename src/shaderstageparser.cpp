@@ -14,7 +14,7 @@ const std::regex shaderstageparser::regex_include(R"(#include\s+\"(.*)\")");
 std::string shaderstageparser::parse(const std::string&    filename_or_source,
                                      std::vector<GLSLVar>& vars,
                                      IncludeTree&          include_tree,
-                                     StringType            string_type) {
+                                     shadersourcetype      string_type) {
   if (string_type == FILE)
     return parse_file(filename_or_source, vars, include_tree);
   else /*if (string_type == SOURCE)*/

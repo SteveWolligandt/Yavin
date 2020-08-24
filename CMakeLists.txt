@@ -69,7 +69,6 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 find_package(X11 REQUIRED)
 find_package(Boost REQUIRED)
-message(STATUS ${X11_LIBRARIES})
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # clang-tidy
@@ -170,8 +169,8 @@ target_link_libraries(yavin
                         OpenGL::OpenGL
                         OpenGL::GLU
                         ${YAVIN_GLEW_LIBRARY}
-                        ${X11_LIBRARIES})
-target_link_libraries(yavin PRIVATE OpenGL::EGL)
+                        ${X11_LIBRARIES}
+                        OpenGL::EGL)
 
 if(YAVIN_CLANG_TIDY AND YAVIN_COMPILE_WITH_CLANG_TIDY_CHECKS)
   set_target_properties(yavin PROPERTIES CXX_CLANG_TIDY "${YAVIN_CLANG_TIDY_CMD}")

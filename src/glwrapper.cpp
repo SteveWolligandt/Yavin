@@ -59,6 +59,22 @@ void disable_blending() {
   gl::disable(GL_BLEND);
 }
 //==============================================================================
+void enable_face_culling() {
+  gl::enable(GL_CULL_FACE);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void disable_face_culling() {
+  gl::disable(GL_CULL_FACE);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void set_front_face_culling() {
+  gl::cull_face(GL_FRONT);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void set_back_face_culling() {
+  gl::cull_face(GL_BACK);
+}
+//==============================================================================
 void enable_multisampling() {
   gl::enable(GL_MULTISAMPLE);
 }
