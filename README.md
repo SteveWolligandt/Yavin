@@ -1,13 +1,47 @@
 Yavin
 ===
 
+Yavin is a C++-20 wrapper for OpenGL 4.6.  It uses EGL for creating contexts
+and windows and GLEW for GL extensions handling. Additionally it has
+implemented Dear ImGUI.
+
 ## Usage
-#### Vertex Buffer Objects
-Vertex buffer objects can be created using the template class vertexbuffer. Specify the vertex attributes like this:
+#### Context creation
+Yavin creates windows via X11 and EGL. A shared context can be created the
+do_async method of yavin::window. Internally a shared context of the window
+will be created and made current in the new thread. However OpenGL is not
+thread-safe so you have to synchronize your rendering and uploading otherwise
+you will get segmentation faults.
 
 ``` cpp
 #include<yavin>
-using vbo_t = yavin::vertexbuffer<yavin::vec2, yavin::vec3>;
+void create_window() {
+  yavin::window win{"Title", window_width, window_height};
+  // do your rendering jobs
+  win.do_async([&](){
+    // do your async uploading of buffers or textures
+  });
+}
+```
+
+You can also create a offscreen rendering context without creating a window:
+``` cpp
+#include<yavin>
+void offscreen_rendering() {
+  yavin::context ctx;
+  // do offscreen rendering
+}
+```
+
+#### Vertex Buffer Objects
+Vertex buffer objects can be created using the template class vertexbuffer.
+Specify the vertex attributes like this:
+
+``` cpp
+#include<yavin>
+using vec2 = std::array<GLfloat, 2>;
+using vec3 = std::array<GLfloat, 3>;
+using vbo_t = yavin::vertexbuffer<vec2, vec3>;
 // ...
 // create a vertex buffer object with a float vec2 and a float vec3
 vbo_t vbo;
@@ -42,7 +76,6 @@ vao.draw_triangles(ibo.size());
 ``` 
 
 #### Shaders
-
 Yavin automatically searches for uniform variables and vertex attributes in the shader source. Additionally you can use #include in shader source.
 
 ``` cpp
@@ -50,8 +83,8 @@ Yavin automatically searches for uniform variables and vertex attributes in the 
 // ...
 // create shader
 Yavin::shader s;
-s.add_stage<yavin::vertexshader>("<path to vertex shader>");
-s.add_stage<yavin::fragmentshader>("<path to fragment shader>");
+s.add_stage<yavin::vertexshader>("path/to/vertex/shader");
+s.add_stage<yavin::fragmentshader>("path/to/fragment/shader");
 s.create();
 //...
 // bind shader
@@ -61,6 +94,8 @@ vao.bind();
 vao.draw_triangles(ibo.gpu_size());
 // ...
 ``` 
+#### Textures
+TODO write
 
 ## Compiling
-Use CMake to compile the library and tests. You will need [glm](https://github.com/g-truc/glm), [glew](http://glew.sourceforge.net/) and [glfw3](https://github.com/glfw/glfw)
+Use CMake to compile the library and tests.
