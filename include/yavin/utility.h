@@ -2,7 +2,9 @@
 #define YAVIN_UTILITY_H
 //==============================================================================
 #include <array>
+#include <concepts>
 #include <utility>
+#include "gltype.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -44,7 +46,32 @@ struct promote<T0, T1, T2, Ts...> {
   using type = promote_t<T0, promote_t<T1, T2, Ts...>>;
 };
 //==============================================================================
+template <typename T>
+struct num_components;
+template <typename T>
+static constexpr auto num_components_v = num_components<T>::value;
+template <typename T, size_t N>
+struct num_components<std::array<T, N>> : std::integral_constant<size_t, N> {};
+template <typename T> requires std::is_arithmetic_v<T>
+struct num_components<T> : std::integral_constant<size_t, 1> {};
+//==============================================================================
+template <typename T>
+struct value_type;
+template <typename T>
+static constexpr auto value_type_v = value_type<T>::value;
+template <typename T, size_t N>
+struct value_type<std::array<T, N>>
+    : std::integral_constant<GLenum, gl_type_v<T>> {};
+template <typename T> requires std::is_arithmetic_v<T>
+struct value_type<T> : std::integral_constant<GLenum, gl_type_v<T>> {};
+//==============================================================================
+template <typename T, typename... Ts>
+struct head {
+  using type = T;
+};
+template <typename... Ts>
+using head_t = typename head<Ts...>::type;
+//==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

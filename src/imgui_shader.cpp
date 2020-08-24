@@ -32,8 +32,8 @@ imgui_shader::imgui_shader() {
   create();
 }
 //------------------------------------------------------------------------------
-void imgui_shader::set_projection_matrix(const mat4& p) {
-  set_uniform("projection_matrix", p);
+void imgui_shader::set_projection_matrix(std::array<GLfloat, 16> const& p) {
+  set_uniform_mat4("projection_matrix", p.data());
 }
 //------------------------------------------------------------------------------
 void imgui_shader::set_texture_slot(int s) {

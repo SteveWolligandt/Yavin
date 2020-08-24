@@ -5,7 +5,7 @@
 namespace yavin::test {
 //==============================================================================
 TEST_CASE("[VBO] download") {
-  using vbo_t = vertexbuffer<vec2, vec2>;
+  using vbo_t = vertexbuffer<std::array<GLfloat, 2>, std::array<GLfloat, 2>>;
   vbo_t vbo{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}};
 
   auto down = vbo.download_data();
@@ -21,17 +21,15 @@ TEST_CASE("[VBO] download") {
 
 //==============================================================================
 TEST_CASE("[VBO] element access") {
-  using vbo_t = vertexbuffer<vec3>;
+  using vbo_t = vertexbuffer<std::array<GLfloat, 3>>;
   REQUIRE(vbo_t::data_size == 3 * sizeof(float));
 
   vbo_t vbo{{1, 2, 3}, {4, 5, 6}};
   REQUIRE(vbo.size() == 2);
   REQUIRE(vbo.capacity() == 2);
 
-  vbo_t::data_t front   = vbo[0];
-  vbo_t::data_t back    = vbo[1];
-  auto          v_front = get<0>(front);
-  auto          v_back  = get<0>(back);
+  auto v_front = vbo[0].download();
+  auto v_back  = vbo[1].download();
 
   REQUIRE(v_front[0] == 1);
   REQUIRE(v_front[1] == 2);
@@ -40,7 +38,6 @@ TEST_CASE("[VBO] element access") {
   REQUIRE(v_back[1] == 5);
   REQUIRE(v_back[2] == 6);
 }
-
 //==============================================================================
 }  // namespace yavin::test
 //==============================================================================

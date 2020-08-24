@@ -12,13 +12,9 @@ class display {
   Display* m_x_display;
   //==============================================================================
  public:
-  display() : m_x_display{XOpenDisplay(nullptr)} {
-    if (m_x_display == nullptr) {
-      throw std::runtime_error{"[X] cannot connect server"};
-    }
-  }
+  display();
   //------------------------------------------------------------------------------
-  ~display() { XCloseDisplay(m_x_display); }
+  ~display();
   //==============================================================================
   auto get() const -> auto const& { return m_x_display; }
   auto get() -> auto& { return m_x_display; }

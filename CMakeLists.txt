@@ -123,8 +123,6 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/glwrapper.cpp
   ${CMAKE_SOURCE_DIR}/src/indexbuffer.cpp
   ${CMAKE_SOURCE_DIR}/src/mutexhandler.cpp
-  ${CMAKE_SOURCE_DIR}/src/orthographiccamera.cpp
-  ${CMAKE_SOURCE_DIR}/src/perspectivecamera.cpp
   ${CMAKE_SOURCE_DIR}/src/shader.cpp
   ${CMAKE_SOURCE_DIR}/src/shaderstage.cpp
   ${CMAKE_SOURCE_DIR}/src/shaderstageparser.cpp
@@ -141,12 +139,17 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/imgui_render_backend.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui.cpp
   ${CMAKE_SOURCE_DIR}/src/egl/error_string.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/context.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/surface.cpp
+  ${CMAKE_SOURCE_DIR}/src/egl/display.cpp
+  ${CMAKE_SOURCE_DIR}/src/X11/display.cpp
+  ${CMAKE_SOURCE_DIR}/src/X11/window.cpp
   ${CMAKE_BINARY_DIR}/src/glverbose.cpp
   ${CMAKE_SOURCE_DIR}/src/context.cpp
   ${CMAKE_SOURCE_DIR}/src/window.cpp
 )
 add_library(yavin SHARED ${YAVIN_GLEW_LIBRARY} ${YAVIN_SOURCES} ${YAVIN_IMGUI_FILES})
-target_compile_features(yavin PUBLIC cxx_std_17)
+target_compile_features(yavin PUBLIC cxx_std_20)
 
 target_compile_definitions(yavin PRIVATE DLL_EXPORT)
 target_compile_options(yavin PRIVATE
@@ -157,7 +160,6 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/single_include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${CMAKE_CURRENT_BINARY_DIR}/single_include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
     ${YAVIN_IMGUI_INCLUDE_DIRS}
@@ -211,7 +213,6 @@ configure_file(include/yavin/shaderincludepaths.h.in
                include/yavin/shaderincludepaths.h)
 configure_file(include/yavin/texpng.h.in
                include/yavin/texpng.h)
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # subdirectories
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

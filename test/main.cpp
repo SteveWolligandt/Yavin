@@ -3,6 +3,6 @@
 #include <yavin/context.h>
 
 int main(int argc, char** argv) {
-  yavin::context ctx{4, 5};
+  yavin::context ctx;
   return Catch::Session().run(argc, argv);
 }

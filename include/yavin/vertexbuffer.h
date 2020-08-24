@@ -6,6 +6,7 @@
 #include <tuple>
 #include <vector>
 #include "buffer.h"
+#include "utility.h"
 #include "errorcheck.h"
 #include "glincludes.h"
 #include "tuple.h"
@@ -14,9 +15,14 @@
 namespace yavin {
 //==============================================================================
 template <typename... Ts>
-class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
+class vertexbuffer
+    : public buffer<GL_ARRAY_BUFFER,
+                    std::conditional_t<sizeof...(Ts) == 1, head_t<Ts...>,
+                                       tuple<Ts...> > > {
  public:
-  using parent_t = buffer<GL_ARRAY_BUFFER, tuple<Ts...>>;
+  using parent_t = buffer<
+      GL_ARRAY_BUFFER,
+      std::conditional_t<sizeof...(Ts) == 1, head_t<Ts...>, tuple<Ts...> > >;
   using this_t   = vertexbuffer<Ts...>;
   using data_t   = typename parent_t::data_t;
 
@@ -25,8 +31,8 @@ class vertexbuffer : public buffer<GL_ARRAY_BUFFER, tuple<Ts...>> {
   static const usage_t default_usage = usage_t::STATIC_DRAW;
 
   static constexpr unsigned int num_attributes = sizeof...(Ts);
-  static constexpr std::array<size_t, num_attributes> num_components{Ts::num_components()...};
-  static constexpr std::array<GLenum, num_attributes> types{Ts::type...};
+  static constexpr std::array<size_t, num_attributes> num_components{num_components_v<Ts>...};
+  static constexpr std::array<GLenum, num_attributes> types{value_type_v<Ts>...};
   static constexpr std::array<size_t, num_attributes> offsets =
       attr_offset<num_attributes, Ts...>::gen(0, 0);
 

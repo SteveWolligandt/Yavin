@@ -28,7 +28,9 @@ struct imgui_render_backend {
       "";  // Specified by user or detected based on compile time GL settings.
   tex2rgba<std::uint8_t>  m_font_texture;
   imgui_shader m_shader;
-  vertexbuffer<vec2, vec2, ui8vec4> m_vbo;
+  vertexbuffer<std::array<GLfloat, 2>, std::array<GLfloat, 2>,
+               std::array<std::uint8_t, 4>>
+              m_vbo;
   indexbuffer m_ibo;
 
   //----------------------------------------------------------------------------
