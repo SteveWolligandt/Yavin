@@ -12,9 +12,6 @@
 #include <yavin/glwrapper.h>
 #include <yavin/indexbuffer.h>
 #include <yavin/indexeddata.h>
-#include <yavin/movable.h>
-#include <yavin/orthographiccamera.h>
-#include <yavin/perspectivecamera.h>
 #include <yavin/pixelunpackbuffer.h>
 #include <yavin/primitive.h>
 #include <yavin/shader.h>

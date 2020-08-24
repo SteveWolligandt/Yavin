@@ -1,7 +1,8 @@
 #ifndef YAVIN_SHADER_H
 #define YAVIN_SHADER_H
-
+//==============================================================================
 #include <string>
+#include <array>
 #include <optional>
 
 #include <map>
@@ -13,16 +14,12 @@
 #include "tesselationcontrolshader.h"
 #include "tesselationevaluationshader.h"
 #include "vertexshader.h"
-#include "vec.h"
-#include "mat.h"
 #include "dllexport.h"
 
 #include "windowsundefines.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 class shader {
  public:
   shader() = default;
@@ -45,43 +42,61 @@ class shader {
   DLL_API GLint uniform(const std::string& uniformVarName);
   DLL_API GLint attribute(const std::string& attributeVarName);
 
-  DLL_API void set_uniform(const std::string&, float);
-  DLL_API void set_uniform(const std::string&, int);
-  DLL_API void set_uniform(const std::string&, unsigned int);
+  DLL_API void set_uniform(const std::string&, GLfloat);
+  DLL_API void set_uniform(const std::string&, GLint);
+  DLL_API void set_uniform(const std::string&, GLuint);
   DLL_API void set_uniform(const std::string&, GLboolean);
 
-  DLL_API void set_uniform(const std::string&, float, float);
-  DLL_API void set_uniform(const std::string&, float, float, float);
-  DLL_API void set_uniform(const std::string&, float, float, float, float);
+  DLL_API void set_uniform(const std::string&, GLfloat, GLfloat);
+  DLL_API void set_uniform(const std::string&, GLfloat, GLfloat, GLfloat);
+  DLL_API void set_uniform(const std::string&, GLfloat, GLfloat, GLfloat, GLfloat);
 
-  DLL_API void set_uniform(const std::string&, int32_t, int32_t);
-  DLL_API void set_uniform(const std::string&, int32_t, int32_t, int32_t);
-  DLL_API void set_uniform(const std::string&, int32_t, int32_t, int32_t,
-                           int32_t);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLfloat, 2> const& data);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLfloat, 3> const& data);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLfloat, 4> const& data);
 
-  DLL_API void set_uniform(const std::string&, uint32_t, uint32_t);
-  DLL_API void set_uniform(const std::string&, uint32_t, uint32_t, uint32_t);
-  DLL_API void set_uniform(const std::string&, uint32_t, uint32_t, uint32_t,
-                           uint32_t);
+  DLL_API void set_uniform(const std::string&, GLint, GLint);
+  DLL_API void set_uniform(const std::string&, GLint, GLint, GLint);
+  DLL_API void set_uniform(const std::string&, GLint, GLint, GLint,
+                           GLint);
 
-  DLL_API void set_uniform(const std::string&, Scalar<float>);
-  DLL_API void set_uniform(const std::string&, Scalar<int32_t>);
-  DLL_API void set_uniform(const std::string&, Scalar<uint32_t>);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLint, 2> const& data);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLint, 3> const& data);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLint, 4> const& data);
 
-  DLL_API void set_uniform(const std::string&, const Vec2<float>&);
-  DLL_API void set_uniform(const std::string&, const Vec3<float>&);
-  DLL_API void set_uniform(const std::string&, const Vec4<float>&);
-  DLL_API void set_uniform(const std::string&, const Mat2<float>&);
-  DLL_API void set_uniform(const std::string&, const Mat3<float>&);
-  DLL_API void set_uniform(const std::string&, const Mat4<float>&);
+  DLL_API void set_uniform(const std::string&, GLuint, GLuint);
+  DLL_API void set_uniform(const std::string&, GLuint, GLuint, GLuint);
+  DLL_API void set_uniform(const std::string&, GLuint, GLuint, GLuint,
+                           GLuint);
 
-  DLL_API void set_uniform(const std::string&, const Vec2<int32_t>&);
-  DLL_API void set_uniform(const std::string&, const Vec3<int32_t>&);
-  DLL_API void set_uniform(const std::string&, const Vec4<int32_t>&);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLuint, 2> const& data);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLuint, 3> const& data);
+  DLL_API void set_uniform(const std::string&,
+                           std::array<GLuint, 4> const& data);
 
-  DLL_API void set_uniform(const std::string&, const Vec2<uint32_t>&);
-  DLL_API void set_uniform(const std::string&, const Vec3<uint32_t>&);
-  DLL_API void set_uniform(const std::string&, const Vec4<uint32_t>&);
+  DLL_API void set_uniform_vec2(const std::string&, GLfloat const *);
+  DLL_API void set_uniform_vec2(const std::string&, GLint const*);
+  DLL_API void set_uniform_vec2(const std::string&, GLuint const*);
+
+  DLL_API void set_uniform_vec3(const std::string&, GLfloat const*);
+  DLL_API void set_uniform_vec3(const std::string&, GLint const*);
+  DLL_API void set_uniform_vec3(const std::string&, GLuint const*);
+
+  DLL_API void set_uniform_vec4(const std::string&, GLfloat const*);
+  DLL_API void set_uniform_vec4(const std::string&, GLint const*);
+  DLL_API void set_uniform_vec4(const std::string&, GLuint const*);
+
+  DLL_API void set_uniform_mat2(const std::string&, GLfloat const *);
+  DLL_API void set_uniform_mat3(const std::string&, GLfloat const *);
+  DLL_API void set_uniform_mat4(const std::string&, GLfloat const *);
 
   DLL_API std::optional<std::string> info_log();
 

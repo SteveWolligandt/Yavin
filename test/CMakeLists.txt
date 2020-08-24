@@ -4,7 +4,7 @@ include(Catch)
 #-------------------------------------------------------------------------------
 add_executable (window.test ${CMAKE_CURRENT_SOURCE_DIR}/window.cpp)
 target_link_libraries(window.test yavin Catch2::Catch2)
-target_compile_features(window.test PUBLIC cxx_std_17)
+target_compile_features(window.test PUBLIC cxx_std_20)
 target_compile_options(window.test PUBLIC
   -Wall -Wextra -pedantic -Wno-missing-braces -Wno-unused-lambda-capture)
 add_custom_target (window.test.run COMMAND ./window.test DEPENDS window.test)
@@ -14,7 +14,7 @@ macro(create_test NAME)
   list(APPEND YAVIN_TEST_CPPS "${NAME}.cpp")
   add_executable (${NAME}.test ${NAME}.cpp main.cpp)
   target_link_libraries(${NAME}.test yavin Catch2::Catch2)
-  target_compile_features(${NAME}.test PUBLIC cxx_std_17)
+  target_compile_features(${NAME}.test PUBLIC cxx_std_20)
   target_compile_options(${NAME}.test PUBLIC
     -Wall -Wextra -pedantic -Wno-missing-braces -Wno-unused-lambda-capture)
   add_custom_target (${NAME}.test.run COMMAND ./${NAME}.test --use-colour=yes DEPENDS ${NAME}.test)
@@ -89,7 +89,7 @@ endif()
 add_executable(unittests ${YAVIN_UNITTEST_SOURCES})
 target_include_directories(unittests PUBLIC ${YAVIN_UNITTEST_INCLUDE_DIRECTORIES})
 target_link_libraries(unittests PUBLIC ${YAVIN_UNITTEST_LIBRARIES})
-target_compile_features(unittests PUBLIC cxx_std_17)
+target_compile_features(unittests PUBLIC cxx_std_20)
 target_compile_options(unittests PUBLIC -Wall -Wextra -Wno-missing-braces -pedantic)
 catch_discover_tests(unittests)
 
@@ -139,7 +139,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND (
   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   include(CodeCoverage)
   add_executable (coverage.gcov ${YAVIN_UNITTEST_SOURCES})
-  target_compile_features(coverage.gcov PUBLIC cxx_std_17)
+  target_compile_features(coverage.gcov PUBLIC cxx_std_20)
   target_include_directories(coverage.gcov PUBLIC ${YAVIN_UNITTEST_INCLUDE_DIRECTORIES})
   set(COVERAGE_EXCLUDES
       "${CMAKE_SOURCE_DIR}/test"
@@ -172,7 +172,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND (
           -Wno-missing-braces -Wno-unused-lambda-capture)
     # LLVM Sanitizer
     add_executable (coverage.llvm ${YAVIN_UNITTEST_SOURCES})
-    target_compile_features(coverage.llvm PUBLIC cxx_std_17)
+    target_compile_features(coverage.llvm PUBLIC cxx_std_20)
     target_include_directories(coverage.llvm PUBLIC ${YAVIN_UNITTEST_INCLUDE_DIRECTORIES})
     target_link_libraries(coverage.llvm
       ${YAVIN_UNITTEST_LIBRARIES} -fprofile-instr-generate -fcoverage-mapping)

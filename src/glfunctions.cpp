@@ -1,6 +1,5 @@
 #include <yavin/glfunctions.h>
-#include <yavin/camera.h>
-
+#include <cassert>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -191,17 +190,11 @@ void gl::viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
   gl_error_check("glViewport");
 }
 //------------------------------------------------------------------------------
-void gl::viewport(const camera& cam) {
-  gl::viewport(cam.viewport_x(), cam.viewport_y(), cam.viewport_width(),
-               cam.viewport_height());
-}
-//------------------------------------------------------------------------------
 void gl::flush() {
   if (verbose) *out << "glFlush\n";
   glFlush();
   gl_error_check("glFlush");
 }
-
 //------------------------------------------------------------------------------
 void gl::depth_mask(GLboolean flag) {
   if (verbose) *out << "glDepthMask(" << (flag ? "true" : "false") << ")\n";

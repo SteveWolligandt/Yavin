@@ -1,11 +1,10 @@
-#ifndef __YAVIN_VBOHELPERS_H__
-#define __YAVIN_VBOHELPERS_H__
+#ifndef YAVIN_VBOHELPERS_H
+#define YAVIN_VBOHELPERS_H
 
 #include <array>
 #include <initializer_list>
 #include <iostream>
 #include <vector>
-#include "vec.h"
 #include "glincludes.h"
 #include "gltype.h"
 //==============================================================================

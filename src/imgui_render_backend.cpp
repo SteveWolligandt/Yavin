@@ -55,12 +55,12 @@ void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_widt
   float       R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
   float       T = draw_data->DisplayPos.y;
   float       B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
-  const mat4  ortho_projection = {
-      {2.0f / (R - L), 0.0f, 0.0f, (R + L) / (L - R)},
-      {0.0f, 2.0f / (T - B), 0.0f, (T + B) / (B - T)},
-      {0.0f, 0.0f, -1.0f, 0.0f},
-      {0.0f, 0.0f, 0.0f, 1.0f},
-  };
+  const std::array<GLfloat, 16>  ortho_projection = 
+      {   2.0f / (R - L),              0.0f,  0.0f, 0.0f,
+                    0.0f,    2.0f / (T - B),  0.0f, 0.0f,
+                    0.0f,              0.0f, -1.0f, 0.0f,
+       (R + L) / (L - R), (T + B) / (B - T),  0.0f, 1.0f};
+
   m_shader.bind();
   m_shader.set_texture_slot(0);
   m_shader.set_projection_matrix(ortho_projection);
