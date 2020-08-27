@@ -1,6 +1,3 @@
-Yavin
-===
-
 ![alt text](https://raw.githubusercontent.com/SteveWolligandt/yavin/master/yavin.gif)
 
 Yavin is an OpenGL Wrapper for C++-20.  It uses EGL for creating contexts and
