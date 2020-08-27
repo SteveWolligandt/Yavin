@@ -34,11 +34,19 @@ class indexeddata {
  public:
   indexeddata() = default;
   //----------------------------------------------------------------------------
-  indexeddata(indexeddata const& other)     = default;
-  indexeddata(indexeddata&& other) noexcept = default;
+  indexeddata(indexeddata const& other)
+      : m_vbo{other.m_vbo}, m_ibo{other.m_ibo} {}
+  indexeddata(indexeddata&& other) noexcept
+      : m_vbo{std::move(other.m_vbo)}, m_ibo{std::move(other.m_ibo)} {}
   //----------------------------------------------------------------------------
-  auto operator=(indexeddata const& other) -> indexeddata& = default;
-  auto operator=(indexeddata&& other) noexcept -> indexeddata& = default;
+  auto operator=(indexeddata const& other) -> indexeddata& {
+    m_vbo = other.m_vbo;
+    m_ibo = other.m_ibo;
+  }
+  auto operator=(indexeddata&& other) noexcept -> indexeddata& {
+    m_vbo = std::move(other.m_vbo);
+    m_ibo = std::move(other.m_ibo);
+  }
   //----------------------------------------------------------------------------
   indexeddata(vbo_data_vec const& vbo_data, ibo_data_vec const& ibo_data)
       : m_vbo(vbo_data), m_ibo(ibo_data) {}

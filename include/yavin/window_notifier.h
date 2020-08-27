@@ -8,6 +8,20 @@
 namespace yavin {
 //==============================================================================
 template <typename Event>
+struct resize_event : holder<Event>, yavin::window_listener {
+  using holder<Event>::holder;
+  void on_resize(int width, int height) override {
+    this->get()(width, height);
+  }
+};
+// copy when having rvalue
+template <typename T>
+resize_event(T &&) -> resize_event<T>;
+// keep reference when having lvalue
+template <typename T>
+resize_event(T const&) -> resize_event<T const&>;
+//==============================================================================
+template <typename Event>
 struct key_pressed_event : holder<Event>, yavin::window_listener {
   using holder<Event>::holder;
   void on_key_pressed(yavin::key k) override {
@@ -64,6 +78,34 @@ template <typename T>
 button_released_event(T const &) -> button_released_event<T const &>;
 //==============================================================================
 template <typename Event>
+struct wheel_up_event : holder<Event>, yavin::window_listener {
+  using holder<Event>::holder;
+  void on_wheel_up() override {
+    this->get()();
+  }
+};
+// copy when having rvalue
+template <typename T>
+wheel_up_event(T &&) -> wheel_up_event<T>;
+// keep reference when having lvalue
+template <typename T>
+wheel_up_event(T const &) -> wheel_up_event<T const &>;
+//==============================================================================
+template <typename Event>
+struct wheel_down_event : holder<Event>, yavin::window_listener {
+  using holder<Event>::holder;
+  void on_wheel_down() override {
+    this->get()();
+  }
+};
+// copy when having rvalue
+template <typename T>
+wheel_down_event(T &&) -> wheel_down_event<T>;
+// keep reference when having lvalue
+template <typename T>
+wheel_down_event(T const &) -> wheel_down_event<T const &>;
+//==============================================================================
+template <typename Event>
 struct mouse_motion_event : holder<Event>, yavin::window_listener {
   using holder<Event>::holder;
   void on_mouse_motion(int x, int y) override {
@@ -93,6 +135,13 @@ struct window_notifier {
   void notify_resize(int width, int height);
   //----------------------------------------------------------------------------
   void add_listener(window_listener &l);
+  //----------------------------------------------------------------------------
+  template <typename Event>
+  void add_resize_event(Event&& event) {
+    m_events.push_back(std::unique_ptr<base_holder>{
+        new resize_event{std::forward<Event>(event)}});
+    add_listener(*dynamic_cast<yavin::window_listener*>(m_events.back().get()));
+  }
   //----------------------------------------------------------------------------
   template <typename Event>
   void add_key_pressed_event(Event&& event) {
@@ -126,6 +175,20 @@ struct window_notifier {
   void add_mouse_motion_event(Event&& event) {
     m_events.push_back(std::unique_ptr<base_holder>{
         new mouse_motion_event{std::forward<Event>(event)}});
+    add_listener(*dynamic_cast<yavin::window_listener*>(m_events.back().get()));
+  }
+  //----------------------------------------------------------------------------
+  template <typename Event>
+  void add_wheel_up_event(Event&& event) {
+    m_events.push_back(std::unique_ptr<base_holder>{
+        new wheel_up_event{std::forward<Event>(event)}});
+    add_listener(*dynamic_cast<yavin::window_listener*>(m_events.back().get()));
+  }
+  //----------------------------------------------------------------------------
+  template <typename Event>
+  void add_wheel_down_event(Event&& event) {
+    m_events.push_back(std::unique_ptr<base_holder>{
+        new wheel_down_event{std::forward<Event>(event)}});
     add_listener(*dynamic_cast<yavin::window_listener*>(m_events.back().get()));
   }
 };

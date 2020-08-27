@@ -940,7 +940,7 @@ void gl::tex_image_1d(GLenum target, GLint level, GLint internal_format,
                       GLsizei width, GLint border, GLenum format, GLenum type,
                       const GLvoid* data) {
   assert(width >= 0);
-  assert(width < GL_MAX_TEXTURE_SIZE);
+  //assert(width < GL_MAX_TEXTURE_SIZE);
   if (verbose)
     *out << "glTexImage1D(" << to_string(target) << ", " << level << ", "
          << to_string(internal_format) << ", " << width << ", " << border
@@ -957,8 +957,8 @@ void gl::tex_image_2d(GLenum target, GLint level, GLint internal_format,
                       GLenum format, GLenum type, const GLvoid* data) {
   assert(width >= 0);
   assert(height >= 0);
-  assert(width < GL_MAX_TEXTURE_SIZE);
-  assert(height < GL_MAX_TEXTURE_SIZE);
+  //assert(width < GL_MAX_TEXTURE_SIZE);
+  //assert(height < GL_MAX_TEXTURE_SIZE);
 
   if (verbose)
     *out << "glTexImage2D(" << to_string(target) << ", " << level << ", "
@@ -1006,9 +1006,9 @@ void gl::tex_image_3d(GLenum target, GLint level, GLint internal_format,
   assert(width >= 0);
   assert(height >= 0);
   assert(depth >= 0);
-  assert(width < GL_MAX_TEXTURE_SIZE);
-  assert(height < GL_MAX_TEXTURE_SIZE);
-  assert(depth < GL_MAX_TEXTURE_SIZE);
+  //assert(width < GL_MAX_TEXTURE_SIZE);
+  //assert(height < GL_MAX_TEXTURE_SIZE);
+  //assert(depth < GL_MAX_TEXTURE_SIZE);
   if (verbose)
     *out << "glTexImage3D(" << to_string(target) << ", " << level << ", "
          << to_string(internal_format) << ", " << width << ", " << height
