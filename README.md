@@ -1,9 +1,9 @@
 Yavin
 ===
 
-Yavin is a C++-20 wrapper for OpenGL 4.6.  It uses EGL for creating contexts
-and windows and GLEW for GL extensions handling. Additionally it has
-implemented Dear ImGUI.
+Yavin is an OpenGL Wrapper for C++-20.  It uses EGL for creating contexts and
+windows and GLEW for GL extensions handling. Additionally it has implemented
+Dear ImGUI.
 
 ## Usage
 #### Context creation
