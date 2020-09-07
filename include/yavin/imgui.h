@@ -1,10 +1,7 @@
 #ifndef YAVIN_IMGUI_H
 #define YAVIN_IMGUI_H
 //==============================================================================
-#include "imgui_api_backend.h"
-#include "imgui_render_backend.h"
-//==============================================================================
-#include <imgui/imgui_internal.h>
+#include <yavin/imgui_includes.h>
 //==============================================================================
 namespace ImGui {
 //==============================================================================
@@ -29,5 +26,8 @@ bool DragDouble4(const char* label, double v[4], double v_speed = 1.0,
                  const char* format = "%.3lf", double power = 1.0);
 //==============================================================================
 }  // namespace ImGui
+//==============================================================================
+#include <yavin/imgui_api_backend.h>
+#include <yavin/imgui_render_backend.h>
 //==============================================================================
 #endif

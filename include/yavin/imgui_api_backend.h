@@ -2,13 +2,8 @@
 #define YAVIN_IMGUI_API_BACKEND_H
 //==============================================================================
 #include <yavin/glincludes.h>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
-
+#include <yavin/imgui_includes.h>
 #include <chrono>
-
 #include "window_listener.h"
 //==============================================================================
 namespace yavin {
