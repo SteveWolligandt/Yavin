@@ -40,7 +40,7 @@ class window : public window_notifier, public window_listener {
   // ctors / dtor
   //============================================================================
  public:
-  window(const std::string &title, GLsizei width, GLsizei height);
+  window(const std::string &title, size_t width, size_t height);
   ~window();
 
   //============================================================================
@@ -83,7 +83,7 @@ class window : public window_notifier, public window_listener {
   }
 
  private:
-  void setup(const std::string &title, GLsizei width, GLsizei height);
+  void setup(const std::string &title, size_t width, size_t height);
   void init_imgui(size_t width, size_t height);
   void deinit_imgui();
 };

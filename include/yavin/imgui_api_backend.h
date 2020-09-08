@@ -13,7 +13,7 @@ struct imgui_api_backend : window_listener {
   static std::chrono::time_point<std::chrono::system_clock> time;
   //----------------------------------------------------------------------------
   imgui_api_backend();
-  ~imgui_api_backend();
+  virtual ~imgui_api_backend();
   //----------------------------------------------------------------------------
   void on_key_pressed(key k) override;
   void on_key_released(key k) override;

@@ -14,7 +14,7 @@ class window : public window_notifier {
   Window                   m_root;
   Window                   m_x_window;
   XEvent                   m_xevent;
-  bool                     m_shift_down, m_ctrl_down, m_alt_down;
+  //bool                     m_shift_down, m_ctrl_down, m_alt_down;
   //============================================================================
  public:
   window(std::string const& title, size_t width, size_t height,

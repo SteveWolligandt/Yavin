@@ -216,8 +216,19 @@ configure_file(include/yavin/texpng.h.in
 # subdirectories
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 add_subdirectory(external/catch2)
-add_subdirectory(test)
-add_subdirectory(doc)
+
+
+set(YAVIN_BUILD_TESTS false CACHE BOOL "compile tests")
+option(YAVIN_BUILD_TESTS "compile tests" FALSE)
+if (YAVIN_BUILD_TESTS)
+  add_subdirectory(test)
+endif()
+
+set(YAVIN_BUILD_DOC false CACHE BOOL "build doc")
+option(YAVIN_BUILD_DOC "build doc" FALSE)
+if (YAVIN_BUILD_DOC)
+  add_subdirectory(doc)
+endif()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # target export

@@ -6,7 +6,7 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-window::window(const std::string &title, GLsizei width, GLsizei height) {
+window::window(const std::string &title, size_t width, size_t height) {
   setup(title, width, height);
 }
 //------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ void window::render_imgui() {
   m_imgui_render_backend->render_draw_data(ImGui::GetDrawData());
 }
 //------------------------------------------------------------------------------
-void window::setup(const std::string &title, GLsizei width, GLsizei height) {
+void window::setup(const std::string &title, size_t width, size_t height) {
   auto x11_disp = std::make_shared<x11::display>();
   m_egl_disp     = std::make_shared<egl::display>(x11_disp);
   // EGL context and surface
