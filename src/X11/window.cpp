@@ -1,4 +1,5 @@
 #include <yavin/X11/window.h>
+#include <iostream>
 //==============================================================================
 namespace yavin::x11 {
 //==============================================================================
@@ -8,7 +9,11 @@ window::window(std::string const& title, size_t width, size_t height,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 window::window(std::string const& title, size_t width, size_t height,
                std::shared_ptr<display> const& disp, XVisualInfo* visual)
-    : m_x_display{disp}, m_root{DefaultRootWindow(m_x_display->get())} {
+    : m_x_display{disp},
+      m_root{DefaultRootWindow(m_x_display->get())},
+      m_wm_protocols{XInternAtom(m_x_display->get(), "WM_PROTOCOLS", false)},
+      m_wm_delete_window{
+          XInternAtom(m_x_display->get(), "WM_DELETE_WINDOW", false)} {
   m_attributes.event_mask =
       ExposureMask | KeyPressMask | ButtonPress | StructureNotifyMask |
       ButtonReleaseMask | KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
@@ -25,6 +30,7 @@ window::window(std::string const& title, size_t width, size_t height,
   );
   XStoreName(m_x_display->get(), m_x_window, title.c_str());
   XMapWindow(m_x_display->get(), m_x_window);
+  XSetWMProtocols(m_x_display->get(), m_x_window, &m_wm_delete_window, 1);
 }
 //------------------------------------------------------------------------------
 window::~window() {
@@ -32,6 +38,7 @@ window::~window() {
 }
 //==============================================================================
 void window::check_events() {
+
   while (XCheckWindowEvent(m_x_display->get(), m_x_window,
                            ExposureMask | KeyPressMask | ButtonPress |
                                StructureNotifyMask | ButtonReleaseMask |
@@ -65,6 +72,13 @@ void window::check_events() {
       case ConfigureNotify:
         notify_resize(m_xevent.xconfigure.width, m_xevent.xconfigure.height);
         break;
+    }
+    if (XCheckTypedWindowEvent(m_x_display->get(), m_x_window,
+                               ClientMessage, &m_xevent)) {
+      if (m_xevent.xclient.message_type == m_wm_protocols &&
+          static_cast<Atom>(m_xevent.xclient.data.l[0]) == m_wm_delete_window) {
+        m_should_close = true;
+      }
     }
   }
 }

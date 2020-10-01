@@ -219,13 +219,13 @@ add_subdirectory(external/catch2)
 
 
 set(YAVIN_BUILD_TESTS false CACHE BOOL "compile tests")
-option(YAVIN_BUILD_TESTS "compile tests" FALSE)
-if (YAVIN_BUILD_TESTS)
+if (YAVIN_BUILD_TESTS )
   add_subdirectory(test)
+else()
+  message(STATUS foo)
 endif()
 
 set(YAVIN_BUILD_DOC false CACHE BOOL "build doc")
-option(YAVIN_BUILD_DOC "build doc" FALSE)
 if (YAVIN_BUILD_DOC)
   add_subdirectory(doc)
 endif()

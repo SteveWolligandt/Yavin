@@ -14,6 +14,9 @@ class window : public window_notifier {
   Window                   m_root;
   Window                   m_x_window;
   XEvent                   m_xevent;
+  bool                     m_should_close = false;
+  Atom                     m_wm_protocols;
+  Atom                     m_wm_delete_window;
   //bool                     m_shift_down, m_ctrl_down, m_alt_down;
   //============================================================================
  public:
@@ -27,6 +30,8 @@ class window : public window_notifier {
   //==============================================================================
   auto get() const -> auto const& { return m_x_window; }
   auto get() -> auto& { return m_x_window; }
+  //------------------------------------------------------------------------------
+  auto should_close() const { return m_should_close; }
   //------------------------------------------------------------------------------
   void check_events();
 };

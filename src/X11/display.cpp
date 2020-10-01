@@ -2,14 +2,21 @@
 //==============================================================================
 namespace yavin::x11 {
 //==============================================================================
-display::display() : m_x_display{XOpenDisplay(nullptr)} {
+display::display() : m_x_display{XOpenDisplay(nullptr)}, m_closed{false} {
   if (m_x_display == nullptr) {
     throw std::runtime_error{"[X] cannot connect server"};
   }
 }
 //------------------------------------------------------------------------------
+void display::close() {
+  if (!m_closed) {
+    XCloseDisplay(m_x_display);
+    m_closed = true;
+  }
+}
+//------------------------------------------------------------------------------
 display::~display() {
-  XCloseDisplay(m_x_display);
+  close();
 }
 //==============================================================================
 }  // namespace yavin::x11

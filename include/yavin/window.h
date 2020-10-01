@@ -65,6 +65,10 @@ class window : public window_notifier, public window_listener {
   void    on_mouse_motion(int /*x*/, int /*y*/) override;
   void    on_resize(int /*width*/, int /*height*/) override;
   //----------------------------------------------------------------------------
+  auto should_close() const {
+    return m_egl_surface->x11_window()->should_close();
+  }
+  //----------------------------------------------------------------------------
   template <typename F>
   void do_async(F &&f) {
     auto it = [this] {
