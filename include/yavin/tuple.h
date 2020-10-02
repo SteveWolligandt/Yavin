@@ -1,6 +1,9 @@
 #ifndef YAVIN_TUPLE_H
 #define YAVIN_TUPLE_H
 //==============================================================================
+#include <utility>
+#include <concepts>
+//==============================================================================
 namespace yavin {
 //==============================================================================
 template <typename... Ts>
@@ -11,7 +14,7 @@ struct tuple<Head, Tail...> {
   Head           head;
   tuple<Tail...> tail;
   //============================================================================
-  template <typename Head_, typename... Tail_>
+  template <std::convertible_to<Head> Head_, typename... Tail_>
   tuple(Head_&& head_, Tail_&&... tail_)
       : head{std::forward<Head_>(head_)}, tail{std::forward<Tail_>(tail_)...} {}
   //----------------------------------------------------------------------------
@@ -19,7 +22,7 @@ struct tuple<Head, Tail...> {
   tuple(tuple const&)                        = default;
   tuple(tuple&&) noexcept                    = default;
   ~tuple()                                   = default;
-  auto operator=(tuple const&)     -> tuple& = default;
+  auto operator=(tuple const&) -> tuple&     = default;
   auto operator=(tuple&&) noexcept -> tuple& = default;
   //============================================================================
   template <typename T>
@@ -35,14 +38,14 @@ template <typename Head>
 struct tuple<Head> {
   Head head;
   //============================================================================
-  template <typename Head_>
+  template <std::convertible_to<Head> Head_>
   tuple(Head_&& head_) : head{std::forward<Head_>(head_)} {}
   //----------------------------------------------------------------------------
   tuple()                                    = default;
   tuple(tuple const&)                        = default;
   tuple(tuple&&) noexcept                    = default;
   ~tuple()                                   = default;
-  auto operator=(tuple const&)     -> tuple& = default;
+  auto operator=(tuple const&) -> tuple&     = default;
   auto operator=(tuple&&) noexcept -> tuple& = default;
   //============================================================================
   template <typename T = void>
@@ -52,18 +55,7 @@ struct tuple<Head> {
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 template <typename Head>
-tuple(Head &&) -> tuple<std::decay_t<Head>>;
-//==============================================================================
-template <typename Head>
-auto make_tuple(Head&& head) {
-  return tuple<Head>{std::forward<Head>(head)};
-}
-//------------------------------------------------------------------------------
-template <typename Head, typename... Tail>
-auto make_tuple(Head&& head, Tail&&... tail) {
-  return tuple<Head, Tail...>{std::forward<Head>(head),
-                              make_tuple<Tail...>(std::forward<Tail>(tail)...)};
-}
+tuple(Head&&) -> tuple<std::decay_t<Head>>;
 //==============================================================================
 template <std::size_t Idx, typename Head, typename... Tail>
 struct _tuple_get_t {
@@ -80,7 +72,9 @@ struct _tuple_get_t<0, Head, Tail...> {
   static constexpr auto get(tuple<Head, Tail...> const& t) -> auto const& {
     return t.head;
   }
-  static constexpr auto get(tuple<Head, Tail...>& t) -> auto& { return t.head; }
+  static constexpr auto get(tuple<Head, Tail...>& t) -> auto& {
+    return t.head;
+  }
 };
 //------------------------------------------------------------------------------
 template <std::size_t Idx, typename... Ts>

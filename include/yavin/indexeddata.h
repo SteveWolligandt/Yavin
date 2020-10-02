@@ -42,10 +42,13 @@ class indexeddata {
   auto operator=(indexeddata const& other) -> indexeddata& {
     m_vbo = other.m_vbo;
     m_ibo = other.m_ibo;
+    return *this;
   }
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   auto operator=(indexeddata&& other) noexcept -> indexeddata& {
     m_vbo = std::move(other.m_vbo);
     m_ibo = std::move(other.m_ibo);
+    return *this;
   }
   //----------------------------------------------------------------------------
   indexeddata(vbo_data_vec const& vbo_data, ibo_data_vec const& ibo_data)
