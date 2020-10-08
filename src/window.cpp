@@ -91,7 +91,11 @@ void window::setup(const std::string &title, size_t width, size_t height) {
 }
 //------------------------------------------------------------------------------
 void window::swap_buffers() {
-  eglSwapBuffers(m_egl_disp->get(), m_egl_surface->get());
+  if (!eglSwapBuffers(m_egl_disp->get(), m_egl_surface->get())) {
+    auto err = eglGetError();
+    throw std::runtime_error{"[EGL] eglSwapBuffers - " +
+                             egl::error_string(err)};
+  }
 }
 //------------------------------------------------------------------------------
 void window::init_imgui(size_t width, size_t height) {
@@ -151,6 +155,9 @@ void window::on_mouse_motion(int x, int y) {
 void window::on_resize(int w, int h) {
   imgui_api_backend::instance().on_resize(w, h);
   notify_resize(w, h);
+}
+void window::x_init_threads() {
+  XInitThreads();
 }
 //==============================================================================
 }  // namespace yavin

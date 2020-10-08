@@ -1,5 +1,7 @@
 #include <yavin/context.h>
 #include <yavin/window.h>
+#include <thread>
+#include <chrono>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -22,16 +24,22 @@ context context::create_shared_context() const {
 }
 //------------------------------------------------------------------------------
 void context::make_current() {
-  if (!eglMakeCurrent(m_egl_disp->get(), EGL_NO_SURFACE,
-                      EGL_NO_SURFACE, m_egl_context->get())) {
-    throw std::runtime_error{"[EGL] make context current."};
+  size_t i = 0;
+  while (!eglMakeCurrent(m_egl_disp->get(), EGL_NO_SURFACE, EGL_NO_SURFACE,
+                         m_egl_context->get())) {
+    if (i < 10) {
+      ++i;
+      std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    } else {
+      throw std::runtime_error{"[EGL] make context current."};
+    }
   }
   if (m_glew == nullptr) { m_glew = glew::create(); }
 }
 //------------------------------------------------------------------------------
 void context::release() {
-  if (!eglMakeCurrent(m_egl_disp->get(), EGL_NO_SURFACE,
-                      EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+  if (!eglMakeCurrent(m_egl_disp->get(), EGL_NO_SURFACE, EGL_NO_SURFACE,
+                      EGL_NO_CONTEXT)) {
     throw std::runtime_error{"[EGL] could not release context"};
   }
 }

@@ -1,6 +1,6 @@
-#ifndef __YAVIN_VERTEXARRAY_H__
-#define __YAVIN_VERTEXARRAY_H__
-
+#ifndef YAVIN_VERTEXARRAY_H
+#define YAVIN_VERTEXARRAY_H
+//==============================================================================
 #include <iostream>
 #include "indexbuffer.h"
 #include "primitive.h"
@@ -8,7 +8,6 @@
 #include "vertexbuffer.h"
 #include "dllexport.h"
 #include "glfunctions.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
