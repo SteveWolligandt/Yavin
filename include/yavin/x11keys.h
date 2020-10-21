@@ -2,6 +2,9 @@
 #define YAVIN_X11KEYS_H
 //==============================================================================
 #include <X11/XKBlib.h>
+#ifdef Bool
+#undef Bool
+#endif
 #include <yavin/keyboard.h>
 //==============================================================================
 namespace yavin {
