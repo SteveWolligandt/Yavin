@@ -69,7 +69,7 @@ class indexeddata {
   }
   //----------------------------------------------------------------------------
   void clear() {
-    std::lock_guard lock{m_mutex};
+    //std::lock_guard lock{m_mutex};
     m_vbo.clear();
     m_ibo.clear();
   }
