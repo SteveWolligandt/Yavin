@@ -34,7 +34,8 @@ set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_BINARY_DIR}/lib/libGLEW.a)
 
 add_custom_target(glew.copy
                   COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/external
-                  COMMAND cp -r ${YAVIN_GLEW_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/external)
+                  COMMAND cp -r ${YAVIN_GLEW_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/external
+                  COMMAND rm -rf ${YAVIN_GLEW_BINARY_DIR}/.git)
 add_custom_target(glew.download
                   COMMAND make
                   WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR}/auto
@@ -167,6 +168,7 @@ target_include_directories(yavin
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_GLEW_INCLUDE_DIR}
     ${YAVIN_IMGUI_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui-filebrowser
     ${X11_INCLUDE_DIR})
 
 target_link_libraries(yavin
