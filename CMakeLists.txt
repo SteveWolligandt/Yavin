@@ -27,29 +27,34 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # build glew
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-set(YAVIN_GLEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
-set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_DIR}/include)
-set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_DIR}/lib/libGLEW.a)
+set(YAVIN_GLEW_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
+set(YAVIN_GLEW_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/glew)
+set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_SOURCE_DIR}/include)
+set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_BINARY_DIR}/lib/libGLEW.a)
 
+add_custom_target(glew.copy
+                  COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/external
+                  COMMAND cp -r ${YAVIN_GLEW_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/external)
 add_custom_target(glew.download
                   COMMAND make
-                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
+                  WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR}/auto
+                  DEPENDS glew.copy)
 add_custom_target(glew.build.clean
                   COMMAND make clean
-                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+                  WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR})
 add_custom_target(glew.download.clean
                   COMMAND make clean
-                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR}/auto)
+                  WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR}/auto)
 add_custom_target(glew.clean
                   DEPENDS glew.download.clean glew.build.clean
-                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+                  WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR})
 add_custom_command(OUTPUT ${YAVIN_GLEW_LIBRARY}
                   COMMAND make SYSTEM=linux-egl
                   DEPENDS glew.download
-                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+                  WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR})
 add_custom_target(glew.build
                   DEPENDS ${YAVIN_GLEW_LIBRARY}
-                  WORKING_DIRECTORY ${YAVIN_GLEW_DIR})
+                  WORKING_DIRECTORY ${YAVIN_GLEW_BINARY_DIR})
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # build imgui
