@@ -71,28 +71,80 @@ class buffer_map {
     }
   }
 
-  auto at(size_t i) -> auto& { return m_gpu_mapping[i]; }
-  auto at(size_t i) const -> const auto& { return m_gpu_mapping[i]; }
+  auto at(size_t i) -> auto& {
+    return m_gpu_mapping[i];
+  }
+  auto at(size_t i) const -> const auto& {
+    return m_gpu_mapping[i];
+  }
 
-  auto front() -> auto& { return at(0); }
-  auto front() const -> const auto& { return at(0); }
+  auto front() -> auto& {
+    return at(0);
+  }
+  auto front() const -> const auto& {
+    return at(0);
+  }
 
-  auto back() -> auto& { return at(m_length - 1); }
-  auto back() const -> const auto& { return at(m_length - 1); }
+  auto back() -> auto& {
+    return at(m_length - 1);
+  }
+  auto back() const -> const auto& {
+    return at(m_length - 1);
+  }
 
-  auto operator[](size_t i) -> auto& { return at(i); }
-  auto operator[](size_t i) const -> const auto& { return at(i); }
+  auto operator[](size_t i) -> auto& {
+    return at(i);
+  }
+  auto operator[](size_t i) const -> const auto& {
+    return at(i);
+  }
 
-  auto begin() { return m_gpu_mapping; }
-  auto begin() const { return m_gpu_mapping; }
+  auto begin() {
+    return m_gpu_mapping;
+  }
+  auto begin() const {
+    return m_gpu_mapping;
+  }
 
-  auto end() { return m_gpu_mapping + m_length; }
-  auto end() const { return m_gpu_mapping + m_length; }
+  auto end() {
+    return m_gpu_mapping + m_length;
+  }
+  auto end() const {
+    return m_gpu_mapping + m_length;
+  }
 
-  auto offset() const { return m_offset; }
-  auto length() const { return m_length; }
+  auto offset() const {
+    return m_offset;
+  }
+  auto length() const {
+    return m_length;
+  }
 };
-
+//------------------------------------------------------------------------------
+// buffer_map free functions
+//------------------------------------------------------------------------------
+template <GLsizei ArrayType, typename T, GLbitfield Access>
+auto begin(buffer_map<ArrayType, T, Access>& map) {
+  return map.begin();
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+template <GLsizei ArrayType, typename T, GLbitfield Access>
+auto begin(buffer_map<ArrayType, T, Access> const& map) {
+  return map.begin();
+}
+//------------------------------------------------------------------------------
+template <GLsizei ArrayType, typename T, GLbitfield Access>
+auto end(buffer_map<ArrayType, T, Access>& map) {
+  return map.end();
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+template <GLsizei ArrayType, typename T, GLbitfield Access>
+auto end(buffer_map<ArrayType, T, Access> const& map) {
+  return map.end();
+}
+//------------------------------------------------------------------------------
+// buffer_map free typedefs
+//------------------------------------------------------------------------------
 template <GLsizei array_type, typename T>
 using rbuffer_map = buffer_map<array_type, T, GL_MAP_READ_BIT>;
 
@@ -441,7 +493,7 @@ class buffer : public id_holder<GLuint> {
   [[nodiscard]] auto begin() const { return const_iterator_t(this, 0); }
   [[nodiscard]] auto end() const { return const_iterator_t(this, m_size); }
 
-  [[nodiscard]] auto rmap() const { return rap_t(this, 0, m_size); }
+  [[nodiscard]] auto rmap() const { return rmap_t(this, 0, m_size); }
   [[nodiscard]] auto wmap() { return wmap_t(this, 0, m_size); }
   [[nodiscard]] auto rwmap() { return rwmap_t(this, 0, m_size); }
 

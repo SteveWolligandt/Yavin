@@ -75,7 +75,7 @@ class vertexbuffer
     for (unsigned int i = 0; i < num_attributes; i++) {
       gl::enable_vertex_attrib_array(i);
       gl::vertex_attrib_pointer(i, num_components[i], types[i], GL_FALSE,
-                                this_t::data_size, (void*)offsets[i]);
+                                data_size, (void*)offsets[i]);
     }
   }
   //----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ class vertexbuffer
         [&](auto i, auto normalized) {
           gl::enable_vertex_attrib_array(i);
           gl::vertex_attrib_pointer(i, num_components[i], types[i], normalized,
-                                    this_t::data_size, (void*)offsets[i]);
+                                    data_size, (void*)offsets[i]);
         }(Is, normalized),
         ...);
   }
