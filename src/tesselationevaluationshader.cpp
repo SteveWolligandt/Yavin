@@ -1,19 +1,23 @@
-#include <yavin/tesselationevaluationshader.h>
-
 #include <yavin/glincludes.h>
-
+#include <yavin/tesselationevaluationshader.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 tesselationevaluationshader::tesselationevaluationshader(
-    const std::string& filepath)
-    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath) {}
-
+    std::string const& filepath, shadersourcetype string_type)
+    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath, string_type) {}
+//------------------------------------------------------------------------------
+tesselationevaluationshader::tesselationevaluationshader(
+    std::string_view const& filepath, shadersourcetype string_type)
+    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath, string_type) {}
+//------------------------------------------------------------------------------
+tesselationevaluationshader::tesselationevaluationshader(
+    char const* filepath, shadersourcetype string_type)
+    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath, string_type) {}
+//------------------------------------------------------------------------------
 tesselationevaluationshader::tesselationevaluationshader(
     tesselationevaluationshader&& other)
     : shaderstage(std::move(other)) {}
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

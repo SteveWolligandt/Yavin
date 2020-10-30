@@ -1,24 +1,24 @@
-#ifndef __YAVIN_COMPUTESHADER_H__
-#define __YAVIN_COMPUTESHADER_H__
-
+#ifndef YAVIN_COMPUTESHADER_H
+#define YAVIN_COMPUTESHADER_H
+//==============================================================================
 #include <string>
 
 #include "shaderstage.h"
 #include "dllexport.h"
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
 class computeshader : public shaderstage {
  public:
-  DLL_API computeshader(const std::string& filename,
+  DLL_API computeshader(std::string const& filename,
+                        shadersourcetype string_type = shadersourcetype::FILE);
+  DLL_API computeshader(std::string_view const& filename,
+                        shadersourcetype string_type = shadersourcetype::FILE);
+  DLL_API computeshader(char const*      filename,
                         shadersourcetype string_type = shadersourcetype::FILE);
   DLL_API computeshader(computeshader&& other);
 };
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

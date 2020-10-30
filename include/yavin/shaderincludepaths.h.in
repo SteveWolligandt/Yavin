@@ -1,16 +1,13 @@
-#ifndef __YAVIN_SHADER_INCLUDE_PATHS_H__
-#define __YAVIN_SHADER_INCLUDE_PATHS_H__
-
+#ifndef YAVIN_SHADER_INCLUDE_PATHS_H
+#define YAVIN_SHADER_INCLUDE_PATHS_H
+//==============================================================================
 #include <string>
 #include <vector>
-
 //==============================================================================
 namespace yavin {
 //==============================================================================
-
-static const std::string        shader_dir = "@CMAKE_SOURCE_DIR@/shaders/";
-static std::vector<std::string> shader_include_paths{shader_dir};
-
+static const std::string_view   shader_dir = "@CMAKE_SOURCE_DIR@/shaders/";
+static std::vector<std::string> shader_include_paths{std::string{shader_dir}};
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

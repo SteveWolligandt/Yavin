@@ -1,26 +1,37 @@
-#include <memory>
-
 #include <yavin/ansiformat.h>
 #include <yavin/glfunctions.h>
 #include <yavin/shaderincludepaths.h>
 #include <yavin/shaderstage.h>
 
+#include <memory>
 //==============================================================================
 namespace yavin {
 //==============================================================================
-const std::regex shaderstage::regex_nvidia_compiler_error(
+std::regex const shaderstage::regex_nvidia_compiler_error(
     R"(\d+\((\d+)\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
 //------------------------------------------------------------------------------
-const std::regex shaderstage::regex_mesa_compiler_error(
+std::regex const shaderstage::regex_mesa_compiler_error(
     R"(\d+:(\d+)\(\d+\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
 //==============================================================================
 shaderstage::shaderstage(GLenum             shader_type,
-                         const std::string &filename_or_source,
+                         std::string const &filename_or_source,
+                         shadersourcetype   string_type)
+    : m_shader_type(shader_type),
+      m_string_type(string_type),
+      m_filename_or_source(filename_or_source) {}
+//------------------------------------------------------------------------------
+shaderstage::shaderstage(GLenum                  shader_type,
+                         std::string_view const &filename_or_source,
+                         shadersourcetype        string_type)
+    : m_shader_type(shader_type),
+      m_string_type(string_type),
+      m_filename_or_source(filename_or_source) {}
+//------------------------------------------------------------------------------
+shaderstage::shaderstage(GLenum shader_type, char const *filename_or_source,
                          shadersourcetype string_type)
     : m_shader_type(shader_type),
       m_string_type(string_type),
-      m_filename_or_source(filename_or_source),
-      m_include_tree{-1, 0, "", {}, nullptr} {}
+      m_filename_or_source(filename_or_source) {}
 //------------------------------------------------------------------------------
 shaderstage::shaderstage(shaderstage &&other)
     : m_id(other.m_id),
@@ -38,20 +49,27 @@ shaderstage::~shaderstage() {
 //------------------------------------------------------------------------------
 std::string shaderstage::type_to_string(GLenum shader_type) {
   switch (shader_type) {
-    case GL_VERTEX_SHADER: return "Vertex";
-    case GL_FRAGMENT_SHADER: return "Fragment";
-    case GL_GEOMETRY_SHADER: return "Geometry";
-    case GL_TESS_EVALUATION_SHADER: return "Tesselation Evaluation";
-    case GL_TESS_CONTROL_SHADER: return "Tesselation Control";
-    case GL_COMPUTE_SHADER: return "Compute";
-    default: return "unknown";
+    case GL_VERTEX_SHADER:
+      return "Vertex";
+    case GL_FRAGMENT_SHADER:
+      return "Fragment";
+    case GL_GEOMETRY_SHADER:
+      return "Geometry";
+    case GL_TESS_EVALUATION_SHADER:
+      return "Tesselation Evaluation";
+    case GL_TESS_CONTROL_SHADER:
+      return "Tesselation Control";
+    case GL_COMPUTE_SHADER:
+      return "Compute";
+    default:
+      return "unknown";
   }
 }
 //------------------------------------------------------------------------------
 void shaderstage::compile(bool use_ansi_color) {
   delete_stage();
-  m_id           = gl::create_shader(m_shader_type);
-  auto source    = shaderstageparser::parse(m_filename_or_source, m_glsl_vars,
+  m_id          = gl::create_shader(m_shader_type);
+  auto source   = shaderstageparser::parse(m_filename_or_source, m_glsl_vars,
                                          m_include_tree, m_string_type);
   auto source_c = source.c_str();
   gl::shader_source(m_id, 1, &source_c, nullptr);
@@ -95,45 +113,51 @@ void shaderstage::info_log(bool use_ansi_color) {
 //------------------------------------------------------------------------------
 void shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
                                       bool use_ansi_color) {
-  const size_t line_number = stoul(match.str(1));
-  const auto [include_tree_ptr, error_line] =
+  size_t const line_number = stoul(match.str(1));
+  auto [include_tree, error_line] =
       m_include_tree.parse_line(line_number - 1);
 
   // print file and include hierarchy
-  if (use_ansi_color) { os << ansi::red << ansi::bold; }
+  if (use_ansi_color) {
+    os << ansi::red << ansi::bold;
+  }
   os << "[GLSL " << stage_name() << " Shader " << match.str(2) << "]\n";
-  if (use_ansi_color) { os << ansi::reset; }
+  if (use_ansi_color) {
+    os << ansi::reset;
+  }
 
   os << "in file ";
   if (use_ansi_color) os << ansi::cyan << ansi::bold;
-  os << include_tree_ptr->filename << ":";
+  os << include_tree.path() << ":";
 
   if (use_ansi_color) os << ansi::yellow << ansi::bold;
   os << error_line + 1;
   if (use_ansi_color) os << ansi::reset;
   os << ": " << match.str(3) << '\n';
 
-  auto hierarchy = include_tree_ptr;
-  while (hierarchy->parent) {
+  auto const* hierarchy = &include_tree;
+  while (hierarchy->has_parent()) {
     os << "    included from ";
     if (use_ansi_color) os << ansi::bold;
-    os << hierarchy->parent->filename;
+    os << hierarchy->parent().path();
 
     if (use_ansi_color) os << ansi::reset;
     os << ":";
     if (use_ansi_color) os << ansi::bold;
-    os << hierarchy->line_number << '\n';
+    os << hierarchy->line_number() << '\n';
     if (use_ansi_color) os << ansi::reset;
-    hierarchy = hierarchy->parent;
+    hierarchy = &hierarchy->parent();
   }
 
-  print_line(include_tree_ptr->filename, error_line, os);
+  print_line(include_tree.path(), error_line, os);
 }
 //------------------------------------------------------------------------------
-void shaderstage::print_line(const std::string &filename, size_t line_number,
-                             std::ostream &os) {
-  std::ifstream file(filename);
-  if (!file.is_open()) file.open(shader_dir + filename);
+void shaderstage::print_line(std::filesystem::path const &path,
+                             size_t line_number, std::ostream &os) {
+  std::ifstream file{path};
+  if (!file.is_open()) {
+    file.open(std::string{shader_dir} + path.string());
+  }
 
   if (file.is_open()) {
     std::string line;
@@ -142,7 +166,8 @@ void shaderstage::print_line(const std::string &filename, size_t line_number,
       if (line_cnt == line_number) {
         os << "  " << line << "\n  ";
         os << ansi::bold;
-        for (size_t i = 0; i < line.size(); ++i) os << '~';
+        for (size_t i = 0; i < line.size(); ++i)
+          os << '~';
         os << ansi::reset;
         break;
       }
