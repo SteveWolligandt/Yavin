@@ -455,6 +455,7 @@ class buffer : public id_holder<GLuint> {
 
   void copy(const this_t& other);
 
+  [[nodiscard]] auto empty() const -> bool { return m_size == 0; }
   [[nodiscard]] auto size() const { return m_size; }
   [[nodiscard]] auto capacity() const { return m_capacity; }
 
