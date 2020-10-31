@@ -171,11 +171,11 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
     glBufferData(GL_ARRAY_BUFFER,
                  (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert),
                  (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
-    gl_error_check("glBufferData");
+    gl_error_check("IMGUI glBufferData");
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
                  (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
-    gl_error_check("glBufferData");
+    gl_error_check("IMGUI glBufferData");
 
     for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
       const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
@@ -202,17 +202,17 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
             glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w),
                       (int)(clip_rect.z - clip_rect.x),
                       (int)(clip_rect.w - clip_rect.y));
-            gl_error_check("glScissor");
+            gl_error_check("IMGUI glScissor");
           } else {
             glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z,
                       (int)clip_rect.w);  // Support for GL 4.5 rarely used
                                           // glClipControl(GL_UPPER_LEFT)
-            gl_error_check("glScissor");
+            gl_error_check("IMGUI glScissor");
           }
 
           // Bind texture, Draw
           glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-          gl_error_check("glBindTexture");
+          gl_error_check("IMGUI glBindTexture");
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET
           if (m_gl_version >= 3200) {
             glDrawElementsBaseVertex(
@@ -220,7 +220,7 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
                 sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
                 (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)),
                 (GLint)pcmd->VtxOffset);
-            gl_error_check("glDrawElementsBaseVertex");
+            gl_error_check("IMGUI glDrawElementsBaseVertex");
           } else {
 #else
           {
@@ -229,7 +229,7 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
                 GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
                 sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
                 (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
-            gl_error_check("glDrawElements");
+            gl_error_check("IMGUI glDrawElements");
           }
         }
       }
@@ -238,64 +238,64 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
 
   // Restore modified GL state
   glUseProgram(last_program);
-  gl_error_check("glUseProgram");
+  gl_error_check("IMGUI glUseProgram");
   glBindTexture(GL_TEXTURE_2D, last_texture);
-  gl_error_check("glBindTexture");
+  gl_error_check("IMGUI glBindTexture");
 #ifdef GL_SAMPLER_BINDING
   glBindSampler(0, last_sampler);
-  gl_error_check("glBindSampler");
+  gl_error_check("IMGUI glBindSampler");
 #endif
   glActiveTexture(last_active_texture);
-  gl_error_check("glActiveTexture");
+  gl_error_check("IMGUI glActiveTexture");
 #ifndef IMGUI_IMPL_OPENGL_ES2
   glBindVertexArray(last_vertex_array_object);
-  gl_error_check("glVertexArray");
+  gl_error_check("IMGUI glVertexArray");
 #endif
   glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
-  gl_error_check("glBindBuffer");
+  gl_error_check("IMGUI glBindBuffer");
   glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
-  gl_error_check("glEquationSeparate");
+  gl_error_check("IMGUI glEquationSeparate");
   glBlendFuncSeparate(last_blend_src_rgb, last_blend_dst_rgb,
                       last_blend_src_alpha, last_blend_dst_alpha);
-  gl_error_check("glBlendFuncSeparate");
+  gl_error_check("IMGUI glBlendFuncSeparate");
   if (last_enable_blend) {
     glEnable(GL_BLEND);
-    gl_error_check("glEnable");
+    gl_error_check("IMGUI glEnable");
   } else {
     glDisable(GL_BLEND);
-    gl_error_check("glDisable");
+    gl_error_check("IMGUI glDisable");
   }
   if (last_enable_cull_face) {
     glEnable(GL_CULL_FACE);
-    gl_error_check("glEnable");
+    gl_error_check("IMGUI glEnable");
   } else {
     glDisable(GL_CULL_FACE);
-    gl_error_check("glDisable");
+    gl_error_check("IMGUI glDisable");
   }
   if (last_enable_depth_test) {
     glEnable(GL_DEPTH_TEST);
-    gl_error_check("glEnable");
+    gl_error_check("IMGUI glEnable");
   } else {
     glDisable(GL_DEPTH_TEST);
-    gl_error_check("glDisable");
+    gl_error_check("IMGUI glDisable");
   }
   if (last_enable_scissor_test) {
     glEnable(GL_SCISSOR_TEST);
-    gl_error_check("glEnable");
+    gl_error_check("IMGUI glEnable");
   } else {
     glDisable(GL_SCISSOR_TEST);
-    gl_error_check("glDisable");
+    gl_error_check("IMGUI glDisable");
   }
 #ifdef GL_POLYGON_MODE
   glPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
-  gl_error_check("glPolygonMode");
+  gl_error_check("IMGUI glPolygonMode");
 #endif
   glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2],
              (GLsizei)last_viewport[3]);
-  gl_error_check("glViewport");
+  gl_error_check("IMGUI glViewport");
   glScissor(last_scissor_box[0], last_scissor_box[1],
             (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
-  gl_error_check("glScissor");
+  gl_error_check("IMGUI glScissor");
 }
 //------------------------------------------------------------------------------
 bool imgui_render_backend::create_fonts_texture() {

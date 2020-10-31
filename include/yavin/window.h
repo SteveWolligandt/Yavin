@@ -80,6 +80,7 @@ class window : public window_notifier, public window_listener {
 
     m_async_tasks.back() = std::thread{[win = this, it, g = f] {
       auto ctx = win->create_shared_context();
+      ctx.make_current();
       g();
       std::lock_guard lock{win->m_async_tasks_mutex};
       win->m_joinable_async_tasks.push_back(it);

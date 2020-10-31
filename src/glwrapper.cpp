@@ -192,6 +192,11 @@ GLint current_program() {
   glGetIntegerv(GL_CURRENT_PROGRAM, &p);
   return p;
 }
+GLint texture_binding_2d() {
+  GLint p;
+  glGetIntegerv(GL_CURRENT_PROGRAM, &p);
+  return p;
+}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

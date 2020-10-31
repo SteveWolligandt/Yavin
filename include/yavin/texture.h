@@ -1,16 +1,16 @@
 #ifndef YAVIN_TEXTURE_H
 #define YAVIN_TEXTURE_H
 
-#include "errorcheck.h"
-#include "glfunctions.h"
-#include "idholder.h"
-#include "pixelunpackbuffer.h"
-#include "texcomponents.h"
+#include <yavin/errorcheck.h>
+#include <yavin/glfunctions.h>
+#include <yavin/idholder.h>
+#include <yavin/pixelunpackbuffer.h>
+#include <yavin/texcomponents.h>
 #include <yavin/texpng.h>
-#include "texsettings.h"
-#include "textarget.h"
-#include "type.h"
-#include "glwrapper.h"
+#include <yavin/texsettings.h>
+#include <yavin/textarget.h>
+#include <yavin/type.h>
+#include <yavin/glwrapper.h>
 
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
@@ -119,6 +119,11 @@ class texture : public id_holder<GLuint> {
   }
   //----------------------------------------------------------------------------
   ~texture() {
+    if constexpr (D==2) {
+      if ((GLuint)texture_binding_2d() == id()) {
+        unbind();
+      }
+    }
     if (id()) { gl::delete_textures(1, &id_ref()); }
   }
   //----------------------------------------------------------------------------
