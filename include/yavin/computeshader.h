@@ -10,12 +10,8 @@ namespace yavin {
 //==============================================================================
 class computeshader : public shaderstage {
  public:
-  DLL_API computeshader(std::string const& filename,
-                        shadersourcetype string_type = shadersourcetype::FILE);
-  DLL_API computeshader(std::string_view const& filename,
-                        shadersourcetype string_type = shadersourcetype::FILE);
-  DLL_API computeshader(char const*      filename,
-                        shadersourcetype string_type = shadersourcetype::FILE);
+  DLL_API computeshader(std::filesystem::path const& sourcepath);
+  DLL_API computeshader(shadersource const& sourcepath);
   DLL_API computeshader(computeshader&& other);
 };
 //==============================================================================

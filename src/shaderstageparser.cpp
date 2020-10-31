@@ -10,19 +10,9 @@ std::regex const shaderstageparser::regex_var{
 //------------------------------------------------------------------------------
 std::regex const shaderstageparser::regex_include{R"(#include\s+\"(.*)\")"};
 //==============================================================================
-std::string shaderstageparser::parse(std::string const&    filename_or_source,
-                                     std::vector<GLSLVar>& vars,
-                                     include_tree&         it,
-                                     shadersourcetype      string_type) {
-  if (string_type == FILE) {
-    return parse_file(filename_or_source, vars, it);
-  }
-  return parse_source(filename_or_source, vars, it);
-}
-//------------------------------------------------------------------------------
-std::string shaderstageparser::parse_file(std::filesystem::path const& path,
-                                          std::vector<GLSLVar>&        vars,
-                                          include_tree&                it) {
+auto shaderstageparser::parse(std::filesystem::path const& path,
+                              std::vector<GLSLVar>& vars, include_tree& it)
+    -> shadersource {
   it.path()            = path;
   auto          folder = path.parent_path();
   std::ifstream file{path};
@@ -41,16 +31,16 @@ std::string shaderstageparser::parse_file(std::filesystem::path const& path,
   return content;
 }
 //------------------------------------------------------------------------------
-std::string shaderstageparser::parse_source(std::string const&    source,
-                                            std::vector<GLSLVar>& vars,
-                                            include_tree&         it) {
+auto shaderstageparser::parse(shadersource const&   source,
+                              std::vector<GLSLVar>& vars, include_tree& it)
+    -> shadersource {
   it.path() = "from string";
-  std::stringstream stream(source);
+  std::stringstream stream(source.string());
   return parse_stream(stream, vars, it);
 }
 //------------------------------------------------------------------------------
-std::optional<GLSLVar> shaderstageparser::parse_varname(
-    std::string const& line) {
+auto shaderstageparser::parse_varname(std::string const& line)
+    -> std::optional<GLSLVar> {
   std::smatch match;
   std::regex_match(line, match, regex_var);
   if (!match.str(4).empty()) {
@@ -70,8 +60,8 @@ std::optional<GLSLVar> shaderstageparser::parse_varname(
   return {};
 }
 //------------------------------------------------------------------------------
-std::optional<std::string> shaderstageparser::parse_include(
-    std::string const& line) {
+auto shaderstageparser::parse_include(std::string const& line)
+    -> std::optional<std::string> {
   std::smatch match;
 
   std::regex_match(line, match, regex_include);

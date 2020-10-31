@@ -4,16 +4,12 @@
 namespace yavin {
 //==============================================================================
 tesselationevaluationshader::tesselationevaluationshader(
-    std::string const& filepath, shadersourcetype string_type)
-    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath, string_type) {}
+    std::filesystem::path const& sourcepath)
+    : shaderstage{GL_TESS_EVALUATION_SHADER, sourcepath} {}
 //------------------------------------------------------------------------------
 tesselationevaluationshader::tesselationevaluationshader(
-    std::string_view const& filepath, shadersourcetype string_type)
-    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath, string_type) {}
-//------------------------------------------------------------------------------
-tesselationevaluationshader::tesselationevaluationshader(
-    char const* filepath, shadersourcetype string_type)
-    : shaderstage(GL_TESS_EVALUATION_SHADER, filepath, string_type) {}
+    shadersource const& source)
+    : shaderstage{GL_TESS_EVALUATION_SHADER, source} {}
 //------------------------------------------------------------------------------
 tesselationevaluationshader::tesselationevaluationshader(
     tesselationevaluationshader&& other)

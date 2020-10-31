@@ -27,8 +27,8 @@ const std::string_view imgui_shader::frag_source =
     "}";
 //==============================================================================
 imgui_shader::imgui_shader() {
-  add_stage<vertexshader>(vert_source.data(), SOURCE);
-  add_stage<fragmentshader>(frag_source.data(), SOURCE);
+  add_stage<vertexshader>(shadersource{vert_source});
+  add_stage<fragmentshader>(shadersource{frag_source});
   create();
 }
 //------------------------------------------------------------------------------

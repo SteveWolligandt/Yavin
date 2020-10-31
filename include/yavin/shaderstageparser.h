@@ -7,36 +7,37 @@
 #include <optional>
 #include <regex>
 
-#include "dllexport.h"
-#include "glslvar.h"
-#include "includetree.h"
+#include <yavin/dllexport.h>
+#include <yavin/glslvar.h>
+#include <yavin/includetree.h>
+#include <yavin/shadersource.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
-enum shadersourcetype { FILE, SOURCE };
 class shaderstageparser {
+ private:
+  static std::regex const regex_var;
+  static std::regex const regex_include;
  public:
-  DLL_API static std::string parse(std::string const&    filename_or_source,
-                                   std::vector<GLSLVar>& vars, include_tree& it,
-                                   shadersourcetype string_type = FILE);
-  DLL_API static std::string parse_file(
-      std::filesystem::path const& filename_or_source,
-      std::vector<GLSLVar>& vars, include_tree& it);
-  DLL_API static std::string parse_source(std::string const& filename_or_source,
-                                          std::vector<GLSLVar>& vars,
-                                          include_tree&         it);
-
-  DLL_API static std::optional<GLSLVar> parse_varname(std::string const& line);
-  DLL_API static std::optional<std::string> parse_include(
-      std::string const& line);
+  //------------------------------------------------------------------------------
+  DLL_API static auto parse(std::filesystem::path const& path,
+                            std::vector<GLSLVar>& vars, include_tree& it)
+      -> shadersource;
+  DLL_API static auto parse(shadersource const&   source,
+                            std::vector<GLSLVar>& vars, include_tree& it)
+      -> shadersource;
+  DLL_API static auto parse_varname(std::string const& line)
+      -> std::optional<GLSLVar>;
+  DLL_API static auto parse_include(std::string const& line)
+      -> std::optional<std::string>;
 
  private:
   template <typename Stream>
-  static std::string parse_stream(Stream& stream, std::vector<GLSLVar>& vars,
-                                  include_tree&      it,
-                                  std::string const& folder = "") {
+  static auto parse_stream(Stream& stream, std::vector<GLSLVar>& vars,
+                           include_tree& it, std::string const& folder = "")
+      -> shadersource {
     std::string line;
-    std::string content;
+    shadersource content;
 
     int line_number = 0;
 
@@ -47,10 +48,10 @@ class shaderstageparser {
       if (auto parsed_include = parse_include(line); parsed_include) {
         it.nested_include_trees().emplace_back(line_number, 0,
                                                parsed_include.value(), it);
-        content += parse_file(folder + parsed_include.value(), vars,
-                              it.nested_include_trees().back());
+        content.string() += parse(folder + parsed_include.value(), vars,
+                         it.nested_include_trees().back()).string();
       } else
-        content += line + '\n';
+        content.string() += line + '\n';
 
       ++line_number;
     }
@@ -58,13 +59,8 @@ class shaderstageparser {
 
     return content;
   }
-
-  static std::regex const regex_var;
-  static std::regex const regex_include;
 };
-
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-
 #endif

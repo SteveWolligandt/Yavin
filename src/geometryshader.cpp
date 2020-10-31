@@ -4,17 +4,11 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-geometryshader::geometryshader(std::string const& filepath,
-                           shadersourcetype         string_type)
-    : shaderstage{GL_GEOMETRY_SHADER, filepath, string_type} {}
+geometryshader::geometryshader(std::filesystem::path const& sourcepath)
+    : shaderstage{GL_GEOMETRY_SHADER, sourcepath} {}
 //------------------------------------------------------------------------------
-geometryshader::geometryshader(std::string_view const& filepath,
-                           shadersourcetype         string_type)
-    : shaderstage{GL_GEOMETRY_SHADER, filepath, string_type} {}
-//------------------------------------------------------------------------------
-geometryshader::geometryshader(char const*      filepath,
-                               shadersourcetype string_type)
-    : shaderstage{GL_GEOMETRY_SHADER, filepath, string_type} {}
+geometryshader::geometryshader(shadersource const& source)
+    : shaderstage{GL_GEOMETRY_SHADER, source} {}
 //------------------------------------------------------------------------------
 geometryshader::geometryshader(geometryshader&& other)
     : shaderstage{std::move(other)} {}

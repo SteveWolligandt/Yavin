@@ -10,15 +10,8 @@ namespace yavin {
 //==============================================================================
 class tesselationevaluationshader : public shaderstage {
  public:
-  DLL_API tesselationevaluationshader(
-      std::string const& filename,
-      shadersourcetype   string_type = shadersourcetype::FILE);
-  DLL_API tesselationevaluationshader(
-      std::string_view const& filename,
-      shadersourcetype        string_type = shadersourcetype::FILE);
-  DLL_API tesselationevaluationshader(
-      char const*      filename,
-      shadersourcetype string_type = shadersourcetype::FILE);
+  DLL_API tesselationevaluationshader(std::filesystem::path const& sourcepath);
+  DLL_API tesselationevaluationshader(shadersource const& sourcepath);
   DLL_API tesselationevaluationshader(tesselationevaluationshader&& other);
 };
 //==============================================================================

@@ -13,41 +13,30 @@ std::regex const shaderstage::regex_nvidia_compiler_error(
 std::regex const shaderstage::regex_mesa_compiler_error(
     R"(\d+:(\d+)\(\d+\)\s*:\s*(error|warning)\s*\w*:\s*(.*))");
 //==============================================================================
-shaderstage::shaderstage(GLenum             shader_type,
-                         std::string const &filename_or_source,
-                         shadersourcetype   string_type)
-    : m_shader_type(shader_type),
-      m_string_type(string_type),
-      m_filename_or_source(filename_or_source) {}
+shaderstage::shaderstage(GLenum              shader_type,
+                         shadersource const &source)
+    : m_shader_type{shader_type}, m_source{source} {}
 //------------------------------------------------------------------------------
-shaderstage::shaderstage(GLenum                  shader_type,
-                         std::string_view const &filename_or_source,
-                         shadersourcetype        string_type)
-    : m_shader_type(shader_type),
-      m_string_type(string_type),
-      m_filename_or_source(filename_or_source) {}
-//------------------------------------------------------------------------------
-shaderstage::shaderstage(GLenum shader_type, char const *filename_or_source,
-                         shadersourcetype string_type)
-    : m_shader_type(shader_type),
-      m_string_type(string_type),
-      m_filename_or_source(filename_or_source) {}
+shaderstage::shaderstage(GLenum shader_type, std::filesystem::path const& sourcepath)
+    : m_shader_type{shader_type},
+      m_source{sourcepath} {}
 //------------------------------------------------------------------------------
 shaderstage::shaderstage(shaderstage &&other)
-    : m_id(other.m_id),
-      m_shader_type(other.m_shader_type),
-      m_string_type(other.m_string_type),
-      m_filename_or_source(std::move(other.m_filename_or_source)),
-      m_glsl_vars(std::move(other.m_glsl_vars)),
-      m_include_tree(std::move(other.m_include_tree)) {
+    : id_holder<GLuint>{std::move(other)},
+      m_shader_type{other.m_shader_type},
+      m_source{std::move(other.m_source)},
+      m_glsl_vars{std::move(other.m_glsl_vars)},
+      m_include_tree{std::move(other.m_include_tree)} {
   other.m_delete = false;
 }
 //------------------------------------------------------------------------------
 shaderstage::~shaderstage() {
-  if (m_delete) delete_stage();
+  if (m_delete) {
+    delete_stage();
+  }
 }
 //------------------------------------------------------------------------------
-std::string shaderstage::type_to_string(GLenum shader_type) {
+auto shaderstage::type_to_string(GLenum shader_type) -> std::string {
   switch (shader_type) {
     case GL_VERTEX_SHADER:
       return "Vertex";
@@ -66,26 +55,35 @@ std::string shaderstage::type_to_string(GLenum shader_type) {
   }
 }
 //------------------------------------------------------------------------------
-void shaderstage::compile(bool use_ansi_color) {
+auto shaderstage::compile(bool use_ansi_color) -> void {
   delete_stage();
-  m_id          = gl::create_shader(m_shader_type);
-  auto source   = shaderstageparser::parse(m_filename_or_source, m_glsl_vars,
-                                         m_include_tree, m_string_type);
-  auto source_c = source.c_str();
-  gl::shader_source(m_id, 1, &source_c, nullptr);
-  gl::compile_shader(m_id);
+  set_id(gl::create_shader(m_shader_type));
+  auto source = [this] {
+    try{
+      return shaderstageparser::parse(std::get<std::filesystem::path>(m_source),
+                                      m_glsl_vars, m_include_tree);
+    } catch (std::bad_variant_access &) {}
+    try {
+      return shaderstageparser::parse(std::get<shadersource>(m_source),
+                                      m_glsl_vars, m_include_tree);
+    } catch (std::bad_variant_access &) {}
+    return shadersource{};
+  }();
+  auto source_c = source.string().c_str();
+  gl::shader_source(id(), 1, &source_c, nullptr);
+  gl::compile_shader(id());
   info_log(use_ansi_color);
 }
 //------------------------------------------------------------------------------
-void shaderstage::delete_stage() {
-  if (m_id) gl::delete_shader(m_id);
-  m_id = 0;
+auto shaderstage::delete_stage() -> void {
+  if (id()) gl::delete_shader(id());
+  set_id(0);
 }
 //------------------------------------------------------------------------------
-void shaderstage::info_log(bool use_ansi_color) {
-  auto info_log_length = gl::get_shader_info_log_length(m_id);
+auto shaderstage::info_log(bool use_ansi_color) -> void {
+  auto info_log_length = gl::get_shader_info_log_length(id());
   if (info_log_length > 0) {
-    auto info_log = gl::get_shader_info_log(m_id, info_log_length);
+    auto info_log = gl::get_shader_info_log(id(), info_log_length);
     std::istringstream is(info_log);
     std::ostringstream os;
 
@@ -111,11 +109,10 @@ void shaderstage::info_log(bool use_ansi_color) {
   }
 }
 //------------------------------------------------------------------------------
-void shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
-                                      bool use_ansi_color) {
-  size_t const line_number = stoul(match.str(1));
-  auto [include_tree, error_line] =
-      m_include_tree.parse_line(line_number - 1);
+auto shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
+                                      bool use_ansi_color) -> void {
+  size_t const line_number        = stoul(match.str(1));
+  auto [include_tree, error_line] = m_include_tree.parse_line(line_number - 1);
 
   // print file and include hierarchy
   if (use_ansi_color) {
@@ -135,7 +132,7 @@ void shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
   if (use_ansi_color) os << ansi::reset;
   os << ": " << match.str(3) << '\n';
 
-  auto const* hierarchy = &include_tree;
+  auto const *hierarchy = &include_tree;
   while (hierarchy->has_parent()) {
     os << "    included from ";
     if (use_ansi_color) os << ansi::bold;
@@ -152,8 +149,8 @@ void shaderstage::parse_compile_error(std::smatch &match, std::ostream &os,
   print_line(include_tree.path(), error_line, os);
 }
 //------------------------------------------------------------------------------
-void shaderstage::print_line(std::filesystem::path const &path,
-                             size_t line_number, std::ostream &os) {
+auto shaderstage::print_line(std::filesystem::path const &path,
+                             size_t line_number, std::ostream &os) -> void {
   std::ifstream file{path};
   if (!file.is_open()) {
     file.open(std::string{shader_dir} + path.string());

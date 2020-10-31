@@ -3,16 +3,11 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-computeshader::computeshader(std::string const& filepath,
-                             shadersourcetype   string_type)
-    : shaderstage(GL_COMPUTE_SHADER, filepath, string_type) {}
+computeshader::computeshader(std::filesystem::path const& sourcepath)
+    : shaderstage{GL_COMPUTE_SHADER, sourcepath} {}
 //------------------------------------------------------------------------------
-computeshader::computeshader(std::string_view const& filepath,
-                             shadersourcetype        string_type)
-    : shaderstage(GL_COMPUTE_SHADER, filepath, string_type) {}
-//------------------------------------------------------------------------------
-computeshader::computeshader(char const* filepath, shadersourcetype string_type)
-    : shaderstage(GL_COMPUTE_SHADER, filepath, string_type) {}
+computeshader::computeshader(shadersource const& source)
+    : shaderstage{GL_COMPUTE_SHADER, source} {}
 //------------------------------------------------------------------------------
 computeshader::computeshader(computeshader&& other)
     : shaderstage(std::move(other)) {}

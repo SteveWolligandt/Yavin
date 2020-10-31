@@ -10,12 +10,8 @@ namespace yavin {
 //==============================================================================
 class geometryshader : public shaderstage {
  public:
-  DLL_API geometryshader(std::string const& filename,
-                         shadersourcetype   string_type = FILE);
-  DLL_API geometryshader(std::string_view const& filename,
-                         shadersourcetype        string_type = FILE);
-  DLL_API geometryshader(char const*      filename,
-                         shadersourcetype string_type = FILE);
+  DLL_API geometryshader(std::filesystem::path const& sourcepath);
+  DLL_API geometryshader(shadersource const& sourcepath);
   DLL_API geometryshader(geometryshader&& other);
 };
 //==============================================================================

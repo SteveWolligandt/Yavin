@@ -65,7 +65,7 @@ struct include_tree {
         m_parent{&parent} {}
   //----------------------------------------------------------------------------
   /// returns file and line number
-  std::pair<include_tree const&, size_t> parse_line(size_t n) const {
+  auto parse_line(size_t n) const -> std::pair<include_tree const&, size_t> {
     size_t cur_offset = 0;
     for (auto const& nesting : m_nested_include_trees) {
       if (n >= nesting.m_line_number + cur_offset &&
@@ -78,7 +78,7 @@ struct include_tree {
     return {*this, n - cur_offset};
   }
   //----------------------------------------------------------------------------
-  size_t num_lines_with_includes() const {
+  auto num_lines_with_includes() const -> size_t {
     size_t n = m_num_lines;
     n -= m_nested_include_trees.size();
     for (auto const& nesting : m_nested_include_trees)
@@ -86,7 +86,7 @@ struct include_tree {
     return n;
   }
   //----------------------------------------------------------------------------
-  void print(size_t indent = 0) const {
+  auto print(size_t indent = 0) const -> void {
     for (size_t i = 0; i < indent; ++i) {
       std::cerr << ' ';
     }
