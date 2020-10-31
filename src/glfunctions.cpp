@@ -301,11 +301,13 @@ void gl::draw_arrays(GLenum mode, GLint first, GLsizei count) {
 //==============================================================================
 // VERTEXARRAY RELATED
 //==============================================================================
-void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
-  glCreateVertexArrays(n, arrays);
+void gl::create_vertex_arrays(GLsizei n, GLuint* arr) {
+  glCreateVertexArrays(n, arr);
   if (verbose) {
-    *out << "glCreateVertexArrays(" << n << ", " << arrays << ") = [ ";
-    for (GLsizei i = 0; i < n; ++i) *out << arrays[i] << ' ';
+    *out << "glCreateVertexArrays = [" << arr[0];
+    for (GLsizei i = 1; i < n; ++i) {
+      *out << ", " << arr[i];
+    }
     *out << "]\n";
   }
   gl_error_check("glCreateVertexArrays");
@@ -314,8 +316,10 @@ void gl::create_vertex_arrays(GLsizei n, GLuint* arrays) {
 //------------------------------------------------------------------------------
 void gl::delete_vertex_arrays(GLsizei n, GLuint* ids) {
   if (verbose) {
-    *out << "glDeleteVertexArrays[ ";
-    for (GLsizei i = 0; i < n; ++i) *out << ids[i] << ' ';
+    *out << "glDeleteVertexArrays[" << ids[0];
+    for (GLsizei i = 1; i < n; ++i) {
+      *out << ", " << ids[i];
+    }
     *out << "]\n";
   }
   glDeleteVertexArrays(n, ids);

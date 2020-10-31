@@ -156,9 +156,6 @@ void window::on_resize(int w, int h) {
   imgui_api_backend::instance().on_resize(w, h);
   notify_resize(w, h);
 }
-void window::x_init_threads() {
-  XInitThreads();
-}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

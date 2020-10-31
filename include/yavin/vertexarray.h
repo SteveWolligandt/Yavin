@@ -2,24 +2,24 @@
 #define YAVIN_VERTEXARRAY_H
 //==============================================================================
 #include <iostream>
-#include "indexbuffer.h"
-#include "primitive.h"
-#include "type.h"
-#include "vertexbuffer.h"
-#include "dllexport.h"
-#include "glfunctions.h"
+#include <yavin/indexbuffer.h>
+#include <yavin/primitive.h>
+#include <yavin/type.h>
+#include <yavin/vertexbuffer.h>
+#include <yavin/dllexport.h>
+#include <yavin/glfunctions.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================
-class vertexarray {
+class vertexarray : public id_holder<GLuint> {
  public:
   using this_t = vertexarray;
 
   DLL_API vertexarray();
-  DLL_API vertexarray(const vertexarray& other) = delete;
-  DLL_API vertexarray(vertexarray&& other);
-  DLL_API vertexarray& operator=(const vertexarray& other) = delete;
-  DLL_API vertexarray& operator=(vertexarray&& other);
+  DLL_API vertexarray(vertexarray const& other) = delete;
+  DLL_API vertexarray(vertexarray&& other)      = default;
+  DLL_API vertexarray& operator=(vertexarray const& other) = delete;
+  DLL_API vertexarray& operator=(vertexarray&& other) = default;
   DLL_API ~vertexarray();
 
   DLL_API void destroy_handle();
@@ -38,9 +38,6 @@ class vertexarray {
   DLL_API void draw_triangle_strip_adjacency(size_t num_primitives) const;
   DLL_API void draw_triangles_adjacency(size_t num_primitives) const;
   DLL_API void draw_patches(size_t num_primitives) const;
-
- protected:
-  GLuint m_gl_handle;
 };
 //==============================================================================
 }  // namespace yavin

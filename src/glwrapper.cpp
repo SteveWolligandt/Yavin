@@ -186,7 +186,12 @@ GLint max_compute_image_uniforms() {
   gl::get_integer_v(GL_MAX_COMPUTE_IMAGE_UNIFORMS, &val);
   return val;
 }
-
+//==============================================================================
+GLint current_program() {
+  GLint p;
+  glGetIntegerv(GL_CURRENT_PROGRAM, &p);
+  return p;
+}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

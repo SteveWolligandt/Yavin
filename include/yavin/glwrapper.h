@@ -63,6 +63,8 @@ std::array<GLint, 3> max_compute_work_group_size();
 GLint                max_compute_work_group_invocations();
 GLint                max_compute_image_uniforms();
 //==============================================================================
+GLint current_program();
+//==============================================================================
 }  // namespace yavin
 //==============================================================================
 #endif

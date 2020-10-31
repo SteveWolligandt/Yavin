@@ -1,4 +1,5 @@
 #include <yavin/imgui_render_backend.h>
+
 #include <iostream>
 //==============================================================================
 namespace yavin {
@@ -29,11 +30,12 @@ imgui_render_backend::imgui_render_backend() {
             IM_ARRAYSIZE(m_glsl_version_string));
   strcpy(m_glsl_version_string, glsl_version);
   strcat(m_glsl_version_string, "\n");
-   create_device_objects();
+  create_device_objects();
 }
 //------------------------------------------------------------------------------
-void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_width,
-                                 int fb_height, vertexarray& vao) {
+void imgui_render_backend::setup_render_state(ImDrawData* draw_data,
+                                              int fb_width, int fb_height,
+                                              vertexarray& vao) {
   // Setup render state: alpha-blending enabled, no face culling, no depth
   // testing, scissor enabled, polygon fill
   glEnable(GL_BLEND);
@@ -51,15 +53,26 @@ void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_widt
   // draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos
   // is (0,0) for single viewport apps.
   glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-  float       L = draw_data->DisplayPos.x;
-  float       R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
-  float       T = draw_data->DisplayPos.y;
-  float       B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
-  const std::array<GLfloat, 16>  ortho_projection = 
-      {   2.0f / (R - L),              0.0f,  0.0f, 0.0f,
-                    0.0f,    2.0f / (T - B),  0.0f, 0.0f,
-                    0.0f,              0.0f, -1.0f, 0.0f,
-       (R + L) / (L - R), (T + B) / (B - T),  0.0f, 1.0f};
+  float L = draw_data->DisplayPos.x;
+  float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
+  float T = draw_data->DisplayPos.y;
+  float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
+  const std::array<GLfloat, 16> ortho_projection = {2.0f / (R - L),
+                                                    0.0f,
+                                                    0.0f,
+                                                    0.0f,
+                                                    0.0f,
+                                                    2.0f / (T - B),
+                                                    0.0f,
+                                                    0.0f,
+                                                    0.0f,
+                                                    0.0f,
+                                                    -1.0f,
+                                                    0.0f,
+                                                    (R + L) / (L - R),
+                                                    (T + B) / (B - T),
+                                                    0.0f,
+                                                    1.0f};
 
   m_shader.bind();
   m_shader.set_texture_slot(0);
@@ -68,7 +81,6 @@ void imgui_render_backend::setup_render_state(ImDrawData* draw_data, int fb_widt
   glBindSampler(0, 0);  // We use combined texture/sampler state. Applications
                         // using GL 3.3 may set that otherwise.
 #endif
-
 
   vao.bind();
   m_vbo.bind();
@@ -83,7 +95,9 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
       (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
   int fb_height =
       (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
-  if (fb_width <= 0 || fb_height <= 0) return;
+  if (fb_width <= 0 || fb_height <= 0) {
+    return;
+  }
 
   // Backup GL state
   GLenum last_active_texture;
@@ -157,9 +171,11 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
     glBufferData(GL_ARRAY_BUFFER,
                  (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert),
                  (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+    gl_error_check("glBufferData");
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
                  (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+    gl_error_check("glBufferData");
 
     for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
       const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
@@ -168,8 +184,7 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
         // (ImDrawCallback_ResetRenderState is a special callback value used
         // by the user to request the renderer to reset render state.)
         if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
-          setup_render_state(draw_data, fb_width, fb_height,
-                             vao);
+          setup_render_state(draw_data, fb_width, fb_height, vao);
         else
           pcmd->UserCallback(cmd_list, pcmd);
       } else {
@@ -183,30 +198,39 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
         if (clip_rect.x < fb_width && clip_rect.y < fb_height &&
             clip_rect.z >= 0.0f && clip_rect.w >= 0.0f) {
           // Apply scissor/clipping rectangle
-          if (clip_origin_lower_left)
+          if (clip_origin_lower_left) {
             glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w),
                       (int)(clip_rect.z - clip_rect.x),
                       (int)(clip_rect.w - clip_rect.y));
-          else
+            gl_error_check("glScissor");
+          } else {
             glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z,
                       (int)clip_rect.w);  // Support for GL 4.5 rarely used
                                           // glClipControl(GL_UPPER_LEFT)
+            gl_error_check("glScissor");
+          }
 
           // Bind texture, Draw
           glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+          gl_error_check("glBindTexture");
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET
-          if (m_gl_version >= 3200)
+          if (m_gl_version >= 3200) {
             glDrawElementsBaseVertex(
                 GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
                 sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
                 (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)),
                 (GLint)pcmd->VtxOffset);
-          else
+            gl_error_check("glDrawElementsBaseVertex");
+          } else {
+#else
+          {
 #endif
             glDrawElements(
                 GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
                 sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
                 (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
+            gl_error_check("glDrawElements");
+          }
         }
       }
     }
@@ -214,41 +238,64 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
 
   // Restore modified GL state
   glUseProgram(last_program);
+  gl_error_check("glUseProgram");
   glBindTexture(GL_TEXTURE_2D, last_texture);
+  gl_error_check("glBindTexture");
 #ifdef GL_SAMPLER_BINDING
   glBindSampler(0, last_sampler);
+  gl_error_check("glBindSampler");
 #endif
   glActiveTexture(last_active_texture);
+  gl_error_check("glActiveTexture");
 #ifndef IMGUI_IMPL_OPENGL_ES2
   glBindVertexArray(last_vertex_array_object);
+  gl_error_check("glVertexArray");
 #endif
   glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
+  gl_error_check("glBindBuffer");
   glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
+  gl_error_check("glEquationSeparate");
   glBlendFuncSeparate(last_blend_src_rgb, last_blend_dst_rgb,
                       last_blend_src_alpha, last_blend_dst_alpha);
-  if (last_enable_blend)
+  gl_error_check("glBlendFuncSeparate");
+  if (last_enable_blend) {
     glEnable(GL_BLEND);
-  else
+    gl_error_check("glEnable");
+  } else {
     glDisable(GL_BLEND);
-  if (last_enable_cull_face)
+    gl_error_check("glDisable");
+  }
+  if (last_enable_cull_face) {
     glEnable(GL_CULL_FACE);
-  else
+    gl_error_check("glEnable");
+  } else {
     glDisable(GL_CULL_FACE);
-  if (last_enable_depth_test)
+    gl_error_check("glDisable");
+  }
+  if (last_enable_depth_test) {
     glEnable(GL_DEPTH_TEST);
-  else
+    gl_error_check("glEnable");
+  } else {
     glDisable(GL_DEPTH_TEST);
-  if (last_enable_scissor_test)
+    gl_error_check("glDisable");
+  }
+  if (last_enable_scissor_test) {
     glEnable(GL_SCISSOR_TEST);
-  else
+    gl_error_check("glEnable");
+  } else {
     glDisable(GL_SCISSOR_TEST);
+    gl_error_check("glDisable");
+  }
 #ifdef GL_POLYGON_MODE
   glPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
+  gl_error_check("glPolygonMode");
 #endif
   glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2],
              (GLsizei)last_viewport[3]);
+  gl_error_check("glViewport");
   glScissor(last_scissor_box[0], last_scissor_box[1],
             (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+  gl_error_check("glScissor");
 }
 //------------------------------------------------------------------------------
 bool imgui_render_backend::create_fonts_texture() {
@@ -282,7 +329,8 @@ bool imgui_render_backend::check_shader(GLuint handle, const char* desc) {
   glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
   glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
   if ((GLboolean)status == GL_FALSE)
-    std::cerr << "ERROR: imgui_render_backend::create_device_objects: failed to compile "
+    std::cerr << "ERROR: imgui_render_backend::create_device_objects: failed "
+                 "to compile "
               << desc << "!\n";
   if (log_length > 1) {
     ImVector<char> buf;
@@ -320,9 +368,6 @@ bool imgui_render_backend::create_device_objects() {
   glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
   GLint last_vertex_array;
   glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
-
-
-
 
   // Create buffers
   create_fonts_texture();

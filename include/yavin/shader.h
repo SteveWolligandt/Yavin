@@ -20,7 +20,7 @@
 //==============================================================================
 namespace yavin {
 //==============================================================================
-class shader {
+class shader : public id_holder<GLuint> {
  public:
   shader() = default;
   ~shader() {
@@ -104,7 +104,6 @@ class shader {
   std::map<std::string, GLint>    m_uniform_locations;
   std::map<std::string, GLint>    m_attribute_locations;
   std::vector<shaderstage>        m_shader_stages;
-  GLuint                          m_id = 0;
   std::unordered_set<std::string> m_uniform_var_names;
   std::unordered_set<std::string> m_attribute_var_names;
 

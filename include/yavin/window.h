@@ -36,7 +36,7 @@ class window : public window_notifier, public window_listener {
   std::list<std::thread>                        m_async_tasks;
   std::vector<std::list<std::thread>::iterator> m_joinable_async_tasks;
   std::mutex                                    m_async_tasks_mutex;
-  mutable std::mutex                                    m_context_creation_mutex;
+  mutable std::mutex                            m_context_creation_mutex;
   //============================================================================
   // ctors / dtor
   //============================================================================
@@ -75,16 +75,14 @@ class window : public window_notifier, public window_listener {
     auto it = [this] {
       std::lock_guard lock{m_async_tasks_mutex};
       m_async_tasks.emplace_back();
-      return prev(m_async_tasks.end());
+      return prev(end(m_async_tasks));
     }();
 
-    m_async_tasks.back() = std::thread{[&w = *this, it, g = f] {
-      w.x_init_threads();
-      auto ctx = w.create_shared_context();
-      ctx.make_current();
+    m_async_tasks.back() = std::thread{[win = this, it, g = f] {
+      auto ctx = win->create_shared_context();
       g();
-      std::lock_guard lock{w.m_async_tasks_mutex};
-      w.m_joinable_async_tasks.push_back(it);
+      std::lock_guard lock{win->m_async_tasks_mutex};
+      win->m_joinable_async_tasks.push_back(it);
     }};
   }
 
@@ -92,7 +90,6 @@ class window : public window_notifier, public window_listener {
   void setup(const std::string &title, size_t width, size_t height);
   void init_imgui(size_t width, size_t height);
   void deinit_imgui();
-  void x_init_threads();
 };
 //==============================================================================
 }  // namespace yavin

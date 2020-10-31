@@ -58,6 +58,7 @@ struct id_holder {
  protected:
   void set_id(ID id) { m_id = id; }
   //----------------------------------------------------------------------------
+  auto id_ptr() { return &m_id; }
   auto id_ref() -> auto& { return m_id; }
   //----------------------------------------------------------------------------
  public:
