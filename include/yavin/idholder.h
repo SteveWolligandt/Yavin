@@ -41,11 +41,11 @@ struct id_holder {
   //----------------------------------------------------------------------------
   explicit id_holder(ID _id) : m_id{_id} {}
   //----------------------------------------------------------------------------
-  id_holder(const id_holder& other) = delete;
+  id_holder(id_holder const& other) = delete;
   id_holder(id_holder&& other) noexcept
       : m_id{std::exchange(other.m_id, default_val)} {}
   //----------------------------------------------------------------------------
-  auto operator=(const id_holder& other) -> id_holder& = delete;
+  auto operator=(id_holder const& other) -> id_holder& = delete;
   auto operator=(id_holder&& other) noexcept -> id_holder& {
     swap(other);
     return *this;

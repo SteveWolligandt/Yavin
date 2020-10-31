@@ -119,8 +119,16 @@ class texture : public id_holder<GLuint> {
   }
   //----------------------------------------------------------------------------
   ~texture() {
-    if constexpr (D==2) {
-      if ((GLuint)texture_binding_2d() == id()) {
+    if constexpr (D == 1) {
+      if (bound_texture1d() == id()) {
+        unbind();
+      }
+    } else if constexpr (D == 2) {
+      if (bound_texture2d() == id()) {
+        unbind();
+      }
+    } else if constexpr (D == 3) {
+      if (bound_texture3d() == id()) {
         unbind();
       }
     }

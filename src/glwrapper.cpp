@@ -112,6 +112,12 @@ GLint get_current_available_memory() {
   return tam;
 }
 //==============================================================================
+GLuint current_program() {
+  GLint p;
+  glGetIntegerv(GL_CURRENT_PROGRAM, &p);
+  return static_cast<GLuint>(p);
+}
+//------------------------------------------------------------------------------
 GLuint bound_texture(GLenum binding) {
   GLint tex;
   gl::get_integer_v(binding, &tex);
@@ -187,16 +193,6 @@ GLint max_compute_image_uniforms() {
   return val;
 }
 //==============================================================================
-GLint current_program() {
-  GLint p;
-  glGetIntegerv(GL_CURRENT_PROGRAM, &p);
-  return p;
-}
-GLint texture_binding_2d() {
-  GLint p;
-  glGetIntegerv(GL_CURRENT_PROGRAM, &p);
-  return p;
-}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
