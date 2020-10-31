@@ -215,8 +215,6 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 configure_file(src/glverbose.cpp.in
                src/glverbose.cpp)
-configure_file(include/yavin/shaderincludepaths.h.in
-               include/yavin/shaderincludepaths.h)
 configure_file(include/yavin/texpng.h.in
                include/yavin/texpng.h)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

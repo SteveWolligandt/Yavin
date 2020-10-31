@@ -1,4 +1,3 @@
-#include <yavin/shaderincludepaths.h>
 #include <yavin/shaderstageparser.h>
 
 #include <sstream>
@@ -18,17 +17,9 @@ auto shaderstageparser::parse(std::filesystem::path const& path,
   std::ifstream file{path};
 
   if (!file.is_open()) {
-    std::filesystem::path path_in_shader_dir{shader_dir};
-    path_in_shader_dir += path;
-    file.open(path_in_shader_dir);
-  }
-  if (!file.is_open()) {
     throw std::runtime_error{"ERROR: Unable to open file " + path.string()};
   }
-
-  auto content = parse_stream(file, vars, it, folder);
-  file.close();
-  return content;
+  return parse_stream(file, vars, it, folder);
 }
 //------------------------------------------------------------------------------
 auto shaderstageparser::parse(shadersource const&   source,
