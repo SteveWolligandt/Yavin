@@ -92,6 +92,7 @@ bool BufferingBar(const char* label, float value, const ImVec2& size_arg,
       ImVec2(pos.x + circleEnd - o2, bb.Min.y + r), r, bg_col);
   window->DrawList->AddCircleFilled(
       ImVec2(pos.x + circleEnd - o3, bb.Min.y + r), r, bg_col);
+  return true;
 }
 //------------------------------------------------------------------------------
 bool Spinner(const char* label, float radius, int thickness,
@@ -131,6 +132,7 @@ bool Spinner(const char* label, float radius, int thickness,
   }
 
   window->DrawList->PathStroke(color, false, thickness);
+  return true;
 }
 //==============================================================================
 }  // namespace ImGui
