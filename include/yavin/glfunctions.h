@@ -481,6 +481,8 @@ struct gl {
   DLL_API static void clear_tex_image(GLuint texture, GLint level,
                                       GLenum format, GLenum type,
                                       const void* data);
+  //------------------------------------------------------------------------------
+  DLL_API static auto is_texture(GLuint texture) -> GLboolean;
   //==============================================================================
   // FRAMEBUFFER RELATED
   //==============================================================================

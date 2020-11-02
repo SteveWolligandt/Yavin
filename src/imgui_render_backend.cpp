@@ -239,8 +239,11 @@ void imgui_render_backend::render_draw_data(ImDrawData* draw_data) {
   // Restore modified GL state
   glUseProgram(last_program);
   gl_error_check("IMGUI glUseProgram");
-  glBindTexture(GL_TEXTURE_2D, last_texture);
-  gl_error_check("IMGUI glBindTexture");
+
+  if (gl::is_texture(last_texture)) {
+    glBindTexture(GL_TEXTURE_2D, last_texture);
+    gl_error_check("IMGUI glBindTexture");
+  }
 #ifdef GL_SAMPLER_BINDING
   glBindSampler(0, last_sampler);
   gl_error_check("IMGUI glBindSampler");

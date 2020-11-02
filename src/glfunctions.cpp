@@ -1200,6 +1200,13 @@ void gl::clear_tex_image(GLuint texture, GLint level, GLenum format,
   glClearTexImage(texture, level, format, type, data);
   gl_error_check("glClearTexImage");
 }
+//------------------------------------------------------------------------------
+auto gl::is_texture(GLuint texture) -> GLboolean {
+  if (verbose) *out << "glIsTexture(" << texture << ")\n";
+  auto const b = glIsTexture(texture);
+  gl_error_check("glIsTexture");
+  return b;
+}
 
 //==============================================================================
 // FRAMEBUFFER RELATED
