@@ -63,7 +63,7 @@ class indexeddata {
     vertexarray vao;
     vao.bind();
     m_vbo.bind();
-    vbo_t::activate_attributes();
+    m_vbo.activate_attributes();
     m_ibo.bind();
     return vao;
   }

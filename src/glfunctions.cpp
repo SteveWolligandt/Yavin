@@ -265,10 +265,11 @@ void gl::enable_vertex_attrib_array(GLuint vaobj, GLuint index) {
 void gl::vertex_attrib_pointer(GLuint index, GLint size, GLenum type,
                                GLboolean normalized, GLsizei stride,
                                const GLvoid* pointer) {
-  if (verbose)
+  if (verbose) {
     *out << "glVertexAttribPointer(" << index << ", " << size << ", "
          << to_string(type) << ", " << (normalized ? "true" : "false") << ", "
          << stride << ", " << pointer << ")\n";
+  }
   glVertexAttribPointer(index, size, type, normalized, stride, pointer);
   gl_error_check("glVertexAttribPointer");
 }

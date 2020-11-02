@@ -46,7 +46,7 @@ void window::check_events() {
   {
     std::lock_guard lock{m_async_tasks_mutex};
     if (!m_joinable_async_tasks.empty()) {
-      for (auto const &it : m_joinable_async_tasks) {
+      for (auto const it : m_joinable_async_tasks) {
         it->join();
         m_async_tasks.erase(it);
       }

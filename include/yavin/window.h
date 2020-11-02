@@ -36,7 +36,6 @@ class window : public window_notifier, public window_listener {
   std::list<std::thread>                        m_async_tasks;
   std::vector<std::list<std::thread>::iterator> m_joinable_async_tasks;
   std::mutex                                    m_async_tasks_mutex;
-  mutable std::mutex                            m_context_creation_mutex;
   //============================================================================
   // ctors / dtor
   //============================================================================
