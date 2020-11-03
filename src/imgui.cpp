@@ -134,6 +134,15 @@ bool Spinner(const char* label, float radius, int thickness,
   window->DrawList->PathStroke(color, false, thickness);
   return true;
 }
+inline static void StdStringNonStdResize(std::string& s, int size) {
+  IM_ASSERT(size >= 0);
+  const int oldLength = s.length();
+  if (size < oldLength)
+    s = s.substr(0, size);
+  else if (size > oldLength)
+    for (int i = 0, icnt = size - oldLength; i < icnt; i++)
+      s += '\0';
+}
 //==============================================================================
 }  // namespace ImGui
 //==============================================================================

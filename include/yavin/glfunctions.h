@@ -1,13 +1,13 @@
 #ifndef YAVIN_GL_FUNCTIONS_WRAPPER_H
 #define YAVIN_GL_FUNCTIONS_WRAPPER_H
 //==============================================================================
+#include <yavin/errorcheck.h>
+#include <yavin/glincludes.h>
+#include <yavin/mutexhandler.h>
+#include <yavin/tostring.h>
+
 #include <ostream>
 #include <vector>
-
-#include "errorcheck.h"
-#include "glincludes.h"
-#include "mutexhandler.h"
-#include "yavin/tostring.h"
 //==============================================================================
 namespace yavin {
 //==============================================================================

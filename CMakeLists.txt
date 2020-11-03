@@ -139,6 +139,7 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/window_notifier.cpp
   ${CMAKE_SOURCE_DIR}/src/keyboard.cpp
   ${CMAKE_SOURCE_DIR}/src/mouse.cpp
+  ${CMAKE_SOURCE_DIR}/external/imgui/misc/cpp/imgui_stdlib.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_api_backend.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_render_backend.cpp

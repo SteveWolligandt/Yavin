@@ -1,7 +1,7 @@
 #include <yavin/imgui_api_backend.h>
 #include <yavin/keyboard.h>
 #include <memory>
-
+#include <iostream>
 //==============================================================================
 namespace yavin {
 //==============================================================================
@@ -11,6 +11,13 @@ std::chrono::time_point<std::chrono::system_clock> imgui_api_backend::time =
 //==============================================================================
 imgui_api_backend::imgui_api_backend() {
   ImGuiIO& io = ImGui::GetIO();
+  io.BackendFlags |=
+      ImGuiBackendFlags_HasMouseCursors;  // We can honor GetMouseCursor()
+                                          // values (optional)
+  io.BackendFlags |=
+      ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos
+                                         // requests (optional, rarely used)
+
   io.BackendPlatformName = "imgui_impl_yavin";
 
   io.KeyMap[ImGuiKey_Tab]         = KEY_TAB;
@@ -41,18 +48,48 @@ imgui_api_backend::~imgui_api_backend() {}
 //------------------------------------------------------------------------------
 void imgui_api_backend::on_key_pressed(key k) {
   ImGuiIO& io = ImGui::GetIO();
+  unsigned int k_id = static_cast<unsigned int>(k);
   io.KeysDown[k] = true;
-  io.KeyCtrl     = io.KeysDown[KEY_CTRL_L]  || io.KeysDown[KEY_CTRL_R];
-  io.KeyShift    = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
-  io.KeyAlt      = io.KeysDown[KEY_ALT_L]   || io.KeysDown[KEY_ALT_R];
+  if (k == KEY_CTRL_L || k == KEY_CTRL_R) {
+    io.KeyCtrl = true;
+  }
+  if (k == KEY_SHIFT_L || k == KEY_SHIFT_R) {
+    io.KeyShift = true;
+  }
+  if (k == KEY_ALT_L || k == KEY_ALT_R) {
+    io.KeyAlt = true;
+  }
+  if (k_id >= KEY_0 && k_id <= KEY_9) {
+    if (io.KeyShift) {
+      io.AddInputCharacter((unsigned int)('!' + (unsigned int)(k - KEY_0)));
+    } else {
+      io.AddInputCharacter((unsigned int)('0' + (unsigned int)(k - KEY_0)));
+    }
+  }
+  if (k_id == KEY_SPACE) {
+    io.AddInputCharacter((unsigned int)(' '));
+  }
+  if (k_id >= KEY_A && k_id <= KEY_Z) {
+    if (io.KeyShift) {
+      io.AddInputCharacter((unsigned int)('A' + (unsigned int)(k - KEY_A)));
+    } else {
+      io.AddInputCharacter((unsigned int)('a' + (unsigned int)(k - KEY_A)));
+    }
+  }
 }
 //------------------------------------------------------------------------------
 void imgui_api_backend::on_key_released(key k) {
   ImGuiIO& io    = ImGui::GetIO();
   io.KeysDown[k] = false;
-  io.KeyCtrl     = io.KeysDown[KEY_CTRL_L]  || io.KeysDown[KEY_CTRL_R];
-  io.KeyShift    = io.KeysDown[KEY_SHIFT_L] || io.KeysDown[KEY_SHIFT_R];
-  io.KeyAlt      = io.KeysDown[KEY_ALT_L]   || io.KeysDown[KEY_ALT_R];
+  if (k == KEY_CTRL_L || k == KEY_CTRL_R) {
+    io.KeyCtrl = false;
+  }
+  if (k == KEY_SHIFT_L || k == KEY_SHIFT_R) {
+    io.KeyShift = false;
+  }
+  if (k == KEY_ALT_L || k == KEY_ALT_R) {
+    io.KeyAlt = false;
+  }
 }
 //------------------------------------------------------------------------------
 void imgui_api_backend::on_button_pressed(button b) {

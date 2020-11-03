@@ -4,9 +4,9 @@
 #include <initializer_list>
 #include <iostream>
 #include <vector>
-#include "buffer.h"
-#include "dllexport.h"
-#include "errorcheck.h"
+#include <yavin/buffer.h>
+#include <yavin/dllexport.h>
+#include <yavin/errorcheck.h>
 //==============================================================================
 namespace yavin {
 //==============================================================================

@@ -1,6 +1,5 @@
-#ifdef USE_GLFW3
-#ifndef __YAVIN_OIT_WINDOW__
-#define __YAVIN_OIT_WINDOW__
+#ifndef YAVIN_OIT_WINDOW
+#define YAVIN_OIT_WINDOW
 
 #include "atomic_counter_buffer.h"
 #include "pixel_unpack_buffer.h"
@@ -90,5 +89,4 @@ class OITWindow : public Window {
 //==============================================================================
 }  // namespace yavin
 //==============================================================================
-#endif
 #endif
