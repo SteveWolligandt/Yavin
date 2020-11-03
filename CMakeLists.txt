@@ -62,7 +62,14 @@ add_custom_target(glew.build
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
 set(YAVIN_IMGUI_INCLUDE_DIRS ${YAVIN_IMGUI_DIR}/.. ${YAVIN_IMGUI_DIR})
-file(GLOB YAVIN_IMGUI_FILES "${YAVIN_IMGUI_DIR}/*.cpp")
+set(YAVIN_IMGUI_FILES
+  ${YAVIN_IMGUI_DIR}/imgui.cpp
+  ${YAVIN_IMGUI_DIR}/imgui_widgets.cpp
+  ${YAVIN_IMGUI_DIR}/imgui_draw.cpp
+  ${YAVIN_IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
+  #${YAVIN_IMGUI_DIR}/misc/freetype/imgui_freetype.cpp
+  ${YAVIN_IMGUI_DIR}/misc/fonts/binary_to_compressed_c.cpp
+  )
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # find OpenGL packages
@@ -139,7 +146,6 @@ set(YAVIN_SOURCES
   ${CMAKE_SOURCE_DIR}/src/window_notifier.cpp
   ${CMAKE_SOURCE_DIR}/src/keyboard.cpp
   ${CMAKE_SOURCE_DIR}/src/mouse.cpp
-  ${CMAKE_SOURCE_DIR}/external/imgui/misc/cpp/imgui_stdlib.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_api_backend.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_shader.cpp
   ${CMAKE_SOURCE_DIR}/src/imgui_render_backend.cpp

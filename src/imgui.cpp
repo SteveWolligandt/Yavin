@@ -4,20 +4,20 @@ namespace ImGui {
 //==============================================================================
 bool InputDouble2(const char* label, double v[2], const char* format,
                   ImGuiInputTextFlags flags) {
-  return InputScalarN(label, ImGuiDataType_Double, v, 2, NULL, NULL, format,
-                      flags);
+  return InputScalarN(label, ImGuiDataType_Double, v, 2, nullptr, nullptr,
+                      format, flags);
 }
 //------------------------------------------------------------------------------
 bool InputDouble3(const char* label, double v[3], const char* format,
                   ImGuiInputTextFlags flags) {
-  return InputScalarN(label, ImGuiDataType_Double, v, 3, NULL, NULL, format,
-                      flags);
+  return InputScalarN(label, ImGuiDataType_Double, v, 3, nullptr, nullptr,
+                      format, flags);
 }
 //------------------------------------------------------------------------------
 bool InputDouble4(const char* label, double v[4], const char* format,
                   ImGuiInputTextFlags flags) {
-  return InputScalarN(label, ImGuiDataType_Double, v, 4, NULL, NULL, format,
-                      flags);
+  return InputScalarN(label, ImGuiDataType_Double, v, 4, nullptr, nullptr,
+                      format, flags);
 }
 //------------------------------------------------------------------------------
 bool DragDouble(const char* label, double* v, double v_speed, double v_min,
@@ -134,7 +134,8 @@ bool Spinner(const char* label, float radius, int thickness,
   window->DrawList->PathStroke(color, false, thickness);
   return true;
 }
-inline static void StdStringNonStdResize(std::string& s, int size) {
+//------------------------------------------------------------------------------
+void StdStringNonStdResize(std::string& s, int size) {
   IM_ASSERT(size >= 0);
   const int oldLength = s.length();
   if (size < oldLength)
