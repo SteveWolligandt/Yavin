@@ -58,17 +58,10 @@ auto shaderstage::type_to_string(GLenum shader_type) -> std::string {
 auto shaderstage::compile(bool use_ansi_color) -> void {
   delete_stage();
   set_id(gl::create_shader(m_shader_type));
-  auto source = [this] {
-    try{
-      return shaderstageparser::parse(std::get<std::filesystem::path>(m_source),
-                                      m_glsl_vars, m_include_tree);
-    } catch (std::bad_variant_access &) {}
-    try {
-      return shaderstageparser::parse(std::get<shadersource>(m_source),
-                                      m_glsl_vars, m_include_tree);
-    } catch (std::bad_variant_access &) {}
-    return shadersource{};
-  }();
+  auto source = std::visit(m_source, [this](auto const &src) -> decltype(auto) {
+    return shaderstageparser::parse(std::get<std::filesystem::path>(src),
+                                    m_glsl_vars, m_include_tree);
+  });
   auto source_c = source.string().c_str();
   gl::shader_source(id(), 1, &source_c, nullptr);
   gl::compile_shader(id());
