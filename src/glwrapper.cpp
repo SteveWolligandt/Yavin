@@ -59,6 +59,14 @@ void disable_blending() {
   gl::disable(GL_BLEND);
 }
 //==============================================================================
+void enable_scissor_test() {
+  gl::enable(GL_SCISSOR_TEST);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void disable_scissor_test() {
+  gl::disable(GL_SCISSOR_TEST);
+}
+//==============================================================================
 void enable_face_culling() {
   gl::enable(GL_CULL_FACE);
 }
@@ -74,6 +82,8 @@ void set_front_face_culling() {
 void set_back_face_culling() {
   gl::cull_face(GL_BACK);
 }
+//------------------------------------------------------------------------------
+auto face_culling_enabled() -> GLboolean { return glIsEnabled(GL_CULL_FACE); }
 //==============================================================================
 void enable_multisampling() {
   gl::enable(GL_MULTISAMPLE);
@@ -97,7 +107,7 @@ void blend_func_subtractive() {
 void blend_func_alpha() {
   gl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-//==============================================================================
+//------------------------------------------------------------------------------
 GLint get_total_available_memory() {
   constexpr auto GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX = 0x9048;
   GLint          tam;
@@ -112,10 +122,102 @@ GLint get_current_available_memory() {
   return tam;
 }
 //==============================================================================
-GLuint current_program() {
-  GLint p;
-  glGetIntegerv(GL_CURRENT_PROGRAM, &p);
-  return static_cast<GLuint>(p);
+auto blending_enabled() -> GLboolean { return glIsEnabled(GL_BLEND); }
+//------------------------------------------------------------------------------
+auto depth_test_enabled() -> GLboolean { return glIsEnabled(GL_DEPTH_TEST); }
+//------------------------------------------------------------------------------
+auto scissor_test_enabled() -> GLboolean {
+  return glIsEnabled(GL_SCISSOR_TEST);
+}
+//------------------------------------------------------------------------------
+auto current_viewport() -> std::array<GLint, 4> {
+  std::array<GLint, 4> cur;
+  gl::get_integer_v(GL_VIEWPORT, cur.data());
+  return cur;
+}
+//------------------------------------------------------------------------------
+auto current_scissor_box() -> std::array<GLint, 4> {
+  std::array<GLint, 4> cur;
+  gl::get_integer_v(GL_SCISSOR_BOX, cur.data());
+  return cur;
+}
+//------------------------------------------------------------------------------
+auto current_blend_src_rgb() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_BLEND_SRC_RGB, &cur);
+  return static_cast<GLenum>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_blend_dst_rgb() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_BLEND_DST_RGB, &cur);
+  return static_cast<GLenum>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_blend_src_alpha() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_BLEND_SRC_ALPHA, &cur);
+  return static_cast<GLenum>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_blend_dst_alpha() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_BLEND_DST_ALPHA, &cur);
+  return static_cast<GLenum>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_blend_equation_rgb() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_BLEND_EQUATION_RGB, &cur);
+  return static_cast<GLenum>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_blend_equation_alpha() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_BLEND_EQUATION_ALPHA, &cur);
+  return static_cast<GLenum>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_polygon_mode() -> std::array<GLenum, 2> {
+  std::array<GLint, 2> cur;
+  gl::get_integer_v(GL_POLYGON_MODE, cur.data());
+  return {static_cast<GLenum>(cur[0]), static_cast<GLenum>(cur[1])};
+}
+//------------------------------------------------------------------------------
+GLuint bound_program() {
+  GLint cur;
+  gl::get_integer_v(GL_CURRENT_PROGRAM, &cur);
+  return static_cast<GLuint>(cur);
+}
+//------------------------------------------------------------------------------
+auto bound_vertexbuffer() -> GLuint {
+  GLint cur;
+  gl::get_integer_v(GL_ARRAY_BUFFER_BINDING, &cur);
+  return static_cast<GLuint>(cur);
+}
+//------------------------------------------------------------------------------
+auto bound_vertexarray() -> GLuint {
+  GLint cur;
+  gl::get_integer_v(GL_VERTEX_ARRAY_BINDING, &cur);
+  return static_cast<GLuint>(cur);
+}
+//------------------------------------------------------------------------------
+auto current_active_texture() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_ACTIVE_TEXTURE, &cur);
+  return cur;
+}
+//------------------------------------------------------------------------------
+auto current_clip_origin() -> GLenum {
+  GLint cur;
+  gl::get_integer_v(GL_CLIP_ORIGIN, &cur);
+  return cur;
+}
+//------------------------------------------------------------------------------
+auto bound_sampler() -> GLuint {
+  GLint cur;
+  gl::get_integer_v(GL_SAMPLER_BINDING, &cur);
+  return static_cast<GLuint>(cur);
 }
 //------------------------------------------------------------------------------
 GLuint bound_texture(GLenum binding) {
@@ -193,6 +295,12 @@ GLint max_compute_image_uniforms() {
   return val;
 }
 //==============================================================================
+std::pair<GLint, GLint> opengl_version() {
+  std::pair<GLint, GLint> version;
+  gl::get_integer_v(GL_MAJOR_VERSION, &version.first);
+  gl::get_integer_v(GL_MINOR_VERSION, &version.second);
+  return version;
+}
 //==============================================================================
 }  // namespace yavin
 //==============================================================================

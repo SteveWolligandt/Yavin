@@ -5,6 +5,15 @@ namespace yavin {
 //==============================================================================
 // MISC
 //==============================================================================
+void gl::polygon_mode(GLenum face, GLenum mode) {
+  if (verbose) {
+    *out << "glPolygonMode(" << to_string(face) << ", " << to_string(mode)
+         << ")\n";
+  }
+  glPolygonMode(face, mode);
+  gl_error_check("glPolygonMode");
+}
+//------------------------------------------------------------------------------
 void gl::cull_face(GLenum mode) {
   if (verbose) { *out << "glCullFace(" << to_string(mode) << ")\n"; }
   glCullFace(mode);
@@ -151,6 +160,15 @@ void gl::depth_func(GLenum func) {
   glDepthFunc(func);
   gl_error_check("glDepthFunc");
 }
+//------------------------------------------------------------------------------
+void gl::scissor(GLint x, GLint y, GLsizei width, GLsizei height) {
+  if (verbose) {
+    *out << "glScissor(" << x << ", " << y << ", " << width << ", " << height
+         << ")\n";
+  }
+  glScissor(x, y, width, height);
+  gl_error_check("glScissor");
+}
 
 //==============================================================================
 // BACKBUFFER RELATED
@@ -222,14 +240,71 @@ void gl::blend_func(GLenum sfactor, GLenum dfactor) {
 }
 
 //------------------------------------------------------------------------------
-void gl::blend_funci(GLuint buf, GLenum sfactor, GLenum dfactor) {
-  if (verbose)
+void gl::blend_func_i(GLuint buf, GLenum sfactor, GLenum dfactor) {
+  if (verbose) {
     *out << "glBlendFunci(" << buf << ", " << sfactor << ", " << dfactor
          << ")\n";
+  }
   glBlendFunci(buf, sfactor, dfactor);
   gl_error_check("glBlendFunci");
 }
-
+//------------------------------------------------------------------------------
+void gl::blend_func_separate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha,
+                         GLenum dstAlpha) {
+  if (verbose) {
+    *out << "glBlendFuncSeparate(" << to_string(srcRGB) << ", "
+         << to_string(dstRGB) << ", " << to_string(srcAlpha) << ", "
+         << to_string(dstAlpha) << ")\n";
+  }
+  glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+  gl_error_check("glBlendFuncSeparate");
+}
+//------------------------------------------------------------------------------
+void gl::blend_func_separate_i(GLuint buf, GLenum srcRGB, GLenum dstRGB,
+                           GLenum srcAlpha, GLenum dstAlpha) {
+  if (verbose) {
+    *out << "glBlendFuncSeparatei(" << buf << ", " << to_string(srcRGB) << ", "
+         << to_string(dstRGB) << ", " << to_string(srcAlpha) << ", "
+         << to_string(dstAlpha) << ")\n";
+  }
+  glBlendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha);
+  gl_error_check("glBlendFuncSeparatei");
+}
+//------------------------------------------------------------------------------
+void gl::blend_equation(GLenum mode) {
+  if (verbose) {
+    *out << "glBlendEquation(" << to_string(mode) << ")\n";
+  }
+  glBlendEquation(mode);
+  gl_error_check("glBlendEquation");
+}
+//------------------------------------------------------------------------------
+void gl::blend_equation_i(GLuint buf, GLenum mode) {
+  if (verbose) {
+    *out << "glBlendEquationi(" << buf << ", " << to_string(mode) << ")\n";
+  }
+  glBlendEquationi(buf, mode);
+  gl_error_check("glBlendEquationi");
+}
+//------------------------------------------------------------------------------
+void gl::blend_equation_separate(GLenum modeRGB, GLenum modeAlpha) {
+  if (verbose) {
+    *out << "glBlendEquationSeparate(" << to_string(modeRGB) << ", "
+         << to_string(modeAlpha) << ")\n";
+  }
+  glBlendEquationSeparate(modeRGB, modeAlpha);
+  gl_error_check("glBlendEquationSeparate");
+}
+//------------------------------------------------------------------------------
+void gl::blend_equation_separate_i(GLuint buf, GLenum modeRGB,
+                                   GLenum modeAlpha) {
+  if (verbose) {
+    *out << "glBlendEquationSeparatei(" << buf << ", " << to_string(modeRGB)
+         << ", " << to_string(modeAlpha) << ")\n";
+  }
+  glBlendEquationSeparatei(buf, modeRGB, modeAlpha);
+  gl_error_check("glBlendEquationSeparatei");
+}
 //==============================================================================
 // VERTEXBUFFER RELATED
 //==============================================================================
@@ -347,9 +422,30 @@ void gl::draw_elements(GLenum mode, GLsizei count, GLenum type,
 //==============================================================================
 // BUFFER RELATED
 //==============================================================================
+void gl::buffer_data(GLenum target, GLsizeiptr size, const void* data,
+                     GLenum usage) {
+  if (verbose) {
+    *out << "glBufferData(" << to_string(target) << ", " << size << ", " << data
+         << ", " << to_string(usage) << ")\n";
+  }
+  glBufferData(target, size, data, usage);
+  gl_error_check("glBufferData");
+}
+//----------------------------------------------------------------------------
+void gl::named_buffer_data(GLuint buffer, GLsizeiptr size, const void* data,
+                           GLenum usage) {
+  if (verbose) {
+    *out << "glNamedBufferData(" << buffer << ", " << size << ", " << data
+         << ", " << to_string(usage) << ")\n";
+  }
+  glNamedBufferData(buffer, size, data, usage);
+  gl_error_check("glNamedBufferData");
+}
+  //----------------------------------------------------------------------------
 void gl::bind_buffer(GLenum target, GLuint buffer) {
-  if (verbose)
+  if (verbose) {
     *out << "glBindBuffer(" << to_string(target) << ", " << buffer << ")\n";
+  }
   glBindBuffer(target, buffer);
   gl_error_check("glBindBuffer");
 }
@@ -1208,7 +1304,12 @@ auto gl::is_texture(GLuint texture) -> GLboolean {
   gl_error_check("glIsTexture");
   return b;
 }
-
+//------------------------------------------------------------------------------
+void gl::bind_sampler(GLuint unit, GLuint sampler) {
+  if (verbose) *out << "glBindSampler(" << unit << ", " << sampler << ")\n";
+  glBindSampler(unit, sampler);
+  gl_error_check("glBindSampler");
+}
 //==============================================================================
 // FRAMEBUFFER RELATED
 //==============================================================================

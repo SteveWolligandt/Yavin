@@ -30,7 +30,7 @@ void shader::create() {
 }
 //------------------------------------------------------------------------------
 void shader::delete_shader() {
-  if ((GLuint)current_program() == id()) {
+  if (bound_program() == id()) {
     unbind();
   }
   if (id() != 0) gl::delete_program(id());

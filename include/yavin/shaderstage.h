@@ -33,7 +33,7 @@ class shaderstage : public id_holder<GLuint> {
   static std::regex const regex_mesa_compiler_error;
 
  public:
-  DLL_API static auto type_to_string(GLenum shader_type) -> std::string;
+  DLL_API static auto type_to_string(GLenum shader_type) -> std::string_view;
   //----------------------------------------------------------------------------
   DLL_API shaderstage(GLenum shader_type, shadersource const& shaderfilepath);
   //----------------------------------------------------------------------------

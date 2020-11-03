@@ -36,7 +36,7 @@ shaderstage::~shaderstage() {
   }
 }
 //------------------------------------------------------------------------------
-auto shaderstage::type_to_string(GLenum shader_type) -> std::string {
+auto shaderstage::type_to_string(GLenum shader_type) -> std::string_view {
   switch (shader_type) {
     case GL_VERTEX_SHADER:
       return "Vertex";
@@ -58,10 +58,11 @@ auto shaderstage::type_to_string(GLenum shader_type) -> std::string {
 auto shaderstage::compile(bool use_ansi_color) -> void {
   delete_stage();
   set_id(gl::create_shader(m_shader_type));
-  auto source = std::visit(m_source, [this](auto const &src) -> decltype(auto) {
-    return shaderstageparser::parse(std::get<std::filesystem::path>(src),
-                                    m_glsl_vars, m_include_tree);
-  });
+  auto source = std::visit(
+      [this](auto const &src) -> decltype(auto) {
+        return shaderstageparser::parse(src, m_glsl_vars, m_include_tree);
+      },
+      m_source);
   auto source_c = source.string().c_str();
   gl::shader_source(id(), 1, &source_c, nullptr);
   gl::compile_shader(id());
