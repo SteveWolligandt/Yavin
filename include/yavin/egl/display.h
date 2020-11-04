@@ -12,8 +12,15 @@
 namespace yavin::egl {
 //==============================================================================
 class display {
-  EGLDisplay m_egl_display;
-  EGLint     m_major = -1, m_minor = -1;
+ private:
+  EGLDisplay                    m_egl_display;
+  EGLint                        m_major = -1, m_minor = -1;
+  std::shared_ptr<x11::display> m_x11_disp;
+
+ public:
+  //------------------------------------------------------------------------------
+  auto x11_disp() -> auto& { return m_x11_disp; }
+  auto x11_disp() const -> auto const& { return m_x11_disp; }
 
   //============================================================================
  public:

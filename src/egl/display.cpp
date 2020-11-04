@@ -5,7 +5,9 @@ namespace yavin::egl {
 display::display() : display{EGL_DEFAULT_DISPLAY} {}
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 display::display(std::shared_ptr<x11::display> const& x11_disp)
-    : display{x11_disp->get()} {}
+    : display{x11_disp->get()} {
+  m_x11_disp = x11_disp;
+}
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 display::display(NativeDisplayType native_display)
     : m_egl_display{eglGetDisplay(native_display)} {

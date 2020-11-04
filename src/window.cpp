@@ -1,5 +1,9 @@
-#include <yavin/window.h>
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
 #include <yavin/context.h>
+#include <yavin/window.h>
 
 #include <cstring>
 #include <string>
@@ -91,6 +95,7 @@ void window::setup(const std::string &title, size_t width, size_t height) {
 }
 //------------------------------------------------------------------------------
 void window::swap_buffers() {
+  std::lock_guard lock{m_egl_mutex};
   if (!eglSwapBuffers(m_egl_disp->get(), m_egl_surface->get())) {
     auto err = eglGetError();
     throw std::runtime_error{"[EGL] eglSwapBuffers - " +
