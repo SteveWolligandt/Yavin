@@ -49,32 +49,27 @@ imgui_api_backend::~imgui_api_backend() {}
 void imgui_api_backend::on_key_pressed(key k) {
   ImGuiIO& io = ImGui::GetIO();
   unsigned int k_id = static_cast<unsigned int>(k);
-  io.KeysDown[k] = true;
+  io.KeysDown[k]    = true;
   if (k == KEY_CTRL_L || k == KEY_CTRL_R) {
     io.KeyCtrl = true;
-  }
-  if (k == KEY_SHIFT_L || k == KEY_SHIFT_R) {
+  } else if (k == KEY_SHIFT_L || k == KEY_SHIFT_R) {
     io.KeyShift = true;
-  }
-  if (k == KEY_ALT_L || k == KEY_ALT_R) {
+  } else if (k == KEY_ALT_L || k == KEY_ALT_R) {
     io.KeyAlt = true;
-  }
-  if (k_id >= KEY_0 && k_id <= KEY_9) {
-    if (io.KeyShift) {
-      io.AddInputCharacter((unsigned int)('!' + (unsigned int)(k - KEY_0)));
-    } else {
-      io.AddInputCharacter((unsigned int)('0' + (unsigned int)(k - KEY_0)));
-    }
-  }
-  if (k_id == KEY_SPACE) {
+  } else if (k_id >= KEY_0 && k_id <= KEY_9) {
+    io.AddInputCharacter((unsigned int)('0' + (unsigned int)(k - KEY_0)));
+  } else if (k_id == KEY_SPACE) {
     io.AddInputCharacter((unsigned int)(' '));
-  }
-  if (k_id >= KEY_A && k_id <= KEY_Z) {
+  } else if (k_id >= KEY_A && k_id <= KEY_Z) {
     if (io.KeyShift) {
       io.AddInputCharacter((unsigned int)('A' + (unsigned int)(k - KEY_A)));
     } else {
       io.AddInputCharacter((unsigned int)('a' + (unsigned int)(k - KEY_A)));
     }
+  } else if (k_id == KEY_DECIMALPOINT) {
+    io.AddInputCharacter((unsigned int)('.'));
+  } else if (k_id == KEY_MINUS) {
+    io.AddInputCharacter((unsigned int)('-'));
   }
 }
 //------------------------------------------------------------------------------

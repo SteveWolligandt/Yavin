@@ -93,6 +93,9 @@ inline auto x11_keysym_to_key(KeySym keysym) {
     case XK_Return: return KEY_ENTER;
     case XK_KP_Enter: return KEY_KP_ENTER;
     case XK_space: return KEY_SPACE;
+    case XK_comma: return KEY_COMMA;
+    case XK_period: return KEY_DECIMALPOINT;
+    case XK_minus: return KEY_MINUS;
     case XK_Left: return KEY_LEFT;
     case XK_Up: return KEY_UP;
     case XK_Right: return KEY_RIGHT;
