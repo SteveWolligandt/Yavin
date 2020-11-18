@@ -29,7 +29,7 @@ endif()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 set(YAVIN_GLEW_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glew)
 set(YAVIN_GLEW_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/glew)
-set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_SOURCE_DIR}/include)
+set(YAVIN_GLEW_INCLUDE_DIR ${YAVIN_GLEW_BINARY_DIR}/include)
 set(YAVIN_GLEW_LIBRARY ${YAVIN_GLEW_BINARY_DIR}/lib/libGLEW.a)
 
 add_custom_target(glew.copy
@@ -173,10 +173,12 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_SOURCE_DIR}/single_include
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${OPENGL_INCLUDE_DIR} 
-    ${YAVIN_GLEW_INCLUDE_DIR}
     ${YAVIN_IMGUI_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui-filebrowser
     ${X11_INCLUDE_DIR})
+target_include_directories(yavin
+  PRIVATE 
+    ${YAVIN_GLEW_INCLUDE_DIR})
 
 target_link_libraries(yavin
                        PRIVATE
