@@ -28,7 +28,7 @@ struct include_tree {
   }
   auto nested_include_trees() -> auto& { return m_nested_include_trees; }
   auto parent() const -> auto const& { return *m_parent; }
-  auto has_parent() const { return m_parent != nullptr; }
+  auto has_parent() const -> bool { return m_parent != nullptr; }
 
  public:
   include_tree() : m_line_number{-1}, m_num_lines{0} {}

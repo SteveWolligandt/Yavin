@@ -12,4 +12,8 @@
 #undef Success
 #endif
 
+#ifdef Complex
+#undef Complex
+#endif
+
 #endif
