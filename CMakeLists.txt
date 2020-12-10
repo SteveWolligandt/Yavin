@@ -60,15 +60,14 @@ add_custom_target(glew.build
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # build imgui
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-set(YAVIN_IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
-set(YAVIN_IMGUI_INCLUDE_DIRS ${YAVIN_IMGUI_DIR}/.. ${YAVIN_IMGUI_DIR})
+set(YAVIN_IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui_node_editor_version)
+set(YAVIN_IMGUI_INCLUDE_DIRS ${YAVIN_IMGUI_DIR})
 set(YAVIN_IMGUI_FILES
   ${YAVIN_IMGUI_DIR}/imgui.cpp
   ${YAVIN_IMGUI_DIR}/imgui_widgets.cpp
   ${YAVIN_IMGUI_DIR}/imgui_draw.cpp
-  ${YAVIN_IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
-  #${YAVIN_IMGUI_DIR}/misc/freetype/imgui_freetype.cpp
-  ${YAVIN_IMGUI_DIR}/misc/fonts/binary_to_compressed_c.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/misc/cpp/imgui_stdlib.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/misc/fonts/binary_to_compressed_c.cpp
   )
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -174,6 +173,7 @@ target_include_directories(yavin
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${OPENGL_INCLUDE_DIR} 
     ${YAVIN_IMGUI_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui-filebrowser
     ${X11_INCLUDE_DIR})
 target_include_directories(yavin

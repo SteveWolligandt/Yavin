@@ -10,3 +10,6 @@
 [submodule "external/imgui-filebrowser"]
 	path = external/imgui-filebrowser
 	url = https://github.com/AirGuanZ/imgui-filebrowser.git
+[submodule "external/imgui_thedmd"]
+	path = external/imgui_thedmd
+	url = https://github.com/thedmd/imgui.git
