@@ -106,7 +106,7 @@ void window::swap_buffers() {
 void window::init_imgui(size_t width, size_t height) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  m_imgui_render_backend = std::make_unique<imgui_render_backend>();
+  m_imgui_render_backend = std::make_unique<struct imgui_render_backend>();
   imgui_api_backend::instance().on_resize(width, height);
 }
 //------------------------------------------------------------------------------

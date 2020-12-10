@@ -32,11 +32,16 @@ class window : public window_notifier, public window_listener {
   std::shared_ptr<egl::context>                 m_egl_context;
   std::shared_ptr<egl::surface>                 m_egl_surface;
   std::shared_ptr<glew>                         m_glew;
-  std::unique_ptr<imgui_render_backend>         m_imgui_render_backend;
+  std::unique_ptr<struct imgui_render_backend>  m_imgui_render_backend;
   std::list<std::thread>                        m_async_tasks;
   std::vector<std::list<std::thread>::iterator> m_joinable_async_tasks;
   std::mutex                                    m_async_tasks_mutex;
   std::mutex                                    m_egl_mutex;
+  //============================================================================
+  auto imgui_render_backend() const -> auto const & {
+    return *m_imgui_render_backend;
+  }
+  auto imgui_render_backend() -> auto & { return *m_imgui_render_backend; }
   //============================================================================
   // ctors / dtor
   //============================================================================
