@@ -620,12 +620,10 @@ class texture : public id_holder<GLuint> {
   void read(const std::string filepath) {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_readable) {
-#if YAVIN_HAS_PNG_SUPPORT
       if (ext == "png") {
         read_png(filepath);
         return;
       }
-#endif
     }
 
     throw std::runtime_error("could not read fileformat ." + ext);
@@ -635,17 +633,14 @@ class texture : public id_holder<GLuint> {
   void write(const std::string filepath) const {
     auto ext = filepath.substr(filepath.find_last_of(".") + 1);
     if constexpr (D == 2 && is_writable) {
-#if YAVIN_HAS_PNG_SUPPORT
       if (ext == "png") {
         write_png(filepath);
         return;
       }
-#endif
     }
     throw std::runtime_error("could not write fileformat ." + ext);
   }
-//------------------------------------------------------------------------------
-#if YAVIN_HAS_PNG_SUPPORT
+  //----------------------------------------------------------------------------
   template <typename = void>
   requires (has_png_support()) &&
            (D == 2) &&
@@ -689,7 +684,6 @@ class texture : public id_holder<GLuint> {
       }
     image.write(filepath);
   }
-#endif
 };  // namespace yavin
 
 //==============================================================================
