@@ -71,6 +71,12 @@ class window : public window_notifier, public window_listener {
   void    on_mouse_motion(int /*x*/, int /*y*/) override;
   void    on_resize(int /*width*/, int /*height*/) override;
   //----------------------------------------------------------------------------
+  auto surface() const -> auto const & { return *m_egl_surface; }
+  auto surface() -> auto & { return *m_egl_surface; }
+  //----------------------------------------------------------------------------
+  auto display() const -> auto const & { return *m_egl_disp; }
+  auto display() -> auto & { return *m_egl_disp; }
+  //----------------------------------------------------------------------------
   auto should_close() const {
     return m_egl_surface->x11_window()->should_close();
   }

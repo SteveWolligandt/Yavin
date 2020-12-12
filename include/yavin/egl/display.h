@@ -19,8 +19,8 @@ class display {
 
  public:
   //------------------------------------------------------------------------------
-  auto x11_disp() -> auto& { return m_x11_disp; }
-  auto x11_disp() const -> auto const& { return m_x11_disp; }
+  auto x11_display() -> auto& { return *m_x11_disp; }
+  auto x11_display() const -> auto const& { return *m_x11_disp; }
 
   //============================================================================
  public:

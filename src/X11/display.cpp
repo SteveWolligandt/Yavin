@@ -24,6 +24,12 @@ display::~display() {
 //------------------------------------------------------------------------------
 void display::lock() { XLockDisplay(m_x_display); }
 void display::unlock() { XUnlockDisplay(m_x_display); }
+//------------------------------------------------------------------------------
+auto display::screen_resolution() const -> std::pair<size_t, size_t> {
+  auto screen = XDefaultScreenOfDisplay(m_x_display);
+  return {static_cast<size_t>(XWidthOfScreen(screen)),
+          static_cast<size_t>(XHeightOfScreen(screen))};
+}
 //==============================================================================
 }  // namespace yavin::x11
 //==============================================================================

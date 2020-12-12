@@ -20,6 +20,8 @@ class display {
   auto get() const -> auto const& { return m_x_display; }
   auto get() -> auto& { return m_x_display; }
   //----------------------------------------------------------------------------
+  auto screen_resolution() const -> std::pair<size_t, size_t>;
+  //----------------------------------------------------------------------------
   void close();
   //----------------------------------------------------------------------------
   void lock();
